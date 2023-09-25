@@ -8,7 +8,7 @@ body, h1, p {
 body {
     background-color: #000000;
     color: #333;
-    font-family: Arial, sans-serif;
+    font-family: 'Martian Mono', monospace;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -17,7 +17,8 @@ body {
 }
 
 .link{
-    color: #fc7f23
+    color: #fc7f23;
+    padding: 8px;
 }
 
 /* Style the translucent box */
@@ -25,7 +26,7 @@ body {
     background-color: rgba(0, 0, 0, 0.9);
     color: #fff;
     text-align: center;
-    padding: 100px;
+    padding: 50px 100px 50px;
     border-radius: 10px;
     position: relative; /* Add position:relative to allow z-index */
     z-index: 1; /* Ensure the box is above the dots */
@@ -53,6 +54,11 @@ body {
 /* Style the boxes' content */
 .box h2 {
     font-size: 24px;
+}
+
+.verticalDivider {
+    border-left: 2px solid white;
+    height: 200px;
 }
 
 /* Style the grid dots (initially orange) */
