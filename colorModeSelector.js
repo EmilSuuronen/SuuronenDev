@@ -1,9 +1,10 @@
 
-let isLightMode = false
+let isLightMode = true
 
 function changeColor() {
     const bodyColors = document.body
     const dotColors = document.querySelectorAll(".grid-dot");
+    const buttonColor = document.querySelectorAll(".colorModeButton");
 
     if (!isLightMode){
         bodyColors.style.backgroundColor = ("#ffffff")

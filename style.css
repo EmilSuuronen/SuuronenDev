@@ -6,8 +6,8 @@ body, p {
 
 /* Set a background color and text color for the body */
 body {
-    background-color: #000000;
-    color: white;
+    background-color: #ffffff;
+    color: #ffffff;
     font-family: 'Martian Mono', monospace;
     display: flex;
     justify-content: center;
@@ -31,20 +31,30 @@ header {
     margin: 0;
     font-size: 3vh;
 }
+
+.link-container {
+}
+
 .link{
     color: #fc7f23;
     padding: 8px;
     font-size: 2vh;
+    filter: drop-shadow(0px 0px 18px #fc7f23);
+    transition: drop-shadow 2s;
+}
+
+.link:hover {
+    filter: drop-shadow(0px 0px 2px #fc7f23);
 }
 
 .translucent-box {
-    background-color: rgba(0, 0, 0, 0.9);
-    box-shadow: 1px 1px 0px #999,
-    2px 2px 0px #999,
-    3px 3px 0px #999,
-    4px 4px 0px #999,
-    5px 5px 0px #999,
-    6px 6px 0px #999;
+    background-color: rgba(0, 0, 0, 0.8);
+    box-shadow: 1px 1px 0px rgba(138, 137, 137, 0.7),
+    2px 2px 0px rgba(138, 137, 137, 0.7),
+    3px 3px 0px rgba(138, 137, 137, 0.7),
+    4px 4px 0px rgba(138, 137, 137, 0.7),
+    5px 5px 0px rgba(138, 137, 137, 0.7),
+    6px 6px 0px rgba(138, 137, 137, 0.7);
     text-align: center;
     position: relative; /* Add position:relative to allow z-index */
     z-index: 1; /* Ensure the box is above the dots */
@@ -69,7 +79,20 @@ header {
     background-color: rgba(0, 0, 0, 0.0);
     padding: 40px;
     flex: 1;
-    text-align: center;
+    text-align: left;
+}
+
+.box2 {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.0);
+    padding: 40px;
+    flex: 1;
+    text-align: right;
+}
+
+.box:hover {
+
 }
 
 /* Style the boxes' content */
@@ -80,7 +103,7 @@ header {
 .verticalDivider {
     border-left: 2px solid white;
     height: 30vh;
-    max-height: 300px;
+    max-height: 200px;
 }
 
 /* Style the grid dots (initially orange) */
@@ -88,7 +111,7 @@ header {
     position: absolute;
     width: 2px;
     height: 2px;
-    background-color: #ffffff; /* Initial color */
+    background-color: #000000; /* Initial color */
     border-radius: 50%;
     pointer-events: none; /* Ensure the dots don't interfere with cursor events */
 }
@@ -100,16 +123,28 @@ header {
     background-color: rgba(252, 127, 35, 0.8);
     padding: 8px;
     z-index: 1;
-    max-width: 80px;
+    max-width: 10vh;
+    font-size: 1.2vh;
 }
 
 .floatingInfoBoxParagraph {
-    font-size: 1.3vh;
     font-style: italic;
     color: #333
 }
 
 .floatingInfoLink {
-    font-size: 1.3vh;
     font-style: italic;
 }
+
+.colorModeButton {
+    position: absolute;
+    top: 2vh;
+    right: 4vh;
+    z-index: 1;
+    font-size: 3vh;
+    border: none;
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+    padding: 0px;
+}
+

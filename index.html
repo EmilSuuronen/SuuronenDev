@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Martian+Mono&family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="backgroundAnimation.js" defer></script>
     <script src="colorModeSelector.js"></script>
     <title>SuuronenDev</title>
@@ -17,7 +18,6 @@
         <!--<img src="logo.png" alt="Site logo"> -->
         <h2 class="headerh2">Suuronen.dev</h2>
         <a class="link" href="https://github.com/EmilSuuronen">find me</a>
-        <button class="colorModeButton" onclick="changeColor()">color mode</button>
 </header>
 
 <div class="translucent-box">
@@ -28,16 +28,24 @@
                 <div class="box">
                     <!-- Content for the first box goes here -->
                     <h2 class="boxh2">Links</h2>
-                        <a class="link" href="https://github.com/EmilSuuronen">GitHub</a>
-                        <a class="link" href="https://www.linkedin.com/in/emil-suuronen/">LinkedIn</a>
-                        <a class="link" href="mailto:emilsuuronen@gmail.com">Contact me</a>
+                    <div class = "link-container">
+                        <i class = "fa fa-github"></i>
+                        <a class="link" href="https://github.com/EmilSuuronen" target=”_blank”>Github</a>
+                    </div>
+                    <div class = "link-container">
+                        <i class = "fa fa-linkedin-square"></i>
+                        <a class="link" href="https://www.linkedin.com/in/emil-suuronen/" target=”_blank”>LinkedIn</a>
+                    </div>
+                    <div class = "link-container">
+                        <i class = "fa fa-envelope"></i>
+                        <a class="link" href="mailto:emilsuuronen@gmail.com" target=”_blank”>Contact me</a>
+                    </div>
                 </div>
                 <div class="verticalDivider"></div>
-                <div class="box">
+                <div class="box2">
                     <!-- Content for the second box goes here -->
                     <h2 class="boxh2">Projects</h2>
                         <a class="link" href="">Project Gallery</a>
-                        <a class="link" href=""></a>
                 </div>
         </div>
     </div>
@@ -50,5 +58,8 @@
         <a class="floatingInfoLink"href="https://github.com/">GitHub</a>
     </l>
 </div>
+
+<button class="colorModeButton" onclick="changeColor()"><i class="fa fa-lightbulb-o"></i></button>
+
 </body>
 </html>
