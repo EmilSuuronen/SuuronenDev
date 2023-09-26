@@ -1,5 +1,5 @@
 /* Reset some default styles */
-body, h1, p {
+body, p {
     margin: 0;
     padding: 0;
 }
@@ -16,24 +16,46 @@ body {
     overflow: hidden; /* Prevent scrollbars */
 }
 
+header {
+    position: absolute;
+    top: 0;
+    z-index: 1; /* Ensure the box is above the dots */
+    display: flex;
+    align-content: flex-start;
+    background-color: black;
+    width: 100%;
+    padding: 18px;
+}
+
+.headerh2 {
+    color: white;
+    margin: 0;
+    font-size: 3vh;
+}
 .link{
     color: #fc7f23;
     padding: 8px;
+    font-size: 2vh;
 }
 
-/* Style the translucent box */
 .translucent-box {
     background-color: rgba(0, 0, 0, 0.9);
+    box-shadow: 1px 1px 0px #999,
+    2px 2px 0px #999,
+    3px 3px 0px #999,
+    4px 4px 0px #999,
+    5px 5px 0px #999,
+    6px 6px 0px #999;
     color: #fff;
     text-align: center;
-    padding: 50px 100px 50px;
-    border-radius: 10px;
     position: relative; /* Add position:relative to allow z-index */
     z-index: 1; /* Ensure the box is above the dots */
+    padding-left: 100px;
+    padding-right: 100px;
 }
 
-.translucent-box h1 {
-    font-size: 36px;
+.translucent-boxh1 {
+    font-size: 6vh;
 }
 
 .divider {
@@ -44,21 +66,22 @@ body {
 
 /* Style the boxes */
 .box {
-    background-color: rgba(0, 0, 0, 0.0);;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.0);
     padding: 40px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     flex: 1;
-    margin: 0 10px;
+    text-align: center;
 }
 
 /* Style the boxes' content */
-.box h2 {
-    font-size: 24px;
+.boxh2 {
+    font-size: 4vh;
 }
 
 .verticalDivider {
     border-left: 2px solid white;
-    height: 200px;
+    height: 30vh;
 }
 
 /* Style the grid dots (initially orange) */
@@ -69,7 +92,6 @@ body {
     background-color: #ffffff; /* Initial color */
     border-radius: 50%;
     pointer-events: none; /* Ensure the dots don't interfere with cursor events */
-    transition: background-color 0.3s ease;
 }
 
 /* Style the footer */

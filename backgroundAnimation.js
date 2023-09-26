@@ -3,8 +3,10 @@ const dots = [];
 
 function createGridDots() {
     const dotSize = 20; // Adjust the size of each dot
-    const numRows = Math.floor(window.innerHeight / dotSize);
-    const numCols = Math.floor(window.innerWidth / dotSize);
+    const maxRows = 50;    // Maximum number of rows
+    const maxCols = 100;    // Maximum number of columns
+    const numRows = Math.min(maxRows, Math.floor(window.innerHeight / dotSize));
+    const numCols = Math.min(maxCols, Math.floor(window.innerWidth / dotSize));
     const dotSpacingX = window.innerWidth / numCols;
     const dotSpacingY = window.innerHeight / numRows;
 
@@ -39,7 +41,7 @@ function moveDots(event) {
         dot.style.height = `${dotSize}px`;
 
         if (distance < 100) {
-            dot.style.backgroundColor = "#ff8800";// Change color when cursor is nearby
+            //dot.style.backgroundColor = "#ff8800";// Change color when cursor is nearby
             dot.style.width = `${dotSize}px`;
             dot.style.height = `${dotSize}px`;
         } else {
