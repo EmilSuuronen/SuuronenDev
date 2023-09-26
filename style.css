@@ -7,7 +7,7 @@ body, p {
 /* Set a background color and text color for the body */
 body {
     background-color: #000000;
-    color: #333;
+    color: white;
     font-family: 'Martian Mono', monospace;
     display: flex;
     justify-content: center;
@@ -22,13 +22,12 @@ header {
     z-index: 1; /* Ensure the box is above the dots */
     display: flex;
     align-content: flex-start;
-    background-color: black;
+    background-color: #000000;
     width: 100%;
     padding: 18px;
 }
 
 .headerh2 {
-    color: white;
     margin: 0;
     font-size: 3vh;
 }
@@ -46,7 +45,6 @@ header {
     4px 4px 0px #999,
     5px 5px 0px #999,
     6px 6px 0px #999;
-    color: #fff;
     text-align: center;
     position: relative; /* Add position:relative to allow z-index */
     z-index: 1; /* Ensure the box is above the dots */
@@ -82,6 +80,7 @@ header {
 .verticalDivider {
     border-left: 2px solid white;
     height: 30vh;
+    max-height: 300px;
 }
 
 /* Style the grid dots (initially orange) */
@@ -94,11 +93,23 @@ header {
     pointer-events: none; /* Ensure the dots don't interfere with cursor events */
 }
 
-/* Style the footer */
-footer {
-    text-align: center;
-    margin-top: 20px;
-    padding: 10px 0;
-    background-color: #333;
-    color: #fff;
+.floatingInfoBox {
+    position: absolute;
+    right: 1vh;
+    bottom: 1vh;
+    background-color: rgba(252, 127, 35, 0.8);
+    padding: 8px;
+    z-index: 1;
+    max-width: 80px;
+}
+
+.floatingInfoBoxParagraph {
+    font-size: 1.3vh;
+    font-style: italic;
+    color: #333
+}
+
+.floatingInfoLink {
+    font-size: 1.3vh;
+    font-style: italic;
 }

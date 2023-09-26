@@ -41,11 +41,8 @@ function moveDots(event) {
         dot.style.height = `${dotSize}px`;
 
         if (distance < 100) {
-            //dot.style.backgroundColor = "#ff8800";// Change color when cursor is nearby
             dot.style.width = `${dotSize}px`;
             dot.style.height = `${dotSize}px`;
-        } else {
-            dot.style.backgroundColor = "#ffffff";// Reset color
         }
     });
 }
