@@ -3,12 +3,14 @@ const dots = [];
 
 function createGridDots() {
     const dotSize = 20; // Adjust the size of each dot
-    const maxRows = 50;    // Maximum number of rows
-    const maxCols = 100;    // Maximum number of columns
+    const maxRows = 25;    // Maximum number of rows
+    const maxCols = 50;    // Maximum number of columns
     const numRows = Math.min(maxRows, Math.floor(window.innerHeight / dotSize));
     const numCols = Math.min(maxCols, Math.floor(window.innerWidth / dotSize));
     const dotSpacingX = window.innerWidth / numCols;
     const dotSpacingY = window.innerHeight / numRows;
+
+    const fragment = document.createDocumentFragment(); // Use a document fragment for faster DOM insertion
 
     for (let row = 0; row < numRows; row++) {
         for (let col = 0; col < numCols; col++) {
@@ -19,10 +21,13 @@ function createGridDots() {
             dot.className = "grid-dot";
             dot.style.left = `${x}px`;
             dot.style.top = `${y}px`;
-            container.appendChild(dot);
+
+            fragment.appendChild(dot);
             dots.push(dot);
         }
     }
+
+    container.appendChild(fragment); // Append all dots at once
 }
 
 function moveDots(event) {
@@ -39,7 +44,7 @@ function moveDots(event) {
         const dotSize = Math.min(maxDistance / distance, 1) * 8;
         dot.style.width = `${dotSize}px`;
         dot.style.height = `${dotSize}px`;
-
+        
         if (distance < 100) {
             dot.style.width = `${dotSize}px`;
             dot.style.height = `${dotSize}px`;
@@ -47,12 +52,34 @@ function moveDots(event) {
     });
 }
 
-createGridDots(); // Create the grid dots on page load
+let prevWindowWidth = window.innerWidth;
+let prevWindowHeight = window.innerHeight;
+
+function checkZoomLevel() {
+    const newWindowWidth = window.innerWidth;
+    const newWindowHeight = window.innerHeight;
+
+    // Check if the dimensions have changed significantly, indicating a possible zoom
+    if (Math.abs(prevWindowWidth - newWindowWidth) > 5 || Math.abs(prevWindowHeight - newWindowHeight) > 5) {
+        // Reload the page to reload the script
+        location.reload();
+    }
+
+    // Update the previous dimensions
+    prevWindowWidth = newWindowWidth;
+    prevWindowHeight = newWindowHeight;
+}
 
 function reloadPage() {
     location.reload();
 }
 
+window.addEventListener("resize", checkZoomLevel);
+
 window.addEventListener("resize", reloadPage);
 
 container.addEventListener("mousemove", moveDots);
+
+createGridDots(); // Create the grid dots on page load
+
+
