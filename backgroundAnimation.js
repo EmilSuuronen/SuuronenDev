@@ -2,7 +2,7 @@ const container = document.body;
 const dots = [];
 
 function createGridDots() {
-    const dotSize = 20; // Adjust the size of each dot
+    const dotSize = 20;    // Adjust the size of each dot
     const maxRows = 25;    // Maximum number of rows
     const maxCols = 50;    // Maximum number of columns
     const numRows = Math.min(maxRows, Math.floor(window.innerHeight / dotSize));
@@ -26,8 +26,7 @@ function createGridDots() {
             dots.push(dot);
         }
     }
-
-    container.appendChild(fragment); // Append all dots at once
+    container.appendChild(fragment);
 }
 
 function moveDots(event) {
@@ -61,7 +60,6 @@ function checkZoomLevel() {
 
     // Check if the dimensions have changed significantly, indicating a possible zoom
     if (Math.abs(prevWindowWidth - newWindowWidth) > 5 || Math.abs(prevWindowHeight - newWindowHeight) > 5) {
-        // Reload the page to reload the script
         location.reload();
     }
 
@@ -74,11 +72,14 @@ function reloadPage() {
     location.reload();
 }
 
+
 window.addEventListener("resize", checkZoomLevel);
 
 window.addEventListener("resize", reloadPage);
 
 container.addEventListener("mousemove", moveDots);
+
+container.addEventListener("touchmove", moveDots);
 
 createGridDots(); // Create the grid dots on page load
 
