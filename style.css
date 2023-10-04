@@ -25,6 +25,7 @@ header {
     background-color: #000000;
     width: 100%;
     padding: 18px;
+    max-height: 10vh;
 }
 
 .headerh2 {
@@ -64,12 +65,13 @@ header {
 
 .translucent-boxh1 {
     font-size: 6vh;
+    padding: 20px;
 }
 
 .divider {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
+    margin: 20px;
 }
 
 /* Style the boxes */
@@ -148,9 +150,44 @@ header {
     padding: 0px;
 }
 
-@media screen and (max-width: 768px) {
-
+@media screen and (max-width: 480px) {
     .translucent-box{
-        max-width: 50vh;
+        width: 40vh;
+        height: 50vh;
+        padding:40px;
+    }
+
+    .translucent-boxh1 {
+        font-size: 5vh;
+        padding: 0;
+    }
+
+    .divider {
+        flex-direction: column;
+    }
+
+    .box {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        flex: 1;
+        text-align: left;
+        font-size: 2vh;
+    }
+
+    .box2 {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        flex: 1;
+        text-align: left;
+    }
+
+    .boxh2 {
+        font-size: 3vh;
+    }
+
+    .verticalDivider {
+        display: none;
     }
 }
