@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Suuronen.dev, Personal website and portfolio of Emil Suuronen">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Martian+Mono&family=Roboto+Condensed:wght@300&display=swap"
+          rel="stylesheet">
+    <script src="backgroundAnimation.js" async></script>
+    <script src="colorModeSelector.js"></script>
+    <title>SuuronenDev</title>
+</head>
+<body class="galleryBody">
+
+<header>
+    <!--<img src="logo.png" alt="Site logo"> -->
+    <a href="https://suuronen.dev/" class="headerLink"><h2 class="headerh2">Suuronen.dev</h2></a>
+    <button class="colorModeButton" onclick="changeColor()"><i class="fa fa-lightbulb-o"></i></button>
+</header>
+
+<div class="translucent-box-project-gallery">
+    <h2>Projects</h2>
+    <hr class="solid">
+    <h3>Personal projects</h3>
+    <hr class="solid">
+    <h3>School projects</h3>
+    <hr class="solid">
+    <h3>Other projects</h3>
+    <div class="flex-row-div">
+        <div class="flex-div-item-column" onclick="location.href='https://www.snapchat.com/add/empuhtin';" style="cursor:pointer;">
+            <h4>Snapchat</h4>
+            <i class="fa-brands fa-square-snapchat" style="color: #FFFC00; font-size: 50px;"></i>
+            <p>Filters in Snapchat</p>
+        </div>
+        <div class="flex-div-item-column" onclick="location.href='https://open.spotify.com/artist/5Xuol061Xde1ge1RgQowKr';" style="cursor:pointer;">
+            <h4>Spotify</h4>
+            <i class="fa-brands fa-spotify" style="color: #1DB954; font-size: 50px;"></i>
+            <p>Music in Spotify</p>
+        </div>
+        <div class="flex-div-item-column" onclick="location.href='https://soundcloud.com/meemil';" style="cursor:pointer;">
+            <h4>Soundcloud</h4>
+            <i class="fa-brands fa-soundcloud soundcloud" style="color: #ff7200; font-size: 50px;"></i>
+            <p>Music in Soundcloud</p>
+        </div>
+    </div>
+    <hr class="solid">
+    <p>
+    </p>
+</div>
+</body>
+</html>

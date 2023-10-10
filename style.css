@@ -1,7 +1,8 @@
 /* Reset some default styles */
-body, p {
+html, body {
     margin: 0;
     padding: 0;
+    height: 100%;
 }
 
 /* Set a background color and text color for the body */
@@ -10,27 +11,31 @@ body {
     color: #ffffff;
     font-family: 'Martian Mono', monospace;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    overflow: hidden; /* Prevent scrollbars */
+    min-height: 100%;
+    overflow-x: hidden;
 }
 
 header {
-    position: absolute;
-    top: 0;
     z-index: 1; /* Ensure the box is above the dots */
     display: flex;
-    align-content: flex-start;
     background-color: #000000;
     width: 100%;
     padding: 18px;
-    max-height: 10vh;
+    height: 4vh;
+    align-items: center;
 }
 
 .headerh2 {
-    margin: 0;
+    padding: 8px;
     font-size: 3vh;
+}
+
+.headerLink {
+    color: white;
+    text-decoration: none;
 }
 
 .link-container {
@@ -57,10 +62,43 @@ header {
     5px 5px 0px rgba(138, 137, 137, 0.7),
     6px 6px 0px rgba(138, 137, 137, 0.7);
     text-align: center;
-    position: relative; /* Add position:relative to allow z-index */
     z-index: 1; /* Ensure the box is above the dots */
-    padding-left: 100px;
-    padding-right: 100px;
+    margin: auto;
+}
+
+.translucent-box-project-gallery {
+    background-color: rgba(0, 0, 0, 0.8);
+    box-shadow: 1px 1px 0px rgba(138, 137, 137, 0.7),
+    2px 2px 0px rgba(138, 137, 137, 0.7),
+    3px 3px 0px rgba(138, 137, 137, 0.7),
+    4px 4px 0px rgba(138, 137, 137, 0.7),
+    5px 5px 0px rgba(138, 137, 137, 0.7),
+    6px 6px 0px rgba(138, 137, 137, 0.7);
+    text-align: center;
+    z-index: 1; /* Ensure the box is above the dots */
+    margin: auto;
+    width: 80%;
+
+}
+
+.flex-row-div {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.flex-div-item-column {
+    flex: 1;
+    flex-direction: column;
+    max-width: 100%;
+    background-color: rgba(143, 143, 143, 0.55);
+    border-radius: 12px;
+    margin: 10px;
+    transition: 0.2s;
+}
+
+.flex-div-item-column:hover {
+    flex: 1.2;
+    box-shadow: 0px 0px 12px 4px rgba(255, 136, 0, 0.4);
 }
 
 .translucent-boxh1 {
@@ -140,15 +178,21 @@ header {
 
 .colorModeButton {
     position: absolute;
-    top: 2vh;
     right: 4vh;
-    z-index: 1;
     font-size: 3vh;
     border: none;
     background-color: rgba(0,0,0,0.8);
     color: white;
     padding: 0px;
 }
+
+hr.solid {
+    color: #ffffff;
+    max-width: 95%;
+    margin-top: 48px;
+    margin-bottom: 48px;
+}
+
 
 @media screen and (max-width: 480px) {
     .translucent-box{
@@ -189,5 +233,11 @@ header {
 
     .verticalDivider {
         display: none;
+    }
+
+    .flex-row-div {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
     }
 }
