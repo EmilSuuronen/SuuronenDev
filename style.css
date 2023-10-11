@@ -12,9 +12,7 @@ body {
     font-family: 'Martian Mono', monospace;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    min-height: 100%;
     overflow-x: hidden;
 }
 
@@ -62,8 +60,9 @@ header {
     5px 5px 0px rgba(138, 137, 137, 0.7),
     6px 6px 0px rgba(138, 137, 137, 0.7);
     text-align: center;
-    z-index: 1; /* Ensure the box is above the dots */
+    z-index: 1;
     margin: auto;
+    width: 50%;
 }
 
 .translucent-box-project-gallery {
@@ -74,11 +73,19 @@ header {
     4px 4px 0px rgba(138, 137, 137, 0.7),
     5px 5px 0px rgba(138, 137, 137, 0.7),
     6px 6px 0px rgba(138, 137, 137, 0.7);
+    margin: 40px;
     text-align: center;
-    z-index: 1; /* Ensure the box is above the dots */
-    margin: auto;
+    padding: 20px;
+    z-index: 1;
     width: 80%;
+}
 
+.translucent-box-project-gallery p {
+    font-size: 1.5vh;
+}
+
+.translucent-box-project-gallery h3 {
+    text-align: start;
 }
 
 .flex-row-div {
@@ -89,21 +96,20 @@ header {
 .flex-div-item-column {
     flex: 1;
     flex-direction: column;
-    max-width: 100%;
     background-color: rgba(143, 143, 143, 0.55);
     border-radius: 12px;
-    margin: 10px;
+    margin: 30px;
     transition: 0.2s;
 }
 
 .flex-div-item-column:hover {
     flex: 1.2;
     box-shadow: 0px 0px 12px 4px rgba(255, 136, 0, 0.4);
+    margin: 25px;
 }
 
 .translucent-boxh1 {
     font-size: 6vh;
-    padding: 20px;
 }
 
 .divider {
@@ -194,16 +200,16 @@ hr.solid {
 }
 
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 768px) {
     .translucent-box{
-        width: 40vh;
-        height: 50vh;
         padding:40px;
     }
 
-    .translucent-boxh1 {
-        font-size: 5vh;
-        padding: 0;
+
+    .flex-div-item-column:hover {
+        flex: 1;
+        box-shadow: 0px 0px 12px 4px rgba(255, 136, 0, 0.4);
+        margin: 30px;
     }
 
     .divider {
@@ -239,5 +245,9 @@ hr.solid {
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
+    }
+
+    .floatingInfoBox {
+        display: none;
     }
 }
