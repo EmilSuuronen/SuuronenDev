@@ -1,8 +1,8 @@
-/* Reset some default styles */
-html, body {
+html, body{
     margin: 0;
     padding: 0;
     height: 100%;
+    scroll-behavior: smooth;
 }
 
 /* Set a background color and text color for the body */
@@ -13,6 +13,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
     overflow-x: hidden;
 }
 
@@ -51,40 +52,21 @@ header {
     filter: drop-shadow(0px 0px 2px #fc7f23);
 }
 
-.translucent-box {
+.translucent-box{
     background-color: rgba(0, 0, 0, 0.8);
-    box-shadow: 1px 1px 0px rgba(138, 137, 137, 0.7),
-    2px 2px 0px rgba(138, 137, 137, 0.7),
-    3px 3px 0px rgba(138, 137, 137, 0.7),
-    4px 4px 0px rgba(138, 137, 137, 0.7),
-    5px 5px 0px rgba(138, 137, 137, 0.7),
-    6px 6px 0px rgba(138, 137, 137, 0.7);
-    text-align: center;
-    z-index: 1;
-    margin: auto;
-    width: 50%;
-}
-
-.translucent-box-project-gallery {
-    background-color: rgba(0, 0, 0, 0.8);
-    box-shadow: 1px 1px 0px rgba(138, 137, 137, 0.7),
-    2px 2px 0px rgba(138, 137, 137, 0.7),
-    3px 3px 0px rgba(138, 137, 137, 0.7),
-    4px 4px 0px rgba(138, 137, 137, 0.7),
-    5px 5px 0px rgba(138, 137, 137, 0.7),
-    6px 6px 0px rgba(138, 137, 137, 0.7);
-    margin: 40px;
+    box-shadow: 5px 5px 0px 0px rgba(0, 0, 0, 0.5);
+    margin: 20px;
     text-align: center;
     padding: 20px;
     z-index: 1;
     width: 80%;
 }
 
-.translucent-box-project-gallery p {
+.translucent-box p {
     font-size: 1.5vh;
 }
 
-.translucent-box-project-gallery h3 {
+.translucent-box h3 {
     text-align: start;
 }
 
@@ -108,7 +90,8 @@ header {
     margin: 25px;
 }
 
-.translucent-boxh1 {
+.translucent-box h1 {
+    overflow: clip;
     font-size: 6vh;
 }
 
@@ -150,6 +133,7 @@ header {
     border-left: 2px solid white;
     height: 30vh;
     max-height: 200px;
+    margin: auto;
 }
 
 /* Style the grid dots (initially orange) */
@@ -173,13 +157,30 @@ header {
     font-size: 1.2vh;
 }
 
-.floatingInfoBoxParagraph {
+footer {
+    z-index: 1; /* Ensure the box is above the dots */
+    display: flex;
+    background-color: rgba(252, 127, 35, 0.8);
+    width: 100%;
+    padding: 4px;
+    height: 4vh;
+    align-items: center;
     font-style: italic;
-    color: #333
+    color: #333;
+    justify-content: end;
+    margin-top: 150px;
 }
 
-.floatingInfoLink {
+footer p {
+    font-size: 12px;
+    padding: 12px
+}
+
+footer a {
+    font-size: 12px;
+    padding: 12px;
     font-style: italic;
+
 }
 
 .colorModeButton {
@@ -203,7 +204,13 @@ hr.solid {
 @media screen and (max-width: 768px) {
     .translucent-box{
         padding:40px;
+        margin: 20px;
     }
+
+    .translucent-box h1 {
+        font-size: 3vh;
+    }
+
 
 
     .flex-div-item-column:hover {
@@ -245,9 +252,5 @@ hr.solid {
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
-    }
-
-    .floatingInfoBox {
-        display: none;
     }
 }

@@ -7,50 +7,131 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Martian+Mono&family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Martian+Mono&family=Roboto+Condensed:wght@300&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="backgroundAnimation.js" async></script>
     <script src="colorModeSelector.js"></script>
     <title>SuuronenDev</title>
 </head>
-<body>
+<body class="homeBody">
 
 <header>
-        <!--<img src="logo.png" alt="Site logo"> -->
-        <a href="https://suuronen.dev/" class="headerLink"><h2 class="headerh2">Suuronen.dev</h2></a>
-        <button class="colorModeButton" onclick="changeColor()"><i class="fa fa-lightbulb-o"></i></button>
+    <!--<img src="logo.png" alt="Site logo"> -->
+    <a href="https://suuronen.dev/" class="headerLink"><h2 class="headerh2">Suuronen.dev</h2></a>
+    <button class="colorModeButton" onclick="changeColor()"><i class="fa fa-lightbulb-o"></i></button>
 </header>
 
 <div class="translucent-box">
-    <h1 class="translucent-boxh1">SuuronenDev</h1>
-            <div class="divider">
-                <div class="box">
-                    <h2 class="boxh2">Links</h2>
-                    <div class = "link-container">
-                        <i class = "fa fa-github"></i>
-                        <a class="link" href="https://github.com/EmilSuuronen" target=”_blank”>Github</a>
-                    </div>
-                    <div class = "link-container">
-                        <i class = "fa fa-linkedin-square"></i>
-                        <a class="link" href="https://www.linkedin.com/in/emil-suuronen/" target=”_blank”>LinkedIn</a>
-                    </div>
-                    <div class = "link-container">
-                        <i class = "fa fa-envelope"></i>
-                        <a class="link" href="mailto:emilsuuronen@gmail.com" target=”_blank”>Contact me</a>
-                    </div>
-                </div>
-                <div class="verticalDivider"></div>
-                <div class="box2">
-                    <h2 class="boxh2">Projects</h2>
-                        <a class="link" href="projectGallery.html">Project Gallery</a>
-                </div>
+    <h1>SuuronenDev</h1>
+</div>
+
+<div class="translucent-box">
+    <div class="divider">
+        <div class="box">
+            <h2 class="boxh2">Links</h2>
+            <div class="link-container">
+                <i class="fa-brands fa-github"></i>
+                <a class="link" href="https://github.com/EmilSuuronen" target=”_blank”>Github</a>
+            </div>
+            <div class="link-container">
+                <i class="fa-brands fa-linkedin"></i>
+                <a class="link" href="https://www.linkedin.com/in/emil-suuronen/" target=”_blank”>LinkedIn</a>
+            </div>
+            <div class="link-container">
+                <i class="fa fa-envelope"></i>
+                <a class="link" href="mailto:emilsuuronen@gmail.com" target=”_blank”>Contact me</a>
+            </div>
+        </div>
+        <div class="verticalDivider"></div>
+        <div class="box2">
+            <h2 class="boxh2">Projects</h2>
+            <div class="link-container">
+                <i class="fa-regular fa-folder"></i>
+                <a class="link" href="#projects">Project Gallery</a>
+            </div>
         </div>
     </div>
-<div class="floatingInfoBox">
-    <l>
-        <p class="floatingInfoBoxParagraph">Emil Suuronen 2023©</p>
-        <a class="floatingInfoLink"href="https://github.com/EmilSuuronen/SuuronenDev">GitHub</a>
-    </l>
 </div>
+
+<div class="translucent-box" id="projects">
+    <h2>Projects</h2>
+    <hr class="solid">
+    <h3>Personal projects</h3>
+    <div class="flex-row-div">
+        <div class="flex-div-item-column" onclick="location.href='';" style="cursor:pointer;">
+            <h4>Title</h4>
+
+            <p></p>
+        </div>
+        <div class="flex-div-item-column" onclick="location.href='';" style="cursor:pointer;">
+            <h4>Title</h4>
+
+            <p></p>
+        </div>
+        <div class="flex-div-item-column" onclick="location.href='';" style="cursor:pointer;">
+            <h4>Title</h4>
+
+            <p></p>
+        </div>
+        <div class="flex-div-item-column" onclick="location.href='';" style="cursor:pointer;">
+            <h4>Title</h4>
+
+            <p></p>
+        </div>
+    </div>
+    <hr class="solid">
+    <h3>School projects</h3>
+    <div class="flex-row-div">
+        <div class="flex-div-item-column" onclick="location.href='';" style="cursor:pointer;">
+            <h4>Title</h4>
+
+            <p></p>
+        </div>
+        <div class="flex-div-item-column" onclick="location.href='';" style="cursor:pointer;">
+            <h4>Title</h4>
+
+            <p></p>
+        </div>
+        <div class="flex-div-item-column" onclick="location.href='';" style="cursor:pointer;">
+            <h4>Title</h4>
+
+            <p></p>
+
+        </div>
+        <div class="flex-div-item-column" onclick="location.href='';" style="cursor:pointer;">
+            <h4>Title</h4>
+
+            <p></p>
+        </div>
+    </div>
+
+    <hr class="solid">
+    <h3>Other projects</h3>
+    <div class="flex-row-div">
+        <div class="flex-div-item-column" onclick="location.href='https://www.snapchat.com/add/empuhtin';" style="cursor:pointer;">
+            <h4>Snapchat</h4>
+            <i class="fa-brands fa-square-snapchat" style="color: #FFFC00; font-size: 50px;"></i>
+            <p>Filters in Snapchat</p>
+        </div>
+        <div class="flex-div-item-column" onclick="location.href='https://open.spotify.com/artist/5Xuol061Xde1ge1RgQowKr';" style="cursor:pointer;">
+            <h4>Spotify</h4>
+            <i class="fa-brands fa-spotify" style="color: #1DB954; font-size: 50px;"></i>
+            <p>Music in Spotify</p>
+        </div>
+        <div class="flex-div-item-column" onclick="location.href='https://soundcloud.com/meemil';" style="cursor:pointer;">
+            <h4>Soundcloud</h4>
+            <i class="fa-brands fa-soundcloud soundcloud" style="color: #ff7200; font-size: 50px;"></i>
+            <p>Music in Soundcloud</p>
+        </div>
+    </div>
+    <hr class="solid">
+</div>
+
+<footer>
+    <p class="floatingInfoBoxParagraph">Emil Suuronen 2023©</p>
+    <a class="floatingInfoLink" href="https://github.com/EmilSuuronen/SuuronenDev">GitHub</a>
+</footer>
+
 </body>
 </html>

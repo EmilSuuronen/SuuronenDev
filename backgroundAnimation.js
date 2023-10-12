@@ -2,15 +2,13 @@ const container = document.body;
 const dots = [];
 
 function createGridDots() {
-    const dotSize = 10;    // Adjust the size of each dot
-    const maxRows = 25;    // Maximum number of rows
-    const maxCols = 50;    // Maximum number of columns
-    const numRows = Math.min(maxRows, Math.floor(window.innerHeight / dotSize));
-    const numCols = Math.min(maxCols, Math.floor(window.innerWidth / dotSize));
+    const dotSize = 35;    // Adjust the size of each dot
+    const numRows = (document.body.scrollHeight / 40);
+    const numCols = (window.innerWidth / 40);
     const dotSpacingX = window.innerWidth / numCols;
-    const dotSpacingY = window.innerHeight / numRows;
+    const dotSpacingY = document.body.scrollHeight / numRows;
 
-    const fragment = document.createDocumentFragment(); // Use a document fragment for faster DOM insertion
+    const fragment = document.createDocumentFragment();
 
     for (let row = 0; row < numRows; row++) {
         for (let col = 0; col < numCols; col++) {
@@ -31,7 +29,6 @@ function createGridDots() {
 
 function moveDots(event) {
     dots.forEach((dot) => {
-
         const maxDistance = 50;
 
         const dotX = parseInt(dot.style.left);
@@ -47,33 +44,14 @@ function moveDots(event) {
     });
 }
 
-let prevWindowWidth = window.innerWidth;
-let prevWindowHeight = window.innerHeight;
-
-function checkZoomLevel() {
-    const newWindowWidth = window.innerWidth;
-    const newWindowHeight = window.innerHeight;
-
-    // Check if the dimensions have changed significantly, indicating a possible zoom
-    if (Math.abs(prevWindowWidth - newWindowWidth) > 5 || Math.abs(prevWindowHeight - newWindowHeight) > 5) {
-        location.reload();
-    }
-
-    // Update the previous dimensions
-    prevWindowWidth = newWindowWidth;
-    prevWindowHeight = newWindowHeight;
-}
-
 function reloadPage() {
     location.reload();
 }
 
+document.addEventListener("resize", reloadPage);
 
-window.addEventListener("resize", checkZoomLevel);
+container.addEventListener("mousemove", moveDots);
 
-window.addEventListener("resize", reloadPage);
-
-document.addEventListener("mousemove", moveDots);
 
 createGridDots();
 
