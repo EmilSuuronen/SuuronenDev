@@ -214,6 +214,7 @@ hr.solid {
     .translucent-box{
         padding:40px;
         margin: 20px;
+        width: 80%;
     }
 
     .translucent-box h1 {

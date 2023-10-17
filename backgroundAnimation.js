@@ -3,7 +3,7 @@ const dots = [];
 
 
 function createGridDots() {
-    const dotSize = 35;    // Adjust the size of each dot
+    const dotSize = 35;
     const numRows = (document.body.scrollHeight / 40);
     const numCols = (window.innerWidth / 40);
     const dotSpacingX = window.innerWidth / numCols;
@@ -20,9 +20,9 @@ function createGridDots() {
             dot.className = "grid-dot";
             dot.style.left = `${x}px`;
             dot.style.top = `${y}px`;
-
-            fragment.appendChild(dot);
+            
             dots.push(dot);
+            fragment.appendChild(dot);
         }
     }
     container.appendChild(fragment);
@@ -50,10 +50,9 @@ function reloadPage() {
 }
 
 document.addEventListener("resize", reloadPage);
-
-document.addEventListener("mousemove", moveDots);
-
+container.addEventListener("mousemove", moveDots);
 
 createGridDots();
+
 
 
