@@ -1,6 +1,7 @@
 const container = document.body;
 const dots = [];
 
+
 function createGridDots() {
     const dotSize = 35;    // Adjust the size of each dot
     const numRows = (document.body.scrollHeight / 40);
@@ -50,7 +51,7 @@ function reloadPage() {
 
 document.addEventListener("resize", reloadPage);
 
-container.addEventListener("mousemove", moveDots);
+document.addEventListener("mousemove", moveDots);
 
 
 createGridDots();
