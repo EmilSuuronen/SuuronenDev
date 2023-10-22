@@ -1,11 +1,13 @@
 html, body{
     scroll-behavior: smooth;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    min-height: 100%;
 }
 
 body {
-    background-color: #ffffff;
+    background-color: #f0f0f0;
     color: #ffffff;
     font-family: 'Martian Mono', monospace;
     display: flex;
@@ -13,8 +15,23 @@ body {
     align-items: center;
     overflow-x: hidden;
     height: auto;
+    animation: 0.5s blurAnimation;
 }
 
+@keyframes blurAnimation {
+    0% {
+        filter: blur(10px);
+    }
+    100% {
+        filter: blur(0px);
+    }
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 
 header {
     z-index: 1; /* Ensure the box is above the dots */
@@ -66,10 +83,6 @@ header {
     font-size: 1.5vh;
 }
 
-.translucent-box h3 {
-    text-align: start;
-}
-
 .flex-row-div {
     display: flex;
     justify-content: space-evenly;
@@ -78,7 +91,7 @@ header {
 .flex-div-item-column {
     flex: 1;
     flex-direction: column;
-    background-color: rgba(143, 143, 143, 0.55);
+    background-color: rgb(68, 67, 67);
     border-radius: 12px;
     padding: 16px;
     margin: 30px;
@@ -86,9 +99,7 @@ header {
 }
 
 .flex-div-item-column:hover {
-    flex: 1.2;
     box-shadow: 0px 0px 12px 4px rgba(255, 136, 0, 0.4);
-    margin: 25px;
 }
 
 .translucent-box h1 {
@@ -121,10 +132,6 @@ header {
     text-align: right;
 }
 
-.box:hover {
-
-}
-
 /* Style the boxes' content */
 .boxh2 {
     font-size: 4vh;
@@ -135,6 +142,20 @@ header {
     height: 30vh;
     max-height: 200px;
     margin: auto;
+}
+
+.tag-div {
+    background-color: rgba(128, 128, 128, 0.5);
+    border-radius: 10vh;
+    color: white;
+    padding: 8px;
+    font-size: 12px;
+}
+
+.flex-row-div-tags {
+    display: flex;
+    justify-content: space-evenly;
+
 }
 
 .grid-dot {
@@ -158,7 +179,7 @@ header {
 }
 
 footer {
-    z-index: 1; /* Ensure the box is above the dots */
+    z-index: 1;
     display: flex;
     background-color: rgba(252, 127, 35, 0.8);
     width: 100%;
@@ -170,6 +191,7 @@ footer {
     justify-content: end;
     margin-top: 30px;
 }
+
 
 footer p {
     font-size: 12px;
@@ -208,7 +230,6 @@ hr.solid {
     margin-top: 48px;
     margin-bottom: 48px;
 }
-
 
 @media screen and (max-width: 768px) {
     .translucent-box{
