@@ -69,18 +69,44 @@ header {
     filter: drop-shadow(0px 0px 2px #fc7f23);
 }
 
-.translucent-box{
+.devicon {
+    text-align: center;
+    padding: 12px;
+    font-size: 32px;
+    flex: 1;
+    transition: 0.3s;
+}
+
+.devicon:hover {
+    transform: scale(1.2);
+    flex: 1.2;
+}
+
+.translucent-box {
     background-color: rgba(0, 0, 0, 0.8);
     box-shadow: 5px 5px 0px 0px rgba(0, 0, 0, 0.5);
     margin: 20px;
-    text-align: center;
     padding: 20px;
     z-index: 1;
-    width: 50%;
+    width: 60%;
+}
+
+#tb-heading {
+    text-align: center;
+    width: 80%;
+}
+
+#tb-info {
+    text-align: center;
+}
+
+#skills-container {
+    display: flex;
+    flex-direction: column;
 }
 
 .translucent-box p {
-    font-size: 1.5vh;
+    font-size: 2vh;
 }
 
 .flex-row-div {
@@ -92,10 +118,34 @@ header {
     flex: 1;
     flex-direction: column;
     background-color: rgb(68, 67, 67);
-    border-radius: 12px;
     padding: 16px;
     margin: 30px;
     transition: 0.2s;
+}
+
+.flex-div-skills-container {
+    display: flex;
+    flex-direction: column;
+    flex-flow: wrap;
+    flex: 1;
+    align-items: center;
+    justify-content: start;
+    margin: 12px;
+    background-color: #444444;
+}
+
+.skills-heading {
+    font-size: 2.3vh;
+    margin: 12px;
+    width: 150px;
+    text-align: start;
+    font-weight: bold;
+}
+.flex-div-skills-container-icons {
+    padding: 12px;
+    display: flex;
+    flex-flow: wrap;
+    width: 100%;
 }
 
 .flex-div-item-column:hover {
@@ -120,7 +170,6 @@ header {
     background-color: rgba(0, 0, 0, 0.0);
     padding: 40px;
     flex: 1;
-    text-align: left;
 }
 
 .box2 {
@@ -129,7 +178,6 @@ header {
     background-color: rgba(0, 0, 0, 0.0);
     padding: 40px;
     flex: 1;
-    text-align: right;
 }
 
 /* Style the boxes' content */
@@ -235,6 +283,10 @@ hr.solid {
     .translucent-box{
         padding:40px;
         margin: 20px;
+        width: 80%;
+    }
+
+    #skills-container {
         width: 80%;
     }
 

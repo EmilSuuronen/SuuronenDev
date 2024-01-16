@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Martian+Mono&family=Roboto+Condensed:wght@300&display=swap"
           rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.10.1/devicon.min.css">
     <script src="script/backgroundAnimation.js" async></script>
     <script src="script/colorModeSelector.js"></script>
     <title>SuuronenDev</title>
@@ -20,11 +21,11 @@
     <a href="https://suuronen.dev/" class="headerLink"><h2 class="headerh2">Suuronen.dev</h2></a>
     <button class="colorModeButton" onclick="changeColor()"><i class="fa-solid fa-lightbulb"></i></button>
 </header>
-<div class="translucent-box">
+<div class="translucent-box" id="tb-heading">
     <h1>SuuronenDev</h1>
 </div>
 
-<div class="translucent-box">
+<div class="translucent-box" id="tb-info">
     <h2>About me</h2>
     <p>
         Hello, im Emil. I'm a 3rd year ICT-engineering student especially interested in mobile and
@@ -33,9 +34,6 @@
     <p>
         Here you can find some of my work and my contact information.
     </p>
-</div>
-
-<div class="translucent-box">
     <div class="divider">
         <div class="box">
             <h2 class="boxh2">Contact</h2>
@@ -63,11 +61,92 @@
     </div>
 </div>
 
+<div class="translucent-box" id="skills-container">
+    <h2> Skills</h2>
+    <div class="flex-div-skills-container">
+        <div class="skills-heading">Web</div>
+        <div class="flex-div-skills-container-icons">
+            <div class="devicon">
+                <i class="devicon-react-original colored"></i>
+                <p>React</p>
+            </div>
+            <div class="devicon">
+                <i class="devicon-html5-plain-wordmark colored"></i>
+                <p>HTML</p>
+            </div>
+            <div class="devicon">
+                <i class="devicon-css3-plain-wordmark colored"></i>
+                <p>CSS</p>
+            </div>
+            <div class="devicon">
+                <i class="devicon-nodejs-plain-wordmark colored"></i>
+                <p>Node.js</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-div-skills-container">
+        <div class="skills-heading">Programming</div>
+        <div class="flex-div-skills-container-icons">
+            <div class="devicon">
+                <i class="devicon-kotlin-plain colored"></i>
+                <p>Kotlin</p>
+            </div>
+            <div class="devicon">
+                <i class="devicon-swift-plain colored"></i>
+                <p>Swift</p>
+            </div>
+            <div class="devicon">
+                <i class="devicon-javascript-plain colored"></i>
+                <p>JavaScript</p>
+            </div>
+            <div class="devicon">
+                <i class="devicon-java-plain colored"></i>
+                <p>Java</p>
+            </div>
+            <div class="devicon">
+                <i class="devicon-python-plain colored"></i>
+                <p>Python</p>
+            </div>
+            <div class="devicon">
+                <i class="devicon-csharp-plain colored"></i>
+                <p>C#</p>
+            </div>
+
+            <div class="devicon">
+                <i class="devicon-c-plain colored"></i>
+                <p>C</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-div-skills-container">
+        <div class="skills-heading">Platforms</div>
+        <div class="flex-div-skills-container-icons">
+            <div class="devicon">
+                <i class="devicon-android-plain colored"></i>
+                <p>Android</p>
+            </div>
+            <div class="devicon">
+                <i class="devicon-apple-original colored"></i>
+                <p>iOS</p>
+            </div>
+            <div class="devicon">
+                <i class="devicon-windows8-original colored"></i>
+                <p>Windows</p>
+            </div>
+            <div class="devicon">
+                <i class="devicon-linux-plain colored"></i>
+                <p>Linux</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="translucent-box" id="projects">
     <h2>Projects</h2>
     <hr class="solid">
     <h3>Personal projects</h3>
-    <div class="flex-row-div">
         <div class="flex-div-item-column" onclick="location.href='https://github.com/EmilSuuronen/SuuronenDev';" style="cursor:pointer;">
             <h4>Suuronen.dev</h4>
             <img class="project-img" src="./res/projectImg/suuronendev.png" alt="projectImg">
@@ -78,7 +157,7 @@
             <img class="project-img" src="./res/projectImg/aimpracticeimg.png" alt="projectImg">
             <p>JavaScript game to practice mouse movements</p>
         </div>
-    </div>
+
     <hr class="solid">
     <h3>School projects</h3>
     <h4 style="text-decoration: underline">Mobile</h4>
