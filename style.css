@@ -100,7 +100,7 @@ header {
     text-align: center;
 }
 
-.tb-other {
+#tb-other {
     text-align: center;
 }
 
@@ -212,8 +212,8 @@ header {
 
 .grid-dot {
     position: absolute;
-    width: 2px;
-    height: 2px;
+    width: 3px;
+    height: 3px;
     background-color: #000000;
     border-radius: 50%;
     pointer-events: none; /* Ensure the dots don't interfere with cursor events */

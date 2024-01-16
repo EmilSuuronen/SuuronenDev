@@ -1,10 +1,11 @@
 const container = document.body;
-const dots = [];
+let dots = [];
+
+let dotSize = 35;
 
 function createGridDots() {
-    const dotSize = 35;
-    const numRows = (document.body.scrollHeight/ 40);
-    const numCols = (window.innerWidth / 40);
+    const numRows = (document.body.scrollHeight/ 80);
+    const numCols = (window.innerWidth / 80);
     const dotSpacingX = window.innerWidth / numCols;
     const dotSpacingY = document.body.scrollHeight / numRows;
 
@@ -36,7 +37,7 @@ function moveDots(event) {
         const dy = event.pageY - dotY;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        let dotSize = Math.min(maxDistance / distance, 1) * 8;
+        dotSize = Math.min(maxDistance / distance, 1) * 8;
 
         dot.style.width = `${dotSize}px`;
         dot.style.height = `${dotSize}px`;
@@ -51,6 +52,8 @@ document.addEventListener("resize", reloadPage);
 container.addEventListener("mousemove", moveDots);
 
 createGridDots();
+
+
 
 
 
