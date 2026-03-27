@@ -1,9 +1,13 @@
 import { useRef } from "react";
 
 import BrowserApp from "./apps/BrowserApp";
+import CalculatorApp from "./apps/CalculatorApp";
 import TerminalApp from "./apps/TerminalApp";
+import DesktopIcons from "./components/desktop/DesktopIcons";
 import DesktopWindow from "./components/desktop/DesktopWindow";
 import Taskbar from "./components/desktop/Taskbar";
+import TopBar from "./components/desktop/TopBar";
+import { useDesktopIcons } from "./hooks/useDesktopIcons";
 import { useElementSize } from "./hooks/useElementSize";
 import { useWindowManager } from "./hooks/useWindowManager";
 import type { WindowId } from "./types/desktop";
@@ -13,12 +17,17 @@ function renderWindowApp(windowId: WindowId) {
     return <TerminalApp />;
   }
 
+  if (windowId === "calculator") {
+    return <CalculatorApp />;
+  }
+
   return <BrowserApp />;
 }
 
 function App() {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const bounds = useElementSize(workspaceRef);
+  const { icons, moveIcon, selectedIconId, setSelectedIconId } = useDesktopIcons(bounds);
   const { windows, closeWindow, focusWindow, minimizeWindow, openWindow, updateWindowRect } =
     useWindowManager(bounds);
 
@@ -31,15 +40,16 @@ function App() {
 
   return (
     <div className="desktop-root">
+      <TopBar onOpenWindow={openWindow} />
+
       <main ref={workspaceRef} className="desktop-workspace">
-        <div className="desktop-backdrop-copy">
-          <p className="desktop-kicker">suuronen.dev / desktop prototype</p>
-          <h1>Windowed web portfolio, not a scrolling landing page.</h1>
-          <p>
-            First pass: a fixed desktop, Ubuntu-like bottom bar, a browser workspace, and a
-            terminal shell that can be dragged, resized, closed, and reopened.
-          </p>
-        </div>
+        <DesktopIcons
+          icons={icons}
+          onMoveIcon={moveIcon}
+          onOpenIcon={openWindow}
+          onSelectIcon={setSelectedIconId}
+          selectedIconId={selectedIconId}
+        />
 
         {openWindows.map((windowState) => (
           <DesktopWindow

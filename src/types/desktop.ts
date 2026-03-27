@@ -1,4 +1,4 @@
-export type WindowId = "terminal" | "browser";
+export type WindowId = "terminal" | "browser" | "calculator";
 
 export type Point = {
   x: number;
@@ -36,6 +36,36 @@ export type DesktopLauncher = {
   subtitle: string;
 };
 
+export type DesktopIconState = {
+  id: WindowId;
+  icon: string;
+  label: string;
+  position: Point;
+};
+
+export type DesktopMenuItem = {
+  action?:
+    | {
+        type: "open_window";
+        windowId: WindowId;
+      }
+    | {
+        type: "none";
+      };
+  description?: string;
+  href?: string;
+  icon?:
+    | "mail"
+    | "github"
+    | "linkedin";
+  label: string;
+};
+
+export type DesktopMenu = {
+  items: DesktopMenuItem[];
+  label: string;
+};
+
 export type BrowserCard = {
   title: string;
   description: string;
@@ -60,4 +90,16 @@ export type TerminalLine =
   | {
       kind: "output" | "accent" | "error";
       value: string;
+    }
+  | {
+      href: string;
+      kind: "link";
+      label: string;
+      value: string;
     };
+
+export type TerminalCommandDefinition = {
+  description: string;
+  input: string;
+  output: TerminalLine[];
+};

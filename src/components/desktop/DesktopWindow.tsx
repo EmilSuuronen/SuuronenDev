@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import AppGlyph from "./AppGlyph";
 import type {
   DesktopBounds,
   DesktopWindowState,
@@ -138,7 +139,9 @@ function DesktopWindow({
     >
       <header className="window-titlebar" onPointerDown={startDrag}>
         <div className="window-title">
-          <span className="window-icon">{windowState.icon}</span>
+          <span className="window-icon">
+            <AppGlyph appId={windowState.id} className="window-icon-glyph" />
+          </span>
           <span>{windowState.title}</span>
         </div>
         <div className="window-controls">

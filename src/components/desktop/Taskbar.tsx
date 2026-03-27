@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { desktopLaunchers } from "../../data/desktop";
+import AppGlyph from "./AppGlyph";
 import type { DesktopWindowState, WindowId } from "../../types/desktop";
 
 type TaskbarProps = {
@@ -58,7 +59,7 @@ function Taskbar({ activeWindowId, onFocusWindow, onOpenWindow, windows }: Taskb
                 onClick={() => (isOpen ? onFocusWindow(launcher.id) : onOpenWindow(launcher.id))}
               >
                 <span className="taskbar-launcher-icon" aria-hidden="true">
-                  <span className="taskbar-icon-glyph">{launcher.icon}</span>
+                  <AppGlyph appId={launcher.id} className="taskbar-icon-glyph" />
                 </span>
                 <span className="taskbar-launcher-indicator" aria-hidden="true" />
               </button>
