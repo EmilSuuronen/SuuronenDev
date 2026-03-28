@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import {
   createInitialDesktopIcons,
   DESKTOP_ICON_HEIGHT,
+  DESKTOP_ICON_START_X,
+  DESKTOP_ICON_START_Y,
   DESKTOP_ICON_WIDTH,
+  DESKTOP_ICON_X_GAP,
+  DESKTOP_ICON_Y_GAP,
 } from "../data/desktop";
 import type {
   DesktopBounds,
@@ -11,16 +15,13 @@ import type {
   DesktopIconState,
   FolderId,
 } from "../types/desktop";
-import { WINDOW_GAP, clamp } from "../utils/windowMath";
+import { clamp } from "../utils/windowMath";
 
-const POSITION_SEARCH_STEP = 16;
-const POSITION_SEARCH_ANGLES = 16;
-const POSITION_SEARCH_RADIUS_LIMIT = 640;
+const STORAGE_KEY = "suuronen.desktop.icons";
+const GRID_STEP_X = DESKTOP_ICON_WIDTH + DESKTOP_ICON_X_GAP;
+const GRID_STEP_Y = DESKTOP_ICON_HEIGHT + DESKTOP_ICON_Y_GAP;
 
-function mergeDefaultIcons(
-  storedIcons: DesktopIconState[],
-  bounds: DesktopBounds,
-) {
+function mergeDefaultIcons(storedIcons: DesktopIconState[], bounds: DesktopBounds) {
   const defaultIcons = createInitialDesktopIcons(bounds);
   const storedIconMap = new Map(storedIcons.map((icon) => [icon.id, icon]));
   const mergedDefaultIcons = defaultIcons.map((defaultIcon) => {
@@ -48,91 +49,157 @@ function mergeDefaultIcons(
   return [...mergedDefaultIcons, ...dynamicIcons];
 }
 
-function clampIconToBounds(icon: DesktopIconState, bounds: DesktopBounds): DesktopIconState {
-  if (icon.parentId !== null) {
-    return icon;
-  }
+function sortFolderIcons(icons: DesktopIconState[]) {
+  return [...icons].sort((left, right) => {
+    if (left.position.y !== right.position.y) {
+      return left.position.y - right.position.y;
+    }
 
-  if (!bounds.width || !bounds.height) {
+    if (left.position.x !== right.position.x) {
+      return left.position.x - right.position.x;
+    }
+
+    return left.label.localeCompare(right.label);
+  });
+}
+
+function normalizeFolderOrder(icons: DesktopIconState[], folderId: FolderId) {
+  const orderedFolderIcons = sortFolderIcons(icons.filter((icon) => icon.parentId === folderId));
+  const orderMap = new Map(
+    orderedFolderIcons.map((icon, index) => [
+      icon.id,
+      {
+        x: index,
+        y: 0,
+      },
+    ]),
+  );
+
+  return icons.map((icon) =>
+    icon.parentId === folderId
+      ? {
+          ...icon,
+          position: orderMap.get(icon.id) ?? icon.position,
+        }
+      : icon,
+  );
+}
+
+function getGridDimensions(bounds: DesktopBounds) {
+  return {
+    columns: Math.max(
+      1,
+      Math.floor((bounds.width - DESKTOP_ICON_START_X - DESKTOP_ICON_WIDTH) / GRID_STEP_X) + 1,
+    ),
+    rows: Math.max(
+      1,
+      Math.floor((bounds.height - DESKTOP_ICON_START_Y - DESKTOP_ICON_HEIGHT) / GRID_STEP_Y) + 1,
+    ),
+  };
+}
+
+function getGridPosition(column: number, row: number) {
+  return {
+    x: DESKTOP_ICON_START_X + column * GRID_STEP_X,
+    y: DESKTOP_ICON_START_Y + row * GRID_STEP_Y,
+  };
+}
+
+function getNearestGridCell(position: { x: number; y: number }, bounds: DesktopBounds) {
+  const { columns, rows } = getGridDimensions(bounds);
+
+  return {
+    column: clamp(Math.round((position.x - DESKTOP_ICON_START_X) / GRID_STEP_X), 0, columns - 1),
+    row: clamp(Math.round((position.y - DESKTOP_ICON_START_Y) / GRID_STEP_Y), 0, rows - 1),
+  };
+}
+
+function slotKey(column: number, row: number) {
+  return `${column}:${row}`;
+}
+
+function clampIconToBounds(icon: DesktopIconState, bounds: DesktopBounds): DesktopIconState {
+  if (icon.parentId !== null || !bounds.width || !bounds.height) {
     return icon;
   }
 
   return {
     ...icon,
     position: {
-      x: clamp(icon.position.x, WINDOW_GAP, Math.max(WINDOW_GAP, bounds.width - DESKTOP_ICON_WIDTH)),
-      y: clamp(icon.position.y, WINDOW_GAP, Math.max(WINDOW_GAP, bounds.height - DESKTOP_ICON_HEIGHT)),
+      x: clamp(
+        icon.position.x,
+        DESKTOP_ICON_START_X,
+        Math.max(DESKTOP_ICON_START_X, bounds.width - DESKTOP_ICON_WIDTH),
+      ),
+      y: clamp(
+        icon.position.y,
+        DESKTOP_ICON_START_Y,
+        Math.max(DESKTOP_ICON_START_Y, bounds.height - DESKTOP_ICON_HEIGHT),
+      ),
     },
   };
 }
 
-function rectanglesOverlap(left: DesktopIconState, right: DesktopIconState) {
-  return !(
-    left.position.x + DESKTOP_ICON_WIDTH <= right.position.x ||
-    right.position.x + DESKTOP_ICON_WIDTH <= left.position.x ||
-    left.position.y + DESKTOP_ICON_HEIGHT <= right.position.y ||
-    right.position.y + DESKTOP_ICON_HEIGHT <= left.position.y
-  );
-}
-
-function isPositionAvailable(
-  iconToPlace: DesktopIconState,
-  placedIcons: DesktopIconState[],
-) {
-  return placedIcons.every((placedIcon) => !rectanglesOverlap(iconToPlace, placedIcon));
-}
-
 function findNearestAvailablePosition(
   preferredPosition: { x: number; y: number },
-  placedIcons: DesktopIconState[],
-  iconToPlace: DesktopIconState,
+  occupiedSlots: Set<string>,
   bounds: DesktopBounds,
 ) {
-  const clampedPreferredIcon = clampIconToBounds(
-    {
-      ...iconToPlace,
-      position: preferredPosition,
-    },
-    bounds,
-  );
+  const { columns, rows } = getGridDimensions(bounds);
+  const preferredCell = getNearestGridCell(preferredPosition, bounds);
 
-  if (isPositionAvailable(clampedPreferredIcon, placedIcons)) {
-    return clampedPreferredIcon.position;
+  if (!occupiedSlots.has(slotKey(preferredCell.column, preferredCell.row))) {
+    return getGridPosition(preferredCell.column, preferredCell.row);
   }
 
-  for (
-    let radius = POSITION_SEARCH_STEP;
-    radius <= POSITION_SEARCH_RADIUS_LIMIT;
-    radius += POSITION_SEARCH_STEP
-  ) {
-    for (let angleIndex = 0; angleIndex < POSITION_SEARCH_ANGLES; angleIndex += 1) {
-      const angle = (Math.PI * 2 * angleIndex) / POSITION_SEARCH_ANGLES;
-      const candidateIcon = clampIconToBounds(
-        {
-          ...iconToPlace,
-          position: {
-            x: preferredPosition.x + Math.cos(angle) * radius,
-            y: preferredPosition.y + Math.sin(angle) * radius,
-          },
-        },
-        bounds,
-      );
+  const maxRadius = Math.max(columns, rows);
 
-      if (isPositionAvailable(candidateIcon, placedIcons)) {
-        return candidateIcon.position;
+  for (let radius = 1; radius <= maxRadius; radius += 1) {
+    const candidates: Array<{ column: number; row: number; distance: number }> = [];
+
+    for (let column = preferredCell.column - radius; column <= preferredCell.column + radius; column += 1) {
+      for (let row = preferredCell.row - radius; row <= preferredCell.row + radius; row += 1) {
+        if (column < 0 || row < 0 || column >= columns || row >= rows) {
+          continue;
+        }
+
+        const isOnRing =
+          column === preferredCell.column - radius ||
+          column === preferredCell.column + radius ||
+          row === preferredCell.row - radius ||
+          row === preferredCell.row + radius;
+
+        if (!isOnRing) {
+          continue;
+        }
+
+        candidates.push({
+          column,
+          row,
+          distance: Math.hypot(column - preferredCell.column, row - preferredCell.row),
+        });
       }
+    }
+
+    candidates.sort((left, right) => left.distance - right.distance);
+
+    const availableCandidate = candidates.find(
+      (candidate) => !occupiedSlots.has(slotKey(candidate.column, candidate.row)),
+    );
+
+    if (availableCandidate) {
+      return getGridPosition(availableCandidate.column, availableCandidate.row);
     }
   }
 
-  return clampedPreferredIcon.position;
+  return getGridPosition(preferredCell.column, preferredCell.row);
 }
 
-function resolveIconCollisions(
+function resolveRootIconPositions(
   icons: DesktopIconState[],
   bounds: DesktopBounds,
   prioritizedIconId?: DesktopEntryId,
 ) {
-  const placedIcons: DesktopIconState[] = [];
   const rootIcons = icons.filter((icon) => icon.parentId === null);
   const orderedIcons = prioritizedIconId
     ? [
@@ -140,23 +207,25 @@ function resolveIconCollisions(
         ...rootIcons.filter((icon) => icon.id !== prioritizedIconId),
       ]
     : rootIcons;
+  const occupiedSlots = new Set<string>();
+  const resolvedPositions = new Map<DesktopEntryId, { x: number; y: number }>();
 
-  for (const icon of orderedIcons) {
+  orderedIcons.forEach((icon) => {
     const clampedIcon = clampIconToBounds(icon, bounds);
-    const nearestAvailablePosition = findNearestAvailablePosition(
-      clampedIcon.position,
-      placedIcons,
-      clampedIcon,
-      bounds,
-    );
-    placedIcons.push({
-      ...icon,
-      position: nearestAvailablePosition,
-    });
-  }
+    const snappedPosition = findNearestAvailablePosition(clampedIcon.position, occupiedSlots, bounds);
+    const snappedCell = getNearestGridCell(snappedPosition, bounds);
+
+    occupiedSlots.add(slotKey(snappedCell.column, snappedCell.row));
+    resolvedPositions.set(icon.id, snappedPosition);
+  });
 
   return icons.map((icon) =>
-    icon.parentId === null ? placedIcons.find((placedIcon) => placedIcon.id === icon.id) ?? icon : icon,
+    icon.parentId === null
+      ? {
+          ...icon,
+          position: resolvedPositions.get(icon.id) ?? clampIconToBounds(icon, bounds).position,
+        }
+      : icon,
   );
 }
 
@@ -164,7 +233,6 @@ export function useDesktopIcons(bounds: DesktopBounds) {
   const [icons, setIcons] = useState<DesktopIconState[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [selectedIconIds, setSelectedIconIds] = useState<DesktopEntryId[]>([]);
-  const STORAGE_KEY = "suuronen.desktop.icons";
 
   useEffect(() => {
     if (!bounds.width || !bounds.height) {
@@ -180,7 +248,7 @@ export function useDesktopIcons(bounds: DesktopBounds) {
             const parsed: unknown = JSON.parse(stored);
 
             if (Array.isArray(parsed)) {
-              return resolveIconCollisions(
+              return resolveRootIconPositions(
                 mergeDefaultIcons(
                   [...(parsed as DesktopIconState[]), ...currentIcons].filter(
                     (icon, index, collection) =>
@@ -196,10 +264,10 @@ export function useDesktopIcons(bounds: DesktopBounds) {
           // ignore invalid stored icon state
         }
 
-        return resolveIconCollisions(mergeDefaultIcons(currentIcons, bounds), bounds);
+        return resolveRootIconPositions(mergeDefaultIcons(currentIcons, bounds), bounds);
       }
 
-      return resolveIconCollisions(currentIcons, bounds);
+      return resolveRootIconPositions(currentIcons, bounds);
     });
 
     setIsHydrated(true);
@@ -211,34 +279,17 @@ export function useDesktopIcons(bounds: DesktopBounds) {
     }
   }, [icons, isHydrated]);
 
-  const previewMoveIcon = (iconId: DesktopEntryId, nextX: number, nextY: number) => {
-    setIcons((currentIcons) =>
-      currentIcons.map((icon) =>
-        icon.id === iconId
-          ? clampIconToBounds(
-              {
-                ...icon,
-                position: { x: nextX, y: nextY },
-              },
-              bounds,
-            )
-          : icon,
-      ),
-    );
-  };
+  const previewMoveIcon = () => {};
 
   const moveIcon = (iconId: DesktopEntryId, nextX: number, nextY: number) => {
     setIcons((currentIcons) =>
-      resolveIconCollisions(
+      resolveRootIconPositions(
         currentIcons.map((icon) =>
           icon.id === iconId
-            ? clampIconToBounds(
-                {
-                  ...icon,
-                  position: { x: nextX, y: nextY },
-                },
-                bounds,
-              )
+            ? {
+                ...clampIconToBounds(icon, bounds),
+                position: { x: nextX, y: nextY },
+              }
             : icon,
         ),
         bounds,
@@ -248,25 +299,82 @@ export function useDesktopIcons(bounds: DesktopBounds) {
   };
 
   const moveIconToFolder = (iconId: DesktopEntryId, folderId: FolderId) => {
-    setIcons((currentIcons) =>
-      currentIcons.map((icon) =>
+    if (iconId === folderId) {
+      return;
+    }
+
+    setIcons((currentIcons) => {
+      const nextIcons = currentIcons.map((icon) =>
         icon.id === iconId
           ? {
               ...icon,
               parentId: folderId,
+              position: { x: Number.MAX_SAFE_INTEGER, y: 0 },
             }
           : icon,
-      ),
-    );
+      );
+
+      return normalizeFolderOrder(nextIcons, folderId);
+    });
     setSelectedIconIds((currentSelectedIds) => currentSelectedIds.filter((selectedId) => selectedId !== iconId));
+  };
+
+  const moveIconToDesktop = (iconId: DesktopEntryId, nextX: number, nextY: number) => {
+    setIcons((currentIcons) => {
+      const sourceIcon = currentIcons.find((icon) => icon.id === iconId);
+      const sourceFolderId = sourceIcon?.parentId ?? null;
+      const nextIcons = currentIcons.map((icon) =>
+        icon.id === iconId
+          ? {
+              ...icon,
+              parentId: null,
+              position: { x: nextX, y: nextY },
+            }
+          : icon,
+      );
+      const withRootPositions = resolveRootIconPositions(nextIcons, bounds, iconId);
+
+      return sourceFolderId ? normalizeFolderOrder(withRootPositions, sourceFolderId) : withRootPositions;
+    });
   };
 
   const rootIcons = icons.filter((icon) => icon.parentId === null);
 
   const getFolderEntries = (folderId: FolderId) =>
-    icons
-      .filter((icon) => icon.parentId === folderId)
-      .sort((left, right) => left.label.localeCompare(right.label));
+    sortFolderIcons(icons.filter((icon) => icon.parentId === folderId));
+
+  const reorderFolderEntry = (iconId: DesktopEntryId, folderId: FolderId, targetIndex: number) => {
+    setIcons((currentIcons) => {
+      const folderIcons = sortFolderIcons(currentIcons.filter((icon) => icon.parentId === folderId));
+      const draggedIcon = folderIcons.find((icon) => icon.id === iconId);
+
+      if (!draggedIcon) {
+        return currentIcons;
+      }
+
+      const remainingFolderIcons = folderIcons.filter((icon) => icon.id !== iconId);
+      const clampedIndex = clamp(targetIndex, 0, remainingFolderIcons.length);
+      remainingFolderIcons.splice(clampedIndex, 0, draggedIcon);
+      const reorderedMap = new Map(
+        remainingFolderIcons.map((icon, index) => [
+          icon.id,
+          {
+            x: index,
+            y: 0,
+          },
+        ]),
+      );
+
+      return currentIcons.map((icon) =>
+        icon.parentId === folderId && reorderedMap.has(icon.id)
+          ? {
+              ...icon,
+              position: reorderedMap.get(icon.id) ?? icon.position,
+            }
+          : icon,
+      );
+    });
+  };
 
   const getEntry = (entryId: DesktopEntryId) => icons.find((icon) => icon.id === entryId) ?? null;
 
@@ -276,18 +384,27 @@ export function useDesktopIcons(bounds: DesktopBounds) {
         return currentIcons;
       }
 
-      return resolveIconCollisions([...currentIcons, icon], bounds, icon.id);
+      return resolveRootIconPositions([...currentIcons, icon], bounds, icon.id);
     });
   };
 
   const updateIcon = (iconId: DesktopEntryId, patch: Partial<DesktopIconState>) => {
     setIcons((currentIcons) =>
-      currentIcons.map((icon) => (icon.id === iconId ? { ...icon, ...patch } : icon)),
+      resolveRootIconPositions(
+        currentIcons.map((icon) => (icon.id === iconId ? { ...icon, ...patch } : icon)),
+        bounds,
+        patch.parentId === null ? iconId : undefined,
+      ),
     );
   };
 
   const removeIcon = (iconId: DesktopEntryId) => {
-    setIcons((currentIcons) => currentIcons.filter((icon) => icon.id !== iconId));
+    setIcons((currentIcons) => {
+      const targetIcon = currentIcons.find((icon) => icon.id === iconId);
+      const nextIcons = currentIcons.filter((icon) => icon.id !== iconId);
+
+      return targetIcon?.parentId ? normalizeFolderOrder(nextIcons, targetIcon.parentId) : nextIcons;
+    });
     setSelectedIconIds((currentSelectedIds) => currentSelectedIds.filter((selectedId) => selectedId !== iconId));
   };
 
@@ -299,8 +416,10 @@ export function useDesktopIcons(bounds: DesktopBounds) {
     getFolderEntries,
     isHydrated,
     moveIcon,
+    moveIconToDesktop,
     moveIconToFolder,
     previewMoveIcon,
+    reorderFolderEntry,
     removeIcon,
     selectedIconIds,
     setSelectedIconIds,

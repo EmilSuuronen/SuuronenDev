@@ -1,9 +1,10 @@
-import { Check, Languages, MonitorCog, Palette } from "lucide-react";
+import { AlertTriangle, Check, Languages, MonitorCog, Palette, RotateCcw, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 import type { DesktopFilterId, DesktopFilterOption } from "../data/desktopFilters";
 import type { DesktopTheme } from "../data/themes";
 import { useLocale, type AppLocale } from "../i18n/locale";
+import { resetAppData } from "../utils/resetAppData";
 
 type SettingsAppProps = {
   activeFilterId: string;
@@ -46,7 +47,15 @@ function SettingsApp({
 }: SettingsAppProps) {
   const { languageLabel, locale, setLocale, t, themeName } = useLocale();
   const localeOptions: AppLocale[] = ["en", "fi", "pirate", "alien"];
-  const [activePage, setActivePage] = useState<"appearance" | "language" | "filters">("appearance");
+  const [activePage, setActivePage] = useState<"appearance" | "language" | "filters" | "reset">("appearance");
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+
+  const handleConfirmReset = async () => {
+    setIsResetting(true);
+    await resetAppData();
+    window.location.reload();
+  };
 
   return (
     <div className="settings-app">
@@ -85,6 +94,14 @@ function SettingsApp({
           >
             <Languages className="settings-nav-item-icon" />
             <span>{t("Language")}</span>
+          </button>
+          <button
+            className={`settings-nav-item${activePage === "reset" ? " is-active" : ""}`}
+            type="button"
+            onClick={() => setActivePage("reset")}
+          >
+            <RotateCcw className="settings-nav-item-icon" />
+            <span>{t("Reset")}</span>
           </button>
         </div>
 
@@ -165,6 +182,43 @@ function SettingsApp({
               ))}
             </div>
           </section>
+        ) : activePage === "reset" ? (
+          <section className="settings-panel-card settings-panel-card--danger">
+            <div className="settings-section-header">
+              <div>
+                <span className="settings-section-kicker">{t("Reset")}</span>
+                <h3>{t("Reset desktop state")}</h3>
+              </div>
+            </div>
+
+            <div className="settings-reset-hero">
+              <span className="settings-reset-hero-icon" aria-hidden="true">
+                <Sparkles strokeWidth={1.8} />
+              </span>
+              <div className="settings-reset-hero-copy">
+                <strong>{t("Start from a clean desktop")}</strong>
+                <p>{t("This clears saved notes, window state, theme, language, filters, and desktop icons from this browser.")}</p>
+              </div>
+            </div>
+
+            <div className="settings-reset-list">
+              <div className="settings-reset-list-item">{t("Desktop layout and icon positions")}</div>
+              <div className="settings-reset-list-item">{t("Saved notes and trash contents")}</div>
+              <div className="settings-reset-list-item">{t("Theme, language, and active filters")}</div>
+              <div className="settings-reset-list-item">{t("Cached desktop data in this browser")}</div>
+            </div>
+
+            <div className="settings-reset-actions">
+              <button
+                className="settings-reset-danger-button"
+                type="button"
+                onClick={() => setIsResetDialogOpen(true)}
+              >
+                <RotateCcw className="settings-reset-danger-icon" />
+                <span>{t("Reset everything")}</span>
+              </button>
+            </div>
+          </section>
         ) : (
           <>
             <section className="settings-panel-card">
@@ -234,6 +288,53 @@ function SettingsApp({
           </>
         )}
       </div>
+
+      {isResetDialogOpen ? (
+        <div className="settings-dialog-backdrop" role="presentation">
+          <div
+            aria-labelledby="settings-reset-dialog-title"
+            aria-modal="true"
+            className="settings-dialog"
+            role="dialog"
+          >
+            <div className="settings-dialog-titlebar">
+              <div className="settings-dialog-title">
+                <span className="settings-dialog-icon" aria-hidden="true">
+                  <AlertTriangle strokeWidth={1.8} />
+                </span>
+                <span>{t("Confirm reset")}</span>
+              </div>
+            </div>
+
+            <div className="settings-dialog-body">
+              <div className="settings-dialog-copy">
+                <h4 id="settings-reset-dialog-title">{t("Reset desktop state")}</h4>
+                <p>{t("This action clears all saved application data in this browser and reloads the desktop.")}</p>
+                <p>{t("This cannot be undone.")}</p>
+              </div>
+
+              <div className="settings-dialog-actions">
+                <button
+                  className="settings-dialog-button"
+                  type="button"
+                  onClick={() => setIsResetDialogOpen(false)}
+                  disabled={isResetting}
+                >
+                  {t("Cancel")}
+                </button>
+                <button
+                  className="settings-dialog-button settings-dialog-button--danger"
+                  type="button"
+                  onClick={() => void handleConfirmReset()}
+                  disabled={isResetting}
+                >
+                  {isResetting ? t("Resetting...") : t("Reset everything")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

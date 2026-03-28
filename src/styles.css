@@ -417,6 +417,18 @@ button {
   background: rgba(255, 255, 255, 0.06);
 }
 
+.desktop-icon.is-drag-origin {
+  transition: none;
+}
+
+.desktop-icon--drag-preview {
+  position: fixed;
+  z-index: 120;
+  opacity: 0.56;
+  pointer-events: none;
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.22));
+}
+
 .desktop-selection-box {
   position: absolute;
   z-index: 1;
@@ -438,6 +450,19 @@ button {
     linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03)),
     rgba(11, 11, 11, 0.32);
   box-shadow: 0 14px 24px rgba(0, 0, 0, 0.2);
+}
+
+.desktop-icon--file .desktop-icon-art {
+  width: 46px;
+  height: 54px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.desktop-icon-art--file {
+  background: transparent;
 }
 
 .app-glyph {
@@ -480,80 +505,11 @@ button {
   line-height: 1;
 }
 
-.app-glyph-globe {
-  position: relative;
-  width: 20px;
-  height: 20px;
-  border: 1.6px solid currentColor;
-  border-radius: 999px;
-}
-
-.app-glyph-globe::before,
-.app-glyph-globe::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: -1px;
-  width: 1.6px;
-  height: calc(100% + 2px);
-  background: currentColor;
-  transform: translateX(-50%);
-  opacity: 0.92;
-}
-
-.app-glyph-globe::after {
-  width: calc(100% + 2px);
-  height: 1.6px;
-  left: -1px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.app-glyph-globe-ring {
-  position: absolute;
-  inset: 2px;
-  border: 1.2px solid currentColor;
-  border-radius: 999px;
-  opacity: 0.75;
-}
-
-.app-glyph-globe-ring--vertical {
-  inset: 0 5px;
-}
-
-.app-glyph-globe-ring--horizontal {
-  inset: 5px 0;
-}
-
+.app-glyph-browser,
 .app-glyph-calculator {
-  width: 20px;
-  height: 20px;
-}
-
-.app-glyph-calculator-screen,
-.app-glyph-calculator-keys span {
-  display: block;
-  border: 1.4px solid currentColor;
-  border-radius: 2px;
-}
-
-.app-glyph-calculator-screen {
-  width: 16px;
-  height: 6px;
-  margin: 0 auto 3px;
-}
-
-.app-glyph-calculator-keys {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2px;
-  width: 16px;
-  margin: 0 auto;
-}
-
-.app-glyph-calculator-keys span {
-  width: 7px;
-  height: 5px;
+  width: 21px;
+  height: 21px;
+  color: currentColor;
 }
 
 .app-glyph-settings {
@@ -584,6 +540,23 @@ button {
   height: 20px;
   color: #fff1de;
   filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.16));
+}
+
+.desktop-icon-glyph.app-glyph--textfile {
+  width: 100%;
+  height: 100%;
+  color: #fff6ec;
+}
+
+.desktop-icon-glyph .app-glyph-textfile {
+  width: 100%;
+  height: 100%;
+  color: #fff6ec;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.22));
+}
+
+.desktop-icon--file .desktop-icon-label {
+  max-width: 84px;
 }
 
 .desktop-icon-label {
@@ -695,11 +668,7 @@ button {
   font-size: 0.85rem;
 }
 
-.window-icon-glyph .app-glyph-globe {
-  width: 16px;
-  height: 16px;
-}
-
+.window-icon-glyph .app-glyph-browser,
 .window-icon-glyph .app-glyph-calculator {
   width: 16px;
   height: 16px;
@@ -723,16 +692,27 @@ button {
   display: grid;
   min-width: 172px;
   padding: 0.35rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   background:
-    linear-gradient(180deg, rgba(18, 18, 18, 0.94), rgba(9, 9, 9, 0.92)),
-    rgba(14, 14, 14, 0.92);
+    linear-gradient(180deg, rgba(26, 26, 26, 0.82), rgba(9, 9, 9, 0.78)),
+    rgba(14, 14, 14, 0.72);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 20px 48px rgba(0, 0, 0, 0.34);
-  backdrop-filter: blur(18px) saturate(116%);
-  -webkit-backdrop-filter: blur(18px) saturate(116%);
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.02),
+    0 22px 54px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(22px) saturate(122%);
+  -webkit-backdrop-filter: blur(22px) saturate(122%);
+}
+
+.desktop-context-menu-section {
+  display: grid;
+}
+
+.desktop-context-menu-divider {
+  height: 1px;
+  margin: 0.28rem 0.15rem;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
 }
 
 .desktop-context-menu-item {
@@ -748,17 +728,151 @@ button {
   cursor: pointer;
   transition:
     background-color 140ms ease,
-    color 140ms ease;
+    color 140ms ease,
+    transform 140ms ease;
 }
 
 .desktop-context-menu-item:hover {
   background: rgba(240, 140, 45, 0.14);
   color: #fff5eb;
+  transform: translateX(1px);
 }
 
 .desktop-context-menu-item--danger:hover {
   background: rgba(208, 72, 72, 0.14);
   color: #ffd2d2;
+}
+
+.desktop-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: 1.2rem;
+  background: rgba(9, 9, 9, 0.28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.desktop-dialog {
+  width: min(460px, 100%);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  background: rgba(7, 7, 7, 0.22);
+  backdrop-filter: blur(18px) saturate(118%);
+  -webkit-backdrop-filter: blur(18px) saturate(118%);
+}
+
+.desktop-dialog-titlebar {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, #212121, #141414);
+  color: var(--text-light);
+}
+
+.desktop-dialog-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.82rem;
+}
+
+.desktop-dialog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent-strong);
+}
+
+.desktop-dialog-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.desktop-dialog-body {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(244, 236, 224, 0.74)),
+    rgba(255, 255, 255, 0.72);
+}
+
+.desktop-dialog-copy {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.desktop-dialog-copy h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.desktop-dialog-copy p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.desktop-dialog-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.84rem;
+  outline: none;
+}
+
+.desktop-dialog-input:focus {
+  border-color: rgba(240, 140, 45, 0.28);
+}
+
+.desktop-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+}
+
+.desktop-dialog-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.desktop-dialog-button:hover {
+  transform: translateY(-1px);
+}
+
+.desktop-dialog-button--primary {
+  border-color: rgba(240, 140, 45, 0.2);
+  background: rgba(240, 140, 45, 0.12);
 }
 
 .window-controls {
@@ -832,12 +946,25 @@ button {
 }
 
 .desktop-window--terminal .window-content {
+  position: relative;
   overflow: hidden;
   scrollbar-width: none;
 }
 
 .desktop-window--terminal .window-content::-webkit-scrollbar {
   width: 0;
+}
+
+.desktop-window--terminal .window-content::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(240, 140, 45, 0.06), transparent 28%),
+    linear-gradient(180deg, rgba(14, 14, 14, 0.36), rgba(6, 6, 6, 0.28));
+  backdrop-filter: blur(14px) saturate(112%);
+  -webkit-backdrop-filter: blur(14px) saturate(112%);
+  pointer-events: none;
 }
 
 .resize-handle {
@@ -909,12 +1036,10 @@ button {
 }
 
 .terminal-app {
+  position: relative;
   height: 100%;
-  background:
-    linear-gradient(180deg, rgba(240, 140, 45, 0.07), transparent 28%),
-    linear-gradient(180deg, rgba(20, 20, 20, 0.76), rgba(8, 8, 8, 0.68));
-  backdrop-filter: blur(10px) saturate(105%);
-  -webkit-backdrop-filter: blur(10px) saturate(105%);
+  background: transparent;
+  z-index: 1;
 }
 
 .terminal-screen {
@@ -1903,6 +2028,221 @@ button {
   line-height: 1.5;
 }
 
+.settings-panel-card--danger {
+  border-color: rgba(208, 72, 72, 0.12);
+}
+
+.settings-reset-hero {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9rem;
+  align-items: start;
+  padding: 1rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.68)),
+    rgba(208, 72, 72, 0.04);
+}
+
+.settings-reset-hero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: rgba(208, 72, 72, 0.1);
+  color: #d04848;
+}
+
+.settings-reset-hero-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.settings-reset-hero-copy {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.settings-reset-hero-copy strong,
+.settings-dialog-copy h4 {
+  color: var(--ink);
+}
+
+.settings-reset-hero-copy p,
+.settings-dialog-copy p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.settings-reset-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.settings-reset-list-item {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 0.9rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--ink);
+}
+
+.settings-reset-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.settings-reset-danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 42px;
+  padding: 0.65rem 1rem;
+  border: 1px solid rgba(208, 72, 72, 0.2);
+  border-radius: 999px;
+  background: rgba(208, 72, 72, 0.08);
+  color: #a42f2f;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.settings-reset-danger-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(208, 72, 72, 0.28);
+  background: rgba(208, 72, 72, 0.12);
+}
+
+.settings-reset-danger-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.settings-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 1.2rem;
+  background: rgba(9, 9, 9, 0.28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.settings-dialog {
+  width: min(480px, 100%);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  background: rgba(7, 7, 7, 0.22);
+  backdrop-filter: blur(18px) saturate(118%);
+  -webkit-backdrop-filter: blur(18px) saturate(118%);
+}
+
+.settings-dialog-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, #212121, #141414);
+  color: var(--text-light);
+}
+
+.settings-dialog-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.82rem;
+}
+
+.settings-dialog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent-strong);
+}
+
+.settings-dialog-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.settings-dialog-body {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(244, 236, 224, 0.74)),
+    rgba(255, 255, 255, 0.72);
+}
+
+.settings-dialog-copy {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.settings-dialog-copy h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.settings-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+}
+
+.settings-dialog-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.settings-dialog-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.settings-dialog-button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.settings-dialog-button--danger {
+  border-color: rgba(208, 72, 72, 0.2);
+  background: rgba(208, 72, 72, 0.08);
+  color: #a42f2f;
+}
+
 @keyframes filter-flicker {
   0%,
   100% {
@@ -2515,6 +2855,10 @@ button {
   transform: translateY(-1px);
 }
 
+.folder-item.is-drag-origin {
+  opacity: 0.42;
+}
+
 .folder-item-art {
   display: inline-flex;
   align-items: center;
@@ -2538,6 +2882,15 @@ button {
   line-height: 1.35;
   text-align: center;
   overflow-wrap: anywhere;
+}
+
+.folder-item--drag-preview {
+  position: fixed;
+  z-index: 120;
+  width: 92px;
+  opacity: 0.56;
+  pointer-events: none;
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.22));
 }
 
 .folder-empty-state {
@@ -2780,7 +3133,7 @@ button {
   height: 100%;
 }
 
-.start-menu-item-glyph .app-glyph-globe,
+.start-menu-item-glyph .app-glyph-browser,
 .start-menu-item-glyph .app-glyph-calculator {
   width: 18px;
   height: 18px;
@@ -2909,11 +3262,7 @@ button {
   font-size: 0.82rem;
 }
 
-.taskbar-icon-glyph .app-glyph-globe {
-  width: 18px;
-  height: 18px;
-}
-
+.taskbar-icon-glyph .app-glyph-browser,
 .taskbar-icon-glyph .app-glyph-calculator {
   width: 18px;
   height: 18px;

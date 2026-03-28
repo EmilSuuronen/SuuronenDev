@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import BrowserApp from "./apps/BrowserApp";
 import CalculatorApp from "./apps/CalculatorApp";
@@ -7,8 +7,10 @@ import NotesApp from "./apps/NotesApp";
 import SettingsApp from "./apps/SettingsApp";
 import TerminalApp from "./apps/TerminalApp";
 import DesktopFilterOverlay from "./components/desktop/DesktopFilterOverlay";
+import DesktopContextMenu from "./components/desktop/DesktopContextMenu";
 import DesktopWallpaper from "./components/desktop/DesktopWallpaper";
 import DesktopIcons from "./components/desktop/DesktopIcons";
+import DesktopTextDialog from "./components/desktop/DesktopTextDialog";
 import DesktopWindow from "./components/desktop/DesktopWindow";
 import Taskbar from "./components/desktop/Taskbar";
 import TopBar from "./components/desktop/TopBar";
@@ -20,6 +22,7 @@ import { useDesktopTheme } from "./hooks/useDesktopTheme";
 import { useElementSize } from "./hooks/useElementSize";
 import { useWindowManager } from "./hooks/useWindowManager";
 import type { DesktopEntryId, FolderId, WindowId } from "./types/desktop";
+import { useLocale } from "./i18n/locale";
 
 type RenderWindowAppProps = {
   activeFilterId: string;
@@ -98,9 +101,17 @@ function renderWindowApp({
 function App() {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const bounds = useElementSize(workspaceRef);
+  const { t } = useLocale();
   const { currentTheme, resetTheme, selectTheme, setThemeColor, themeOptions } = useDesktopTheme();
   const { activeFilterId, filterOptions, setActiveFilterId } = useDesktopFilter();
   const notesState = useNotes();
+  const [desktopContextMenu, setDesktopContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [folderDialog, setFolderDialog] = useState<{ initialValue: string } | null>(null);
+  const [renameDialog, setRenameDialog] = useState<
+    | { kind: "folder"; folderId: FolderId; title: string }
+    | { kind: "note"; noteId: `note:${string}`; title: string }
+    | null
+  >(null);
   const {
     addIcon,
     getEntry,
@@ -108,8 +119,10 @@ function App() {
     icons,
     isHydrated: iconsHydrated,
     moveIcon,
+    moveIconToDesktop,
     moveIconToFolder,
     previewMoveIcon,
+    reorderFolderEntry,
     removeIcon,
     rootIcons,
     selectedIconIds,
@@ -155,6 +168,19 @@ function App() {
   const openWindows = windows
     .filter((windowState) => windowState.isOpen)
     .sort((left, right) => left.zIndex - right.zIndex);
+  const workspaceClientBounds = workspaceRef.current?.getBoundingClientRect();
+  const folderWindowDropTargets = openWindows
+    .filter((windowState) => windowState.kind === "folder" && windowState.folderId)
+    .map((windowState) => ({
+      bottom:
+        (workspaceClientBounds?.top ?? 0) + windowState.position.y + windowState.size.height,
+      folderId: windowState.folderId as FolderId,
+      left: (workspaceClientBounds?.left ?? 0) + windowState.position.x,
+      right:
+        (workspaceClientBounds?.left ?? 0) + windowState.position.x + windowState.size.width,
+      top:
+        (workspaceClientBounds?.top ?? 0) + windowState.position.y + 48,
+    }));
 
   const activeWindows = openWindows.filter((windowState) => windowState.animationState === "idle");
   const activeWindow = activeWindows[activeWindows.length - 1] ?? null;
@@ -175,7 +201,7 @@ function App() {
 
     notesState.allNotes.forEach((note) => {
       const existingIcon = icons.find((icon) => icon.id === note.id);
-      const noteParentId = note.trashedAt ? "trash" : null;
+      const noteParentId = note.trashedAt ? "trash" : existingIcon?.parentId ?? null;
 
       if (!existingIcon) {
         addIcon({
@@ -229,13 +255,29 @@ function App() {
       return;
     }
 
-    const nextTitle = window.prompt("Rename note", targetNote.title);
+    setRenameDialog({
+      kind: "note",
+      noteId,
+      title: targetNote.title,
+    });
+  };
 
-    if (nextTitle === null) {
+  const handleRenameFolder = (folderId: FolderId) => {
+    const targetFolder = icons.find((icon) => icon.id === folderId && icon.kind === "folder");
+
+    if (!targetFolder) {
       return;
     }
 
-    notesState.renameNote(noteId, nextTitle);
+    setRenameDialog({
+      folderId,
+      kind: "folder",
+      title: targetFolder.label,
+    });
+  };
+
+  const handleDeleteFolder = (folderId: FolderId) => {
+    moveIconToFolder(folderId, "trash");
   };
 
   const openDesktopEntry = (entryId: DesktopEntryId) => {
@@ -270,20 +312,116 @@ function App() {
     }
   };
 
+  const handleExtractEntryToDesktop = (entryId: DesktopEntryId, clientX: number, clientY: number) => {
+    const workspaceBounds = workspaceRef.current?.getBoundingClientRect();
+
+    if (!workspaceBounds) {
+      return;
+    }
+
+    moveIconToDesktop(
+      entryId,
+      clientX - workspaceBounds.left - 44,
+      clientY - workspaceBounds.top - 48,
+    );
+  };
+
+  const handleCreateFolderRequest = () => {
+    setFolderDialog({ initialValue: t("New folder") });
+  };
+
+  const handleCreateFolder = (value: string) => {
+    const trimmed = value.trim() || t("New folder");
+    const folderId = `user-folder:${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}` as FolderId;
+
+    addIcon({
+      id: folderId,
+      icon: "folder",
+      kind: "folder",
+      label: trimmed,
+      parentId: null,
+      position: { x: 0, y: 0 },
+    });
+    setDesktopContextMenu(null);
+    setFolderDialog(null);
+  };
+
+  useEffect(() => {
+    if (!desktopContextMenu) {
+      return undefined;
+    }
+
+    const closeMenu = () => setDesktopContextMenu(null);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setDesktopContextMenu(null);
+      }
+    };
+
+    window.addEventListener("pointerdown", closeMenu);
+    window.addEventListener("contextmenu", closeMenu);
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("pointerdown", closeMenu);
+      window.removeEventListener("contextmenu", closeMenu);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [desktopContextMenu]);
+
+  useEffect(() => {
+    const workspaceElement = workspaceRef.current;
+
+    if (!workspaceElement) {
+      return undefined;
+    }
+
+    const handleWorkspaceContextMenu = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+
+      if (
+        target?.closest(".desktop-window") ||
+        target?.closest(".desktop-icon") ||
+        target?.closest(".desktop-context-menu")
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      setDesktopContextMenu({
+        x: event.clientX,
+        y: event.clientY,
+      });
+    };
+
+    workspaceElement.addEventListener("contextmenu", handleWorkspaceContextMenu);
+
+    return () => {
+      workspaceElement.removeEventListener("contextmenu", handleWorkspaceContextMenu);
+    };
+  }, []);
+
   return (
     <div className={`desktop-root desktop-root--filter-${activeFilterId}`} style={desktopThemeStyle}>
       <DesktopWallpaper theme={currentTheme} />
       <DesktopFilterOverlay filterId={activeFilterId} />
       <TopBar onOpenWindow={openWindow} />
 
-      <main ref={workspaceRef} className="desktop-workspace">
+      <main
+        ref={workspaceRef}
+        className="desktop-workspace"
+      >
         <DesktopIcons
+          folderWindowDropTargets={folderWindowDropTargets}
+          onDeleteFolder={handleDeleteFolder}
           icons={rootIcons}
           onDeleteNote={handleDeleteNote}
           onMoveIcon={moveIcon}
           onMoveIconToFolder={moveIconToFolder}
           onPreviewMoveIcon={previewMoveIcon}
           onOpenIcon={openDesktopEntry}
+          onRenameFolder={handleRenameFolder}
           onRenameNote={handleRenameNote}
           onSelectIcons={setSelectedIconIds}
           selectedIconIds={selectedIconIds}
@@ -302,7 +440,12 @@ function App() {
             windowState={windowState}
           >
             {windowState.kind === "folder" && windowState.folderId ? (
-              <FolderApp entries={getFolderEntries(windowState.folderId)} onOpenEntry={openDesktopEntry} />
+              <FolderApp
+                entries={getFolderEntries(windowState.folderId)}
+                onExtractEntry={handleExtractEntryToDesktop}
+                onOpenEntry={openDesktopEntry}
+                onReorderEntry={(entryId, targetIndex) => reorderFolderEntry(entryId, windowState.folderId!, targetIndex)}
+              />
             ) : (
               renderWindowApp({
                 activeFilterId,
@@ -337,6 +480,78 @@ function App() {
         onOpenWindow={openWindow}
         windows={windows}
       />
+
+      {desktopContextMenu ? (
+        <DesktopContextMenu
+          sections={[
+            {
+              items: [
+                {
+                  label: t("New folder"),
+                  onSelect: () => {
+                    handleCreateFolderRequest();
+                  },
+                },
+              ],
+            },
+            {
+              items: [
+                {
+                  label: t("Open Settings"),
+                  onSelect: () => {
+                    openWindow("settings");
+                    setDesktopContextMenu(null);
+                  },
+                },
+                {
+                  label: t("Open Terminal"),
+                  onSelect: () => {
+                    openWindow("terminal");
+                    setDesktopContextMenu(null);
+                  },
+                },
+              ],
+            },
+          ]}
+          x={desktopContextMenu.x}
+          y={desktopContextMenu.y}
+        />
+      ) : null}
+
+      {renameDialog ? (
+        <DesktopTextDialog
+          cancelLabel={t("Cancel")}
+          confirmLabel={renameDialog.kind === "folder" ? t("Rename") : t("Rename")}
+          initialValue={renameDialog.title}
+          message={
+            renameDialog.kind === "folder"
+              ? t("Enter a new name for this folder.")
+              : t("Enter a new filename for this desktop note.")
+          }
+          onCancel={() => setRenameDialog(null)}
+          onConfirm={(value) => {
+            if (renameDialog.kind === "folder") {
+              updateIcon(renameDialog.folderId, { label: value.trim() || t("New folder") });
+            } else {
+              notesState.renameNote(renameDialog.noteId, value);
+            }
+            setRenameDialog(null);
+          }}
+          title={renameDialog.kind === "folder" ? t("Rename folder") : t("Rename note")}
+        />
+      ) : null}
+
+      {folderDialog ? (
+        <DesktopTextDialog
+          cancelLabel={t("Cancel")}
+          confirmLabel={t("Create")}
+          initialValue={folderDialog.initialValue}
+          message={t("Enter a name for the new folder.")}
+          onCancel={() => setFolderDialog(null)}
+          onConfirm={handleCreateFolder}
+          title={t("Create folder")}
+        />
+      ) : null}
     </div>
   );
 }

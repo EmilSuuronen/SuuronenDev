@@ -1,4 +1,4 @@
-import { FileText, FolderClosed, NotebookPen, Settings2, Trash2 } from "lucide-react";
+import { Calculator, FileText, FolderClosed, Globe2, NotebookPen, Settings2, Trash2 } from "lucide-react";
 import molkkisIcon from "../../res/icon-192.png";
 import type { DesktopIconKey } from "../../types/desktop";
 
@@ -58,11 +58,8 @@ function AppGlyph({ iconKey, className = "" }: AppGlyphProps) {
 
   if (iconKey === "browser") {
     return (
-      <span className={`app-glyph app-glyph--globe ${className}`.trim()} aria-hidden="true">
-        <span className="app-glyph-globe">
-          <span className="app-glyph-globe-ring app-glyph-globe-ring--vertical" />
-          <span className="app-glyph-globe-ring app-glyph-globe-ring--horizontal" />
-        </span>
+      <span className={`app-glyph app-glyph--browser ${className}`.trim()} aria-hidden="true">
+        <Globe2 className="app-glyph-browser" strokeWidth={1.75} />
       </span>
     );
   }
@@ -70,15 +67,7 @@ function AppGlyph({ iconKey, className = "" }: AppGlyphProps) {
   if (iconKey === "calculator") {
     return (
       <span className={`app-glyph app-glyph--calculator ${className}`.trim()} aria-hidden="true">
-        <span className="app-glyph-calculator">
-          <span className="app-glyph-calculator-screen" />
-          <span className="app-glyph-calculator-keys">
-            <span />
-            <span />
-            <span />
-            <span />
-          </span>
-        </span>
+        <Calculator className="app-glyph-calculator" strokeWidth={1.75} />
       </span>
     );
   }

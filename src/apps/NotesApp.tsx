@@ -1,5 +1,5 @@
 import { FileText, Plus, Search, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useLocale } from "../i18n/locale";
 import type { NoteFile } from "../types/desktop";
@@ -25,6 +25,11 @@ function NotesApp({
 }: NotesAppProps) {
   const { t } = useLocale();
   const [query, setQuery] = useState("");
+  const [titleDraft, setTitleDraft] = useState("");
+
+  useEffect(() => {
+    setTitleDraft(activeNote?.title ?? "");
+  }, [activeNote?.id, activeNote?.title]);
 
   const filteredNotes = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -48,6 +53,16 @@ function NotesApp({
     : 0;
   const characterCount = activeNote?.content.length ?? 0;
   const lineCount = activeNote ? activeNote.content.split("\n").length : 0;
+
+  const commitTitleDraft = () => {
+    if (!activeNote) {
+      return;
+    }
+
+    if (titleDraft !== activeNote.title) {
+      onRenameNote(activeNote.id, titleDraft);
+    }
+  };
 
   return (
     <div className="notes-app">
@@ -104,8 +119,19 @@ function NotesApp({
               <input
                 className="notes-title-input"
                 type="text"
-                value={activeNote.title}
-                onChange={(event) => onRenameNote(activeNote.id, event.target.value)}
+                value={titleDraft}
+                onBlur={commitTitleDraft}
+                onChange={(event) => setTitleDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.currentTarget.blur();
+                  }
+
+                  if (event.key === "Escape") {
+                    setTitleDraft(activeNote.title);
+                    event.currentTarget.blur();
+                  }
+                }}
               />
 
               <div className="notes-editor-toolbar-actions">

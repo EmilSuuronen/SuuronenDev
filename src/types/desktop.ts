@@ -1,7 +1,7 @@
 export type WindowId = "terminal" | "browser" | "calculator" | "settings" | "notes";
 export type DesktopFileId = `note:${string}`;
 export type DesktopAppId = WindowId | "molkkis";
-export type FolderId = "applications" | "trash";
+export type FolderId = "applications" | "trash" | `user-folder:${string}`;
 export type DesktopEntryId = DesktopAppId | DesktopFileId | FolderId;
 export type DesktopIconKey =
   | "terminal"
