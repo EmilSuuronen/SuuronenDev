@@ -562,6 +562,30 @@ button {
   color: currentColor;
 }
 
+.app-glyph-trash {
+  width: 20px;
+  height: 20px;
+  color: #f1f1f1;
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.18));
+}
+
+.app-glyph-notes,
+.app-glyph-textfile {
+  color: currentColor;
+}
+
+.app-glyph-notes {
+  width: 21px;
+  height: 21px;
+}
+
+.app-glyph-textfile {
+  width: 20px;
+  height: 20px;
+  color: #fff1de;
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.16));
+}
+
 .desktop-icon-label {
   max-width: 100%;
   color: var(--text-light);
@@ -684,6 +708,57 @@ button {
 .window-icon-glyph .app-glyph-settings {
   width: 16px;
   height: 16px;
+}
+
+.window-icon-glyph .app-glyph-notes,
+.window-icon-glyph .app-glyph-textfile,
+.window-icon-glyph .app-glyph-trash {
+  width: 16px;
+  height: 16px;
+}
+
+.desktop-context-menu {
+  position: fixed;
+  z-index: 80;
+  display: grid;
+  min-width: 172px;
+  padding: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(18, 18, 18, 0.94), rgba(9, 9, 9, 0.92)),
+    rgba(14, 14, 14, 0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 20px 48px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(18px) saturate(116%);
+  -webkit-backdrop-filter: blur(18px) saturate(116%);
+}
+
+.desktop-context-menu-item {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 0.7rem;
+  border-radius: 7px;
+  color: var(--text-light);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.76rem;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.desktop-context-menu-item:hover {
+  background: rgba(240, 140, 45, 0.14);
+  color: #fff5eb;
+}
+
+.desktop-context-menu-item--danger:hover {
+  background: rgba(208, 72, 72, 0.14);
+  color: #ffd2d2;
 }
 
 .window-controls {
@@ -1976,6 +2051,343 @@ button {
   font-size: 0.72rem;
 }
 
+.notes-app {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100%;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(242, 234, 222, 0.72)),
+    linear-gradient(180deg, #f7f1e6, #ece1d1);
+}
+
+.notes-sidebar {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1rem;
+  border-right: 1px solid rgba(18, 18, 18, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.18)),
+    rgba(255, 255, 255, 0.28);
+}
+
+.notes-sidebar-header {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.notes-sidebar-header h2 {
+  margin: 0.2rem 0 0;
+  color: var(--ink);
+  font-size: 1.1rem;
+}
+
+.notes-kicker {
+  display: inline-block;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.notes-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  width: fit-content;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid rgba(240, 140, 45, 0.18);
+  border-radius: 999px;
+  background: rgba(240, 140, 45, 0.12);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.notes-action-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(240, 140, 45, 0.28);
+  background: rgba(240, 140, 45, 0.18);
+}
+
+.notes-action-icon,
+.notes-delete-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.notes-search {
+  position: relative;
+  display: block;
+}
+
+.notes-search input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.72rem 0.9rem 0.72rem 2.5rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--ink);
+  outline: none;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.notes-search input:focus {
+  border-color: rgba(240, 140, 45, 0.28);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.notes-search-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  color: var(--ink-soft);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.notes-list {
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  min-height: 0;
+}
+
+.notes-list-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.56);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.notes-list-item:hover,
+.notes-list-item.is-active {
+  transform: translateY(-1px);
+  border-color: rgba(240, 140, 45, 0.24);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.72)),
+    rgba(240, 140, 45, 0.06);
+  box-shadow: 0 12px 22px rgba(18, 18, 18, 0.06);
+}
+
+.notes-list-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  color: var(--accent);
+}
+
+.notes-file-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.notes-list-item-text {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.notes-list-item-text strong {
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.notes-list-item-text span {
+  color: var(--ink-soft);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.69rem;
+}
+
+.notes-empty-list {
+  padding: 0.95rem 0.8rem;
+  border: 1px dashed rgba(18, 18, 18, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.34);
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+.notes-editor-shell {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-width: 0;
+  min-height: 0;
+  padding: 1rem;
+  gap: 0.8rem;
+}
+
+.notes-editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.68)),
+    rgba(255, 255, 255, 0.56);
+}
+
+.notes-title-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.08rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.notes-editor-toolbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 0 0 auto;
+}
+
+.notes-save-indicator {
+  color: var(--ink-soft);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.notes-delete-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 36px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.notes-delete-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(208, 72, 72, 0.22);
+  background: rgba(208, 72, 72, 0.08);
+}
+
+.notes-editor {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  resize: none;
+  padding: 1rem 1.05rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.72)),
+    rgba(255, 255, 255, 0.76);
+  color: var(--ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.notes-editor:focus {
+  border-color: rgba(240, 140, 45, 0.24);
+}
+
+.notes-editor::selection,
+.notes-title-input::selection {
+  background: rgba(240, 140, 45, 0.2);
+}
+
+.notes-statusbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 0.15rem;
+  color: var(--ink-soft);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.notes-editor-empty {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.85rem;
+  min-height: 100%;
+  padding: 1.5rem;
+  border: 1px dashed rgba(18, 18, 18, 0.12);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.52)),
+    rgba(240, 140, 45, 0.05);
+  text-align: center;
+}
+
+.notes-empty-icon {
+  width: 26px;
+  height: 26px;
+  color: var(--accent);
+}
+
+.notes-editor-empty h3,
+.notes-editor-empty p {
+  margin: 0;
+}
+
+.notes-editor-empty p {
+  max-width: 40ch;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
 .browser-unavailable {
   display: grid;
   gap: 1rem;
@@ -2379,6 +2791,13 @@ button {
   height: 20px;
 }
 
+.start-menu-item-glyph .app-glyph-notes,
+.start-menu-item-glyph .app-glyph-textfile,
+.start-menu-item-glyph .app-glyph-trash {
+  width: 18px;
+  height: 18px;
+}
+
 .start-menu-item-glyph .app-glyph-text {
   font-size: 0.84rem;
 }
@@ -2500,6 +2919,13 @@ button {
   height: 18px;
 }
 
+.taskbar-icon-glyph .app-glyph-notes,
+.taskbar-icon-glyph .app-glyph-textfile,
+.taskbar-icon-glyph .app-glyph-trash {
+  width: 18px;
+  height: 18px;
+}
+
 .taskbar-launcher-indicator {
   position: absolute;
   left: 50%;
@@ -2607,6 +3033,25 @@ button {
 
   .settings-app {
     grid-template-columns: 1fr;
+  }
+
+  .notes-app {
+    grid-template-columns: 1fr;
+  }
+
+  .notes-sidebar {
+    border-right: 0;
+    border-bottom: 1px solid rgba(18, 18, 18, 0.08);
+  }
+
+  .notes-editor-toolbar {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .notes-editor-toolbar-actions {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .settings-sidebar {

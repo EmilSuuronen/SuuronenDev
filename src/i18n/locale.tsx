@@ -126,6 +126,22 @@ const finnishTranslations: Record<string, string> = {
   "Most comfortable": "Mukavin työkalupakki",
   "Mono Studio": "Mono Studio",
   "No filter": "Ei suodatinta",
+  Notes: "Muistiinpanot",
+  "Desktop notes": "Tyopoydan muistiinpanot",
+  "Text editor and desktop notes": "Tekstieditori ja tyopoydan muistiinpanot",
+  "Open Notes": "Avaa muistiinpanot",
+  "New note": "Uusi muistiinpano",
+  "Search notes": "Etsi muistiinpanoja",
+  "No notes yet. Create one to start writing.": "Muistiinpanoja ei ole viela. Luo ensimmainen aloittaaksesi kirjoittamisen.",
+  "Autosaved to desktop": "Tallennettu automaattisesti tyopoydalle",
+  Delete: "Poista",
+  "Start typing your note here...": "Ala kirjoittaa muistiinpanoa tahan...",
+  Words: "Sanat",
+  Characters: "Merkit",
+  Lines: "Rivit",
+  "No note selected": "Muistiinpanoa ei ole valittu",
+  "Create a .txt file and it will appear on the desktop automatically.": "Luo .txt-tiedosto, niin se ilmestyy automaattisesti tyopoydalle.",
+  "Create first note": "Luo ensimmainen muistiinpano",
   Noir: "Noir",
   "Open in new tab": "Avaa uudessa välilehdessä",
   "Open browser home": "Avaa selaimen etusivu",
@@ -180,6 +196,8 @@ const finnishTranslations: Record<string, string> = {
   "System info": "Järjestelmätiedot",
   "System shell": "Järjestelmäshelli",
   System: "Järjestelmä",
+  Trash: "Roskakori",
+  Rename: "Nimea uudelleen",
   "system version 1.0.0": "järjestelmäversio 1.0.0",
   "suuronen.dev desktop": "suuronen.dev-työpöytä",
   "The operational layer I’m comfortable with around local environments, deployments, telemetry, and reliability.":
@@ -270,6 +288,7 @@ function shouldBypassTranslation(input: string) {
     trimmed.startsWith("http://") ||
     trimmed.startsWith("https://") ||
     trimmed.startsWith("mailto:") ||
+    trimmed.toLowerCase().endsWith(".txt") ||
     /^[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(trimmed)
   );
 }

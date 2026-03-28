@@ -17,6 +17,37 @@ const POSITION_SEARCH_STEP = 16;
 const POSITION_SEARCH_ANGLES = 16;
 const POSITION_SEARCH_RADIUS_LIMIT = 640;
 
+function mergeDefaultIcons(
+  storedIcons: DesktopIconState[],
+  bounds: DesktopBounds,
+) {
+  const defaultIcons = createInitialDesktopIcons(bounds);
+  const storedIconMap = new Map(storedIcons.map((icon) => [icon.id, icon]));
+  const mergedDefaultIcons = defaultIcons.map((defaultIcon) => {
+    const storedIcon = storedIconMap.get(defaultIcon.id);
+
+    if (!storedIcon) {
+      return defaultIcon;
+    }
+
+    return {
+      ...defaultIcon,
+      ...storedIcon,
+      icon: defaultIcon.icon,
+      kind: defaultIcon.kind,
+      label: storedIcon.label || defaultIcon.label,
+      windowId: defaultIcon.windowId,
+      href: defaultIcon.href,
+    };
+  });
+
+  const dynamicIcons = storedIcons.filter(
+    (icon) => !defaultIcons.some((defaultIcon) => defaultIcon.id === icon.id),
+  );
+
+  return [...mergedDefaultIcons, ...dynamicIcons];
+}
+
 function clampIconToBounds(icon: DesktopIconState, bounds: DesktopBounds): DesktopIconState {
   if (icon.parentId !== null) {
     return icon;
@@ -131,7 +162,9 @@ function resolveIconCollisions(
 
 export function useDesktopIcons(bounds: DesktopBounds) {
   const [icons, setIcons] = useState<DesktopIconState[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [selectedIconIds, setSelectedIconIds] = useState<DesktopEntryId[]>([]);
+  const STORAGE_KEY = "suuronen.desktop.icons";
 
   useEffect(() => {
     if (!bounds.width || !bounds.height) {
@@ -139,13 +172,44 @@ export function useDesktopIcons(bounds: DesktopBounds) {
     }
 
     setIcons((currentIcons) => {
-      if (currentIcons.length === 0) {
-        return resolveIconCollisions(createInitialDesktopIcons(bounds), bounds);
+      if (!isHydrated) {
+        try {
+          const stored = window.localStorage.getItem(STORAGE_KEY);
+
+          if (stored) {
+            const parsed: unknown = JSON.parse(stored);
+
+            if (Array.isArray(parsed)) {
+              return resolveIconCollisions(
+                mergeDefaultIcons(
+                  [...(parsed as DesktopIconState[]), ...currentIcons].filter(
+                    (icon, index, collection) =>
+                      collection.findIndex((candidate) => candidate.id === icon.id) === index,
+                  ),
+                  bounds,
+                ),
+                bounds,
+              );
+            }
+          }
+        } catch {
+          // ignore invalid stored icon state
+        }
+
+        return resolveIconCollisions(mergeDefaultIcons(currentIcons, bounds), bounds);
       }
 
       return resolveIconCollisions(currentIcons, bounds);
     });
-  }, [bounds.height, bounds.width]);
+
+    setIsHydrated(true);
+  }, [bounds.height, bounds.width, isHydrated]);
+
+  useEffect(() => {
+    if (isHydrated && icons.length > 0) {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(icons));
+    }
+  }, [icons, isHydrated]);
 
   const previewMoveIcon = (iconId: DesktopEntryId, nextX: number, nextY: number) => {
     setIcons((currentIcons) =>
@@ -206,15 +270,40 @@ export function useDesktopIcons(bounds: DesktopBounds) {
 
   const getEntry = (entryId: DesktopEntryId) => icons.find((icon) => icon.id === entryId) ?? null;
 
+  const addIcon = (icon: DesktopIconState) => {
+    setIcons((currentIcons) => {
+      if (currentIcons.some((existingIcon) => existingIcon.id === icon.id)) {
+        return currentIcons;
+      }
+
+      return resolveIconCollisions([...currentIcons, icon], bounds, icon.id);
+    });
+  };
+
+  const updateIcon = (iconId: DesktopEntryId, patch: Partial<DesktopIconState>) => {
+    setIcons((currentIcons) =>
+      currentIcons.map((icon) => (icon.id === iconId ? { ...icon, ...patch } : icon)),
+    );
+  };
+
+  const removeIcon = (iconId: DesktopEntryId) => {
+    setIcons((currentIcons) => currentIcons.filter((icon) => icon.id !== iconId));
+    setSelectedIconIds((currentSelectedIds) => currentSelectedIds.filter((selectedId) => selectedId !== iconId));
+  };
+
   return {
+    addIcon,
     icons,
     getEntry,
     rootIcons,
     getFolderEntries,
+    isHydrated,
     moveIcon,
     moveIconToFolder,
     previewMoveIcon,
+    removeIcon,
     selectedIconIds,
     setSelectedIconIds,
+    updateIcon,
   };
 }

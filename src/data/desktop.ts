@@ -31,6 +31,12 @@ export const desktopLaunchers: DesktopLauncher[] = [
     icon: "settings",
     subtitle: "Themes and personalization",
   },
+  {
+    id: "notes",
+    label: "Notes",
+    icon: "notes",
+    subtitle: "Text editor and desktop notes",
+  },
 ];
 
 export const DESKTOP_ICON_WIDTH = 88;
@@ -60,6 +66,14 @@ export function createInitialDesktopIcons(bounds: DesktopBounds): DesktopIconSta
       position: { x: 0, y: 0 },
     },
     {
+      id: "trash",
+      icon: "trash",
+      kind: "folder" as const,
+      label: "Trash",
+      parentId: null,
+      position: { x: 0, y: 0 },
+    },
+    {
       id: "molkkis",
       href: "https://emilsuuronen.github.io/molkkis/",
       icon: "molkkis",
@@ -73,12 +87,23 @@ export function createInitialDesktopIcons(bounds: DesktopBounds): DesktopIconSta
   return desktopIconApps.map((app, index) => ({
     ...app,
     position:
-      app.parentId === null
-        ? {
-            x: DESKTOP_ICON_START_X,
-            y: DESKTOP_ICON_START_Y + index * (DESKTOP_ICON_HEIGHT + DESKTOP_ICON_Y_GAP),
-          }
-        : app.position,
+      app.parentId !== null
+        ? app.position
+        : app.id === "trash"
+          ? {
+              x: Math.max(
+                DESKTOP_ICON_START_X,
+                bounds.width - DESKTOP_ICON_WIDTH - WINDOW_GAP - 10,
+              ),
+              y: Math.max(
+                DESKTOP_ICON_START_Y,
+                bounds.height - DESKTOP_ICON_HEIGHT - WINDOW_GAP - 10,
+              ),
+            }
+          : {
+              x: DESKTOP_ICON_START_X,
+              y: DESKTOP_ICON_START_Y + index * (DESKTOP_ICON_HEIGHT + DESKTOP_ICON_Y_GAP),
+            },
   }));
 }
 
@@ -147,6 +172,18 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
     ? WINDOW_GAP
     : Math.max(WINDOW_GAP, safeWidth / 2 - settingsWidth / 2 + 40);
   const settingsY = isCompact ? 60 : 62;
+  const notesWidth = clamp(
+    isCompact ? 360 : 820,
+    360,
+    Math.min(960, safeWidth - WINDOW_GAP * 2),
+  );
+  const notesHeight = clamp(
+    isCompact ? 520 : 620,
+    420,
+    Math.min(720, safeHeight - WINDOW_GAP * 2),
+  );
+  const notesX = isCompact ? WINDOW_GAP : Math.max(WINDOW_GAP, safeWidth / 2 - notesWidth / 2 - 30);
+  const notesY = isCompact ? 72 : 50;
 
   return [
     {
@@ -206,6 +243,21 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
       minSize: { width: 520, height: 420 },
       maxSize: { width: 980, height: 760 },
       zIndex: 0,
+    },
+    {
+      animationState: "idle",
+      id: "notes",
+      kind: "app",
+      title: "notes.app",
+      icon: "notes",
+      isOpen: false,
+      isMaximized: false,
+      position: { x: notesX, y: notesY },
+      restoreRect: null,
+      size: { width: notesWidth, height: notesHeight },
+      minSize: { width: 560, height: 420 },
+      maxSize: { width: 1180, height: 860 },
+      zIndex: -1,
     },
   ];
 }

@@ -1,4 +1,4 @@
-import { FolderClosed, Settings2 } from "lucide-react";
+import { FileText, FolderClosed, NotebookPen, Settings2, Trash2 } from "lucide-react";
 import molkkisIcon from "../../res/icon-192.png";
 import type { DesktopIconKey } from "../../types/desktop";
 
@@ -28,6 +28,30 @@ function AppGlyph({ iconKey, className = "" }: AppGlyphProps) {
     return (
       <span className={`app-glyph app-glyph--settings ${className}`.trim()} aria-hidden="true">
         <Settings2 className="app-glyph-settings" strokeWidth={1.75} />
+      </span>
+    );
+  }
+
+  if (iconKey === "notes") {
+    return (
+      <span className={`app-glyph app-glyph--notes ${className}`.trim()} aria-hidden="true">
+        <NotebookPen className="app-glyph-notes" strokeWidth={1.75} />
+      </span>
+    );
+  }
+
+  if (iconKey === "textfile") {
+    return (
+      <span className={`app-glyph app-glyph--textfile ${className}`.trim()} aria-hidden="true">
+        <FileText className="app-glyph-textfile" strokeWidth={1.75} />
+      </span>
+    );
+  }
+
+  if (iconKey === "trash") {
+    return (
+      <span className={`app-glyph app-glyph--trash ${className}`.trim()} aria-hidden="true">
+        <Trash2 className="app-glyph-trash" strokeWidth={1.75} />
       </span>
     );
   }

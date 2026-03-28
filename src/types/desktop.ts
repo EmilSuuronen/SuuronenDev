@@ -1,8 +1,18 @@
-export type WindowId = "terminal" | "browser" | "calculator" | "settings";
+export type WindowId = "terminal" | "browser" | "calculator" | "settings" | "notes";
+export type DesktopFileId = `note:${string}`;
 export type DesktopAppId = WindowId | "molkkis";
-export type FolderId = "applications";
-export type DesktopEntryId = DesktopAppId | FolderId;
-export type DesktopIconKey = "terminal" | "browser" | "calculator" | "settings" | "molkkis" | "folder";
+export type FolderId = "applications" | "trash";
+export type DesktopEntryId = DesktopAppId | DesktopFileId | FolderId;
+export type DesktopIconKey =
+  | "terminal"
+  | "browser"
+  | "calculator"
+  | "settings"
+  | "notes"
+  | "textfile"
+  | "molkkis"
+  | "trash"
+  | "folder";
 export type WindowEntityId = WindowId | `folder:${FolderId}`;
 
 export type Point = {
@@ -49,10 +59,11 @@ export type DesktopLauncher = {
 export type DesktopIconState = {
   id: DesktopEntryId;
   icon: DesktopIconKey;
-  kind: "app" | "folder";
+  kind: "app" | "folder" | "file";
   label: string;
   parentId: FolderId | null;
   position: Point;
+  noteId?: DesktopFileId;
   windowId?: WindowId;
   href?: string;
 };
@@ -130,6 +141,15 @@ export type BrowserSection = {
   note?: string;
   highlights?: string[];
   view?: "cards" | "tech-stack" | "contact";
+};
+
+export type NoteFile = {
+  content: string;
+  createdAt: string;
+  id: DesktopFileId;
+  title: string;
+  trashedAt?: string | null;
+  updatedAt: string;
 };
 
 export type TerminalLine =

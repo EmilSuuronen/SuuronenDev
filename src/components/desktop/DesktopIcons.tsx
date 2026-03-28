@@ -22,11 +22,13 @@ type SelectionBoxState = {
 };
 
 type DesktopIconsProps = {
+  onDeleteNote: (noteId: `note:${string}`) => void;
   icons: DesktopIconState[];
   onMoveIcon: (iconId: DesktopEntryId, nextX: number, nextY: number) => void;
   onMoveIconToFolder: (iconId: DesktopEntryId, folderId: FolderId) => void;
   onPreviewMoveIcon: (iconId: DesktopEntryId, nextX: number, nextY: number) => void;
   onOpenIcon: (iconId: DesktopEntryId) => void;
+  onRenameNote: (noteId: `note:${string}`) => void;
   onSelectIcons: (iconIds: DesktopEntryId[]) => void;
   selectedIconIds: DesktopEntryId[];
 };
@@ -39,7 +41,14 @@ type DesktopIconProps = {
   onMoveIconToFolder: (iconId: DesktopEntryId, folderId: FolderId) => void;
   onPreviewMoveIcon: (iconId: DesktopEntryId, nextX: number, nextY: number) => void;
   onOpenIcon: (iconId: DesktopEntryId) => void;
+  onOpenContextMenu: (icon: DesktopIconState, clientX: number, clientY: number) => void;
   onSelectIcons: (iconIds: DesktopEntryId[]) => void;
+};
+
+type ContextMenuState = {
+  icon: DesktopIconState;
+  x: number;
+  y: number;
 };
 
 function DesktopIcon({
@@ -50,6 +59,7 @@ function DesktopIcon({
   onMoveIconToFolder,
   onPreviewMoveIcon,
   onOpenIcon,
+  onOpenContextMenu,
   onSelectIcons,
 }: DesktopIconProps) {
   const { t } = useLocale();
@@ -73,6 +83,10 @@ function DesktopIcon({
         const nextX = dragState.originX + deltaX;
         const nextY = dragState.originY + deltaY;
         const targetFolder = folderDropTargets.find((folderIcon) => {
+          if (icon.kind === "file" || folderIcon.id === "trash") {
+            return false;
+          }
+
           const iconCenterX = nextX + DESKTOP_ICON_WIDTH / 2;
           const iconCenterY = nextY + DESKTOP_ICON_HEIGHT / 2;
           return (
@@ -128,7 +142,16 @@ function DesktopIcon({
         event.stopPropagation();
         onOpenIcon(icon.id);
       }}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onSelectIcons([icon.id]);
+        onOpenContextMenu(icon, event.clientX, event.clientY);
+      }}
       onPointerDown={(event) => {
+        if (event.button !== 0) {
+          return;
+        }
         event.stopPropagation();
         onSelectIcons([icon.id]);
         setDragState({
@@ -148,15 +171,42 @@ function DesktopIcon({
 }
 
 function DesktopIcons({
+  onDeleteNote,
   icons,
   onMoveIcon,
   onMoveIconToFolder,
   onPreviewMoveIcon,
   onOpenIcon,
+  onRenameNote,
   onSelectIcons,
   selectedIconIds,
 }: DesktopIconsProps) {
+  const { t } = useLocale();
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [selectionBox, setSelectionBox] = useState<SelectionBoxState | null>(null);
+
+  useEffect(() => {
+    if (!contextMenu) {
+      return undefined;
+    }
+
+    const closeMenu = () => setContextMenu(null);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setContextMenu(null);
+      }
+    };
+
+    window.addEventListener("pointerdown", closeMenu);
+    window.addEventListener("contextmenu", closeMenu);
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("pointerdown", closeMenu);
+      window.removeEventListener("contextmenu", closeMenu);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [contextMenu]);
 
   useEffect(() => {
     if (!selectionBox) {
@@ -204,6 +254,7 @@ function DesktopIcons({
       return;
     }
 
+    setContextMenu(null);
     const workspaceBounds = event.currentTarget.getBoundingClientRect();
 
     onSelectIcons([]);
@@ -240,7 +291,7 @@ function DesktopIcons({
       })
       .map((icon) => icon.id);
 
-    onSelectIcons(nextSelectedIds);
+      onSelectIcons(nextSelectedIds);
   }, [icons, normalizedSelectionBox, onSelectIcons]);
 
   return (
@@ -255,9 +306,41 @@ function DesktopIcons({
           onMoveIconToFolder={onMoveIconToFolder}
           onPreviewMoveIcon={onPreviewMoveIcon}
           onOpenIcon={onOpenIcon}
+          onOpenContextMenu={(targetIcon, x, y) => setContextMenu({ icon: targetIcon, x, y })}
           onSelectIcons={onSelectIcons}
         />
       ))}
+      {contextMenu?.icon.kind === "file" && contextMenu.icon.noteId ? (
+        <div
+          className="desktop-context-menu"
+          style={{
+            left: `${contextMenu.x}px`,
+            top: `${contextMenu.y}px`,
+          }}
+          onPointerDown={(event) => event.stopPropagation()}
+        >
+          <button
+            className="desktop-context-menu-item"
+            type="button"
+            onClick={() => {
+              onRenameNote(contextMenu.icon.noteId as `note:${string}`);
+              setContextMenu(null);
+            }}
+          >
+            {t("Rename")}
+          </button>
+          <button
+            className="desktop-context-menu-item desktop-context-menu-item--danger"
+            type="button"
+            onClick={() => {
+              onDeleteNote(contextMenu.icon.noteId as `note:${string}`);
+              setContextMenu(null);
+            }}
+          >
+            {t("Delete")}
+          </button>
+        </div>
+      ) : null}
       {normalizedSelectionBox && (normalizedSelectionBox.width >= 4 || normalizedSelectionBox.height >= 4) ? (
         <div
           aria-hidden="true"

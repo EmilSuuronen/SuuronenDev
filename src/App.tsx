@@ -1,8 +1,9 @@
-import { useMemo, useRef, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 
 import BrowserApp from "./apps/BrowserApp";
 import CalculatorApp from "./apps/CalculatorApp";
 import FolderApp from "./apps/FolderApp";
+import NotesApp from "./apps/NotesApp";
 import SettingsApp from "./apps/SettingsApp";
 import TerminalApp from "./apps/TerminalApp";
 import DesktopFilterOverlay from "./components/desktop/DesktopFilterOverlay";
@@ -14,6 +15,7 @@ import TopBar from "./components/desktop/TopBar";
 import type { DesktopFilterId, DesktopFilterOption } from "./data/desktopFilters";
 import { useDesktopFilter } from "./hooks/useDesktopFilter";
 import { useDesktopIcons } from "./hooks/useDesktopIcons";
+import { useNotes } from "./hooks/useNotes";
 import { useDesktopTheme } from "./hooks/useDesktopTheme";
 import { useElementSize } from "./hooks/useElementSize";
 import { useWindowManager } from "./hooks/useWindowManager";
@@ -23,6 +25,16 @@ type RenderWindowAppProps = {
   activeFilterId: string;
   currentTheme: ReturnType<typeof useDesktopTheme>["currentTheme"];
   filterOptions: DesktopFilterOption[];
+  notesState: {
+    activeNote: ReturnType<typeof useNotes>["activeNote"];
+    allNotes: ReturnType<typeof useNotes>["allNotes"];
+    notes: ReturnType<typeof useNotes>["notes"];
+    onCreateNote: () => void;
+    onDeleteNote: ReturnType<typeof useNotes>["deleteNote"];
+    onOpenNote: ReturnType<typeof useNotes>["openNote"];
+    onRenameNote: ReturnType<typeof useNotes>["renameNote"];
+    onUpdateNoteContent: ReturnType<typeof useNotes>["updateNoteContent"];
+  };
   onSelectFilter: (filterId: DesktopFilterId) => void;
   onResetTheme: ReturnType<typeof useDesktopTheme>["resetTheme"];
   onSelectTheme: ReturnType<typeof useDesktopTheme>["selectTheme"];
@@ -35,6 +47,7 @@ function renderWindowApp({
   activeFilterId,
   currentTheme,
   filterOptions,
+  notesState,
   onSelectFilter,
   onResetTheme,
   onSelectTheme,
@@ -65,6 +78,20 @@ function renderWindowApp({
     );
   }
 
+    if (windowId === "notes") {
+      return (
+        <NotesApp
+          activeNote={notesState.activeNote}
+          notes={notesState.notes}
+        onCreateNote={notesState.onCreateNote}
+        onDeleteNote={notesState.onDeleteNote}
+        onOpenNote={notesState.onOpenNote}
+        onRenameNote={notesState.onRenameNote}
+        onUpdateNoteContent={notesState.onUpdateNoteContent}
+      />
+    );
+  }
+
   return <BrowserApp />;
 }
 
@@ -73,15 +100,21 @@ function App() {
   const bounds = useElementSize(workspaceRef);
   const { currentTheme, resetTheme, selectTheme, setThemeColor, themeOptions } = useDesktopTheme();
   const { activeFilterId, filterOptions, setActiveFilterId } = useDesktopFilter();
+  const notesState = useNotes();
   const {
+    addIcon,
     getEntry,
     getFolderEntries,
+    icons,
+    isHydrated: iconsHydrated,
     moveIcon,
     moveIconToFolder,
     previewMoveIcon,
+    removeIcon,
     rootIcons,
     selectedIconIds,
     setSelectedIconIds,
+    updateIcon,
   } = useDesktopIcons(bounds);
   const {
     windows,
@@ -126,6 +159,85 @@ function App() {
   const activeWindows = openWindows.filter((windowState) => windowState.animationState === "idle");
   const activeWindow = activeWindows[activeWindows.length - 1] ?? null;
 
+  useEffect(() => {
+    if (!iconsHydrated) {
+      return;
+    }
+
+    const noteIds = new Set(notesState.allNotes.map((note) => note.id));
+    const fileIcons = icons.filter((icon) => icon.kind === "file");
+
+    fileIcons.forEach((icon) => {
+      if (!noteIds.has(icon.id as `note:${string}`)) {
+        removeIcon(icon.id);
+      }
+    });
+
+    notesState.allNotes.forEach((note) => {
+      const existingIcon = icons.find((icon) => icon.id === note.id);
+      const noteParentId = note.trashedAt ? "trash" : null;
+
+      if (!existingIcon) {
+        addIcon({
+          id: note.id,
+          icon: "textfile",
+          kind: "file",
+          label: note.title,
+          noteId: note.id,
+          parentId: noteParentId,
+          position: { x: 0, y: 0 },
+        });
+        return;
+      }
+
+      if (
+        existingIcon.label !== note.title ||
+        existingIcon.parentId !== noteParentId ||
+        existingIcon.noteId !== note.id
+      ) {
+        updateIcon(note.id, {
+          label: note.title,
+          noteId: note.id,
+          parentId: noteParentId,
+        });
+      }
+    });
+  }, [addIcon, icons, iconsHydrated, notesState.allNotes, removeIcon, updateIcon]);
+
+  const handleCreateNote = () => {
+    const note = notesState.createNote();
+    addIcon({
+      id: note.id,
+      icon: "textfile",
+      kind: "file",
+      label: note.title,
+      noteId: note.id,
+      parentId: null,
+      position: { x: 0, y: 0 },
+    });
+    openWindow("notes");
+  };
+
+  const handleDeleteNote = (noteId: `note:${string}`) => {
+    notesState.deleteNote(noteId);
+  };
+
+  const handleRenameNote = (noteId: `note:${string}`) => {
+    const targetNote = notesState.allNotes.find((note) => note.id === noteId);
+
+    if (!targetNote) {
+      return;
+    }
+
+    const nextTitle = window.prompt("Rename note", targetNote.title);
+
+    if (nextTitle === null) {
+      return;
+    }
+
+    notesState.renameNote(noteId, nextTitle);
+  };
+
   const openDesktopEntry = (entryId: DesktopEntryId) => {
     const entry = getEntry(entryId);
 
@@ -136,8 +248,15 @@ function App() {
     if (entry.kind === "folder") {
       openFolderWindow({
         id: entry.id as FolderId,
+        icon: entry.icon,
         label: entry.label,
       });
+      return;
+    }
+
+    if (entry.kind === "file" && entry.noteId) {
+      notesState.openNote(entry.noteId);
+      openWindow("notes");
       return;
     }
 
@@ -160,10 +279,12 @@ function App() {
       <main ref={workspaceRef} className="desktop-workspace">
         <DesktopIcons
           icons={rootIcons}
+          onDeleteNote={handleDeleteNote}
           onMoveIcon={moveIcon}
           onMoveIconToFolder={moveIconToFolder}
           onPreviewMoveIcon={previewMoveIcon}
           onOpenIcon={openDesktopEntry}
+          onRenameNote={handleRenameNote}
           onSelectIcons={setSelectedIconIds}
           selectedIconIds={selectedIconIds}
         />
@@ -187,6 +308,16 @@ function App() {
                 activeFilterId,
                 currentTheme,
                 filterOptions,
+                notesState: {
+                activeNote: notesState.activeNote,
+                allNotes: notesState.allNotes,
+                notes: notesState.notes,
+                onCreateNote: handleCreateNote,
+                onDeleteNote: handleDeleteNote,
+                  onOpenNote: notesState.openNote,
+                  onRenameNote: notesState.renameNote,
+                  onUpdateNoteContent: notesState.updateNoteContent,
+                },
                 onSelectFilter: setActiveFilterId,
                 onResetTheme: resetTheme,
                 onSelectTheme: selectTheme,

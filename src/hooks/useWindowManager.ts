@@ -183,7 +183,7 @@ export function useWindowManager(bounds: DesktopBounds) {
     bringToFront(windowId, true);
   };
 
-  const openFolderWindow = (folderEntry: { id: FolderId; label: string }) => {
+  const openFolderWindow = (folderEntry: { id: FolderId; label: string; icon?: DesktopWindowState["icon"] }) => {
     const folderWindowId = `folder:${folderEntry.id}` as const;
 
     clearExitTimeout(folderWindowId);
@@ -200,8 +200,10 @@ export function useWindowManager(bounds: DesktopBounds) {
               ? {
                   ...windowState,
                   animationState: "idle",
+                  icon: folderEntry.icon ?? windowState.icon,
                   isOpen: true,
                   isMaximized: false,
+                  title: folderEntry.label,
                   zIndex: raisedZIndex,
                 }
               : windowState,
@@ -215,7 +217,7 @@ export function useWindowManager(bounds: DesktopBounds) {
           {
             animationState: "idle",
             folderId: folderEntry.id as FolderId,
-            icon: "folder",
+            icon: folderEntry.icon ?? "folder",
             id: folderWindowId,
             isOpen: true,
             isMaximized: false,

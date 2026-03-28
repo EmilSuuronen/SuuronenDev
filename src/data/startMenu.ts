@@ -32,6 +32,15 @@ export const startMenuSections: StartMenuSection[] = [
         },
       },
       {
+        label: "Notes",
+        description: "Text editor and desktop notes",
+        icon: "notes",
+        action: {
+          type: "open_entry",
+          entryId: "notes",
+        },
+      },
+      {
         label: "Settings",
         description: "Themes and personalization",
         icon: "settings",

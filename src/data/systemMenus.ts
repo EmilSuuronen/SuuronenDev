@@ -41,6 +41,14 @@ export const systemMenus: DesktopMenu[] = [
         },
       },
       {
+        label: "Open Notes",
+        description: "Text editor and desktop notes",
+        action: {
+          type: "open_window",
+          windowId: "notes",
+        },
+      },
+      {
         label: "Open Settings",
         description: "Themes and personalization",
         action: {
