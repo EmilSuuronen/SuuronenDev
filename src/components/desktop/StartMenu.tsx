@@ -8,6 +8,7 @@ import type { DesktopEntryId, StartMenuItem } from "../../types/desktop";
 
 type StartMenuProps = {
   isOpen: boolean;
+  isMobile: boolean;
   onClose: () => void;
   onOpenEntry: (entryId: DesktopEntryId) => void;
 };
@@ -28,7 +29,7 @@ function renderAuxIcon(icon: StartMenuItem["icon"]) {
   return <AppGlyph iconKey={icon} className="start-menu-item-glyph" />;
 }
 
-function StartMenu({ isOpen, onClose, onOpenEntry }: StartMenuProps) {
+function StartMenu({ isOpen, isMobile, onClose, onOpenEntry }: StartMenuProps) {
   const { t } = useLocale();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -76,7 +77,12 @@ function StartMenu({ isOpen, onClose, onOpenEntry }: StartMenuProps) {
   };
 
   return (
-    <div ref={menuRef} className="start-menu" role="dialog" aria-label={t("Start")}>
+    <div
+      ref={menuRef}
+      className={`start-menu${isMobile ? " start-menu--mobile" : ""}`}
+      role="dialog"
+      aria-label={t("Start")}
+    >
       <div className="start-menu-header">
         <div>
           <div className="start-menu-title">{t("Start")}</div>

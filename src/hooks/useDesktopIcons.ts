@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   createInitialDesktopIcons,
@@ -8,6 +8,8 @@ import {
   DESKTOP_ICON_WIDTH,
   DESKTOP_ICON_X_GAP,
   DESKTOP_ICON_Y_GAP,
+  getDefaultDesktopRootIconPosition,
+  isMobileDesktopViewport,
 } from "../data/desktop";
 import type {
   DesktopBounds,
@@ -229,10 +231,33 @@ function resolveRootIconPositions(
   );
 }
 
+function packRootIconsForMobile(icons: DesktopIconState[], bounds: DesktopBounds) {
+  if (!isMobileDesktopViewport(bounds)) {
+    return icons;
+  }
+
+  let rootIndex = 0;
+
+  return icons.map((icon) => {
+    if (icon.parentId !== null) {
+      return icon;
+    }
+
+    const position = getDefaultDesktopRootIconPosition(rootIndex, bounds);
+    rootIndex += 1;
+
+    return {
+      ...icon,
+      position,
+    };
+  });
+}
+
 export function useDesktopIcons(bounds: DesktopBounds) {
   const [icons, setIcons] = useState<DesktopIconState[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [selectedIconIds, setSelectedIconIds] = useState<DesktopEntryId[]>([]);
+  const wasMobileLayoutRef = useRef(isMobileDesktopViewport(bounds));
 
   useEffect(() => {
     if (!bounds.width || !bounds.height) {
@@ -248,14 +273,16 @@ export function useDesktopIcons(bounds: DesktopBounds) {
             const parsed: unknown = JSON.parse(stored);
 
             if (Array.isArray(parsed)) {
-              return resolveRootIconPositions(
-                mergeDefaultIcons(
-                  [...(parsed as DesktopIconState[]), ...currentIcons].filter(
-                    (icon, index, collection) =>
-                      collection.findIndex((candidate) => candidate.id === icon.id) === index,
-                  ),
-                  bounds,
+              const mergedIcons = mergeDefaultIcons(
+                [...(parsed as DesktopIconState[]), ...currentIcons].filter(
+                  (icon, index, collection) =>
+                    collection.findIndex((candidate) => candidate.id === icon.id) === index,
                 ),
+                bounds,
+              );
+
+              return resolveRootIconPositions(
+                packRootIconsForMobile(mergedIcons, bounds),
                 bounds,
               );
             }
@@ -272,6 +299,21 @@ export function useDesktopIcons(bounds: DesktopBounds) {
 
     setIsHydrated(true);
   }, [bounds.height, bounds.width, isHydrated]);
+
+  useEffect(() => {
+    const isMobileLayout = isMobileDesktopViewport(bounds);
+
+    if (!isHydrated) {
+      wasMobileLayoutRef.current = isMobileLayout;
+      return;
+    }
+
+    if (isMobileLayout && !wasMobileLayoutRef.current) {
+      setIcons((currentIcons) => resolveRootIconPositions(packRootIconsForMobile(currentIcons, bounds), bounds));
+    }
+
+    wasMobileLayoutRef.current = isMobileLayout;
+  }, [bounds, isHydrated]);
 
   useEffect(() => {
     if (isHydrated && icons.length > 0) {

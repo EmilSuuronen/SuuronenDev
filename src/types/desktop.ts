@@ -37,6 +37,7 @@ export type DesktopWindowState = {
   id: WindowEntityId;
   isOpen: boolean;
   isMaximized: boolean;
+  maximizeMode: "manual" | "mobile" | null;
   kind: "app" | "folder";
   maxSize?: Size;
   position: Point;

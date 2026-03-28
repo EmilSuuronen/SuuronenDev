@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { createInitialWindows } from "../data/desktop";
+import { createInitialWindows, isMobileDesktopViewport } from "../data/desktop";
 import type {
   DesktopBounds,
   DesktopWindowState,
@@ -14,10 +14,52 @@ import { clampWindowToBounds, getMaximizedWindowRect } from "../utils/windowMath
 
 const WINDOW_EXIT_ANIMATION_MS = 220;
 
+function applyWindowViewportMode(
+  windowState: DesktopWindowState,
+  bounds: DesktopBounds,
+  isMobile: boolean,
+) {
+  if (!bounds.width || !bounds.height) {
+    return windowState;
+  }
+
+  if (isMobile) {
+    return {
+      ...windowState,
+      ...getMaximizedWindowRect(bounds),
+      isMaximized: true,
+      maximizeMode: windowState.maximizeMode ?? "mobile",
+      restoreRect: windowState.restoreRect ?? {
+        position: windowState.position,
+        size: windowState.size,
+      },
+    };
+  }
+
+  if (windowState.maximizeMode === "mobile") {
+    const restoredWindow = clampWindowToBounds(
+      {
+        ...windowState,
+        isMaximized: false,
+        maximizeMode: null,
+        position: windowState.restoreRect?.position ?? windowState.position,
+        restoreRect: null,
+        size: windowState.restoreRect?.size ?? windowState.size,
+      },
+      bounds,
+    );
+
+    return restoredWindow;
+  }
+
+  return clampWindowToBounds(windowState, bounds);
+}
+
 export function useWindowManager(bounds: DesktopBounds) {
   const [windows, setWindows] = useState<DesktopWindowState[]>([]);
   const [nextZIndex, setNextZIndex] = useState(10);
   const exitTimeoutsRef = useRef<Partial<Record<WindowEntityId, number>>>({});
+  const isMobile = isMobileDesktopViewport(bounds);
 
   const clearExitTimeout = (windowId: WindowEntityId) => {
     const timeoutId = exitTimeoutsRef.current[windowId];
@@ -38,9 +80,11 @@ export function useWindowManager(bounds: DesktopBounds) {
         return createInitialWindows(bounds);
       }
 
-      return currentWindows.map((windowState) => clampWindowToBounds(windowState, bounds));
+      return currentWindows.map((windowState) =>
+        applyWindowViewportMode(windowState, bounds, isMobile),
+      );
     });
-  }, [bounds.height, bounds.width]);
+  }, [bounds.height, bounds.width, isMobile]);
 
   useEffect(() => {
     return () => {
@@ -62,7 +106,7 @@ export function useWindowManager(bounds: DesktopBounds) {
         currentWindows.map((windowState) =>
           windowState.id === windowId
             ? {
-                ...windowState,
+                ...applyWindowViewportMode(windowState, bounds, isMobile),
                 animationState: "idle",
                 isOpen: shouldOpen ? true : windowState.isOpen,
                 zIndex: raisedZIndex,
@@ -116,6 +160,10 @@ export function useWindowManager(bounds: DesktopBounds) {
   };
 
   const restoreWindowFromDrag = (windowId: WindowEntityId, nextRect: WindowRect) => {
+    if (isMobile) {
+      return;
+    }
+
     setWindows((currentWindows) =>
       currentWindows.map((windowState) =>
         windowState.id === windowId
@@ -124,6 +172,7 @@ export function useWindowManager(bounds: DesktopBounds) {
                 ...windowState,
                 ...nextRect,
                 isMaximized: false,
+                maximizeMode: null,
                 restoreRect: null,
               },
               bounds,
@@ -136,6 +185,10 @@ export function useWindowManager(bounds: DesktopBounds) {
   };
 
   const toggleMaximizeWindow = (windowId: WindowEntityId) => {
+    if (isMobile) {
+      return;
+    }
+
     setWindows((currentWindows) =>
       currentWindows.map((windowState) => {
         if (windowState.id !== windowId) {
@@ -146,6 +199,7 @@ export function useWindowManager(bounds: DesktopBounds) {
           const restoredWindow = {
             ...windowState,
             isMaximized: false,
+            maximizeMode: null,
             position: windowState.restoreRect?.position ?? windowState.position,
             restoreRect: null,
             size: windowState.restoreRect?.size ?? windowState.size,
@@ -158,6 +212,7 @@ export function useWindowManager(bounds: DesktopBounds) {
           ...windowState,
           ...getMaximizedWindowRect(bounds),
           isMaximized: true,
+          maximizeMode: "manual",
           restoreRect: {
             position: windowState.position,
             size: windowState.size,
@@ -170,6 +225,10 @@ export function useWindowManager(bounds: DesktopBounds) {
   };
 
   const updateWindowRect = (windowId: WindowEntityId, nextRect: WindowRect) => {
+    if (isMobile) {
+      return;
+    }
+
     setWindows((currentWindows) =>
       currentWindows.map((windowState) =>
         windowState.id === windowId
@@ -199,13 +258,27 @@ export function useWindowManager(bounds: DesktopBounds) {
             windowState.id === folderWindowId
               ? {
                   ...windowState,
-                  animationState: "idle",
-                  icon: folderEntry.icon ?? windowState.icon,
-                  isOpen: true,
-                  isMaximized: false,
-                  title: folderEntry.label,
-                  zIndex: raisedZIndex,
-                }
+                animationState: "idle",
+                icon: folderEntry.icon ?? windowState.icon,
+                isOpen: true,
+                ...(isMobile
+                  ? {
+                      ...getMaximizedWindowRect(bounds),
+                      isMaximized: true,
+                      maximizeMode: "mobile" as const,
+                      restoreRect:
+                        windowState.restoreRect ?? {
+                          position: windowState.position,
+                          size: windowState.size,
+                        },
+                    }
+                  : {
+                      isMaximized: false,
+                      maximizeMode: null,
+                    }),
+                title: folderEntry.label,
+                zIndex: raisedZIndex,
+              }
               : windowState,
           );
         }
@@ -220,14 +293,23 @@ export function useWindowManager(bounds: DesktopBounds) {
             icon: folderEntry.icon ?? "folder",
             id: folderWindowId,
             isOpen: true,
-            isMaximized: false,
+            isMaximized: isMobile,
+            maximizeMode: isMobile ? "mobile" : null,
             kind: "folder",
             minSize: { width: 320, height: 240 },
             position: {
               x: Math.max(32, bounds.width / 2 - width / 2),
               y: Math.max(48, bounds.height / 2 - height / 2),
             },
-            restoreRect: null,
+            restoreRect: isMobile
+              ? {
+                  position: {
+                    x: Math.max(32, bounds.width / 2 - width / 2),
+                    y: Math.max(48, bounds.height / 2 - height / 2),
+                  },
+                  size: { width, height },
+                }
+              : null,
             size: { width, height },
             title: folderEntry.label,
             zIndex: raisedZIndex,

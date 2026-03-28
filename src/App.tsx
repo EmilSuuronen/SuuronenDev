@@ -15,6 +15,7 @@ import DesktopWindow from "./components/desktop/DesktopWindow";
 import Taskbar from "./components/desktop/Taskbar";
 import TopBar from "./components/desktop/TopBar";
 import type { DesktopFilterId, DesktopFilterOption } from "./data/desktopFilters";
+import { isMobileDesktopViewport } from "./data/desktop";
 import { useDesktopFilter } from "./hooks/useDesktopFilter";
 import { useDesktopIcons } from "./hooks/useDesktopIcons";
 import { useNotes } from "./hooks/useNotes";
@@ -101,6 +102,7 @@ function renderWindowApp({
 function App() {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const bounds = useElementSize(workspaceRef);
+  const isMobile = isMobileDesktopViewport(bounds);
   const { t } = useLocale();
   const { currentTheme, resetTheme, selectTheme, setThemeColor, themeOptions } = useDesktopTheme();
   const { activeFilterId, filterOptions, setActiveFilterId } = useDesktopFilter();
@@ -475,6 +477,7 @@ function App() {
 
       <Taskbar
         activeWindowId={activeWindow?.kind === "app" ? (activeWindow.id as WindowId) : null}
+        isMobile={isMobile}
         onOpenEntry={openDesktopEntry}
         onFocusWindow={focusWindow}
         onOpenWindow={openWindow}

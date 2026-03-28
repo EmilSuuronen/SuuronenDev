@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { isMobileDesktopViewport } from "../../data/desktop";
 import { useLocale } from "../../i18n/locale";
 import AppGlyph from "./AppGlyph";
 import type {
@@ -54,6 +55,7 @@ function DesktopWindow({
   const { t } = useLocale();
   const [interaction, setInteraction] = useState<Interaction | null>(null);
   const isAnimatingOut = windowState.animationState !== "idle";
+  const isMobile = isMobileDesktopViewport(bounds);
 
   const handleControlPointerDown =
     (action: (windowId: WindowEntityId) => void) =>
@@ -100,7 +102,7 @@ function DesktopWindow({
   }, [bounds, interaction, isAnimatingOut, onRectChange, windowState.id]);
 
   const startDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (isAnimatingOut) {
+    if (isAnimatingOut || isMobile) {
       return;
     }
 
@@ -154,7 +156,7 @@ function DesktopWindow({
 
   const startResize =
     (edge: ResizeEdge) => (event: React.PointerEvent<HTMLDivElement>) => {
-      if (isAnimatingOut || windowState.isMaximized) {
+      if (isAnimatingOut || windowState.isMaximized || isMobile) {
         return;
       }
 
@@ -172,7 +174,7 @@ function DesktopWindow({
 
   return (
     <section
-      className={`desktop-window desktop-window--${windowState.id} desktop-window--${windowState.animationState}${windowState.isMaximized ? " desktop-window--maximized" : ""}${interaction ? " desktop-window--interacting" : ""}`}
+      className={`desktop-window desktop-window--${windowState.id} desktop-window--${windowState.animationState}${windowState.isMaximized ? " desktop-window--maximized" : ""}${interaction ? " desktop-window--interacting" : ""}${isMobile ? " desktop-window--mobile" : ""}`}
       style={{
         width: `${windowState.size.width}px`,
         height: `${windowState.size.height}px`,
@@ -206,14 +208,16 @@ function DesktopWindow({
           >
             _
           </button>
-          <button
-            className="window-control window-control--maximize"
-            type="button"
-            aria-label={`${t(windowState.isMaximized ? "Restore" : "Maximize")} ${t(windowState.title)}`}
-            onPointerDown={handleControlPointerDown(onToggleMaximize)}
-          >
-            {windowState.isMaximized ? "❐" : "□"}
-          </button>
+          {!isMobile ? (
+            <button
+              className="window-control window-control--maximize"
+              type="button"
+              aria-label={`${t(windowState.isMaximized ? "Restore" : "Maximize")} ${t(windowState.title)}`}
+              onPointerDown={handleControlPointerDown(onToggleMaximize)}
+            >
+              {windowState.isMaximized ? "❐" : "□"}
+            </button>
+          ) : null}
           <button
             className="window-control window-control--close"
             type="button"

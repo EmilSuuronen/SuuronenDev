@@ -8,13 +8,21 @@ import type { DesktopEntryId, DesktopWindowState, WindowId } from "../../types/d
 
 type TaskbarProps = {
   activeWindowId: WindowId | null;
+  isMobile: boolean;
   onOpenEntry: (entryId: DesktopEntryId) => void;
   onOpenWindow: (windowId: WindowId) => void;
   onFocusWindow: (windowId: WindowId) => void;
   windows: DesktopWindowState[];
 };
 
-function Taskbar({ activeWindowId, onFocusWindow, onOpenEntry, onOpenWindow, windows }: TaskbarProps) {
+function Taskbar({
+  activeWindowId,
+  isMobile,
+  onFocusWindow,
+  onOpenEntry,
+  onOpenWindow,
+  windows,
+}: TaskbarProps) {
   const { t } = useLocale();
   const [clock, setClock] = useState(() => new Date());
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
@@ -30,12 +38,13 @@ function Taskbar({ activeWindowId, onFocusWindow, onOpenEntry, onOpenWindow, win
   }, []);
 
   return (
-    <footer className="taskbar">
+    <footer className={`taskbar${isMobile ? " taskbar--mobile" : ""}`}>
       <div className="taskbar-spacer" aria-hidden="true" />
 
       <div className="taskbar-center">
         <StartMenu
           isOpen={isStartMenuOpen}
+          isMobile={isMobile}
           onClose={() => setIsStartMenuOpen(false)}
           onOpenEntry={onOpenEntry}
         />

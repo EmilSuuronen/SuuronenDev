@@ -45,6 +45,41 @@ export const DESKTOP_ICON_START_X = WINDOW_GAP + 6;
 export const DESKTOP_ICON_START_Y = 28;
 export const DESKTOP_ICON_X_GAP = 18;
 export const DESKTOP_ICON_Y_GAP = 12;
+export const MOBILE_DESKTOP_BREAKPOINT = 820;
+
+export function isMobileDesktopViewport(bounds: Pick<DesktopBounds, "width">) {
+  return bounds.width <= MOBILE_DESKTOP_BREAKPOINT;
+}
+
+export function isMobileDesktopIconLayout(bounds: Pick<DesktopBounds, "width">) {
+  return isMobileDesktopViewport(bounds);
+}
+
+function getMobileDesktopIconColumns(bounds: Pick<DesktopBounds, "width">) {
+  return Math.max(
+    1,
+    Math.floor(
+      (Math.max(bounds.width, DESKTOP_ICON_WIDTH) - DESKTOP_ICON_START_X * 2 + DESKTOP_ICON_X_GAP) /
+        (DESKTOP_ICON_WIDTH + DESKTOP_ICON_X_GAP),
+    ),
+  );
+}
+
+export function getDefaultDesktopRootIconPosition(index: number, bounds: Pick<DesktopBounds, "width">) {
+  if (isMobileDesktopIconLayout(bounds)) {
+    const columnCount = getMobileDesktopIconColumns(bounds);
+
+    return {
+      x: DESKTOP_ICON_START_X + (index % columnCount) * (DESKTOP_ICON_WIDTH + DESKTOP_ICON_X_GAP),
+      y: DESKTOP_ICON_START_Y + Math.floor(index / columnCount) * (DESKTOP_ICON_HEIGHT + DESKTOP_ICON_Y_GAP),
+    };
+  }
+
+  return {
+    x: DESKTOP_ICON_START_X,
+    y: DESKTOP_ICON_START_Y + index * (DESKTOP_ICON_HEIGHT + DESKTOP_ICON_Y_GAP),
+  };
+}
 
 export function createInitialDesktopIcons(bounds: DesktopBounds): DesktopIconState[] {
   const desktopIconApps: DesktopIconState[] = [
@@ -84,32 +119,43 @@ export function createInitialDesktopIcons(bounds: DesktopBounds): DesktopIconSta
     },
   ];
 
-  return desktopIconApps.map((app, index) => ({
-    ...app,
-    position:
-      app.parentId !== null
-        ? app.position
-        : app.id === "trash"
-          ? {
-              x: Math.max(
-                DESKTOP_ICON_START_X,
-                bounds.width - DESKTOP_ICON_WIDTH - WINDOW_GAP - 10,
-              ),
-              y: Math.max(
-                DESKTOP_ICON_START_Y,
-                bounds.height - DESKTOP_ICON_HEIGHT - WINDOW_GAP - 10,
-              ),
-            }
-          : {
-              x: DESKTOP_ICON_START_X,
-              y: DESKTOP_ICON_START_Y + index * (DESKTOP_ICON_HEIGHT + DESKTOP_ICON_Y_GAP),
-            },
-  }));
+  let rootIndex = 0;
+
+  return desktopIconApps.map((app) => {
+    if (app.parentId !== null) {
+      return app;
+    }
+
+    if (app.id === "trash" && !isMobileDesktopIconLayout(bounds)) {
+      return {
+        ...app,
+        position: {
+          x: Math.max(
+            DESKTOP_ICON_START_X,
+            bounds.width - DESKTOP_ICON_WIDTH - WINDOW_GAP - 10,
+          ),
+          y: Math.max(
+            DESKTOP_ICON_START_Y,
+            bounds.height - DESKTOP_ICON_HEIGHT - WINDOW_GAP - 10,
+          ),
+        },
+      };
+    }
+
+    const position = getDefaultDesktopRootIconPosition(rootIndex, bounds);
+    rootIndex += 1;
+
+    return {
+      ...app,
+      position,
+    };
+  });
 }
 
 export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[] {
   const safeWidth = Math.max(bounds.width, 360);
   const safeHeight = Math.max(bounds.height, 420);
+  const isMobile = isMobileDesktopViewport(bounds);
   const isCompact = safeWidth < 920;
   const browserHorizontalPadding = 116;
   const browserTopPadding = 30;
@@ -192,8 +238,9 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
       kind: "app",
       title: "emil@desktop: terminal",
       icon: "terminal",
-      isOpen: true,
+      isOpen: !isMobile,
       isMaximized: false,
+      maximizeMode: null,
       position: { x: terminalX, y: terminalY },
       restoreRect: null,
       size: { width: terminalWidth, height: terminalHeight },
@@ -206,8 +253,9 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
       kind: "app",
       title: "workspace.browser",
       icon: "browser",
-      isOpen: true,
+      isOpen: !isMobile,
       isMaximized: false,
+      maximizeMode: null,
       position: { x: browserX, y: browserY },
       restoreRect: null,
       size: { width: browserWidth, height: browserHeight },
@@ -222,6 +270,7 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
       icon: "calculator",
       isOpen: false,
       isMaximized: false,
+      maximizeMode: null,
       position: { x: calculatorX, y: calculatorY },
       restoreRect: null,
       size: { width: calculatorWidth, height: calculatorHeight },
@@ -237,6 +286,7 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
       icon: "settings",
       isOpen: false,
       isMaximized: false,
+      maximizeMode: null,
       position: { x: settingsX, y: settingsY },
       restoreRect: null,
       size: { width: settingsWidth, height: settingsHeight },
@@ -252,6 +302,7 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
       icon: "notes",
       isOpen: false,
       isMaximized: false,
+      maximizeMode: null,
       position: { x: notesX, y: notesY },
       restoreRect: null,
       size: { width: notesWidth, height: notesHeight },
