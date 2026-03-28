@@ -2,7 +2,9 @@ import { useRef } from "react";
 
 import BrowserApp from "./apps/BrowserApp";
 import CalculatorApp from "./apps/CalculatorApp";
+import FolderApp from "./apps/FolderApp";
 import TerminalApp from "./apps/TerminalApp";
+import DesktopWallpaper from "./components/desktop/DesktopWallpaper";
 import DesktopIcons from "./components/desktop/DesktopIcons";
 import DesktopWindow from "./components/desktop/DesktopWindow";
 import Taskbar from "./components/desktop/Taskbar";
@@ -10,7 +12,7 @@ import TopBar from "./components/desktop/TopBar";
 import { useDesktopIcons } from "./hooks/useDesktopIcons";
 import { useElementSize } from "./hooks/useElementSize";
 import { useWindowManager } from "./hooks/useWindowManager";
-import type { WindowId } from "./types/desktop";
+import type { DesktopEntryId, FolderId, WindowId } from "./types/desktop";
 
 function renderWindowApp(windowId: WindowId) {
   if (windowId === "terminal") {
@@ -27,8 +29,17 @@ function renderWindowApp(windowId: WindowId) {
 function App() {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const bounds = useElementSize(workspaceRef);
-  const { icons, moveIcon, selectedIconId, setSelectedIconId } = useDesktopIcons(bounds);
-  const { windows, closeWindow, focusWindow, minimizeWindow, openWindow, updateWindowRect } =
+  const {
+    getEntry,
+    getFolderEntries,
+    moveIcon,
+    moveIconToFolder,
+    previewMoveIcon,
+    rootIcons,
+    selectedIconIds,
+    setSelectedIconIds,
+  } = useDesktopIcons(bounds);
+  const { windows, closeWindow, focusWindow, minimizeWindow, openFolderWindow, openWindow, updateWindowRect } =
     useWindowManager(bounds);
 
   const openWindows = windows
@@ -38,17 +49,45 @@ function App() {
   const activeWindows = openWindows.filter((windowState) => windowState.animationState === "idle");
   const activeWindow = activeWindows[activeWindows.length - 1] ?? null;
 
+  const openDesktopEntry = (entryId: DesktopEntryId) => {
+    const entry = getEntry(entryId);
+
+    if (!entry) {
+      return;
+    }
+
+    if (entry.kind === "folder") {
+      openFolderWindow({
+        id: entry.id as FolderId,
+        label: entry.label,
+      });
+      return;
+    }
+
+    if (entry.href) {
+      window.open(entry.href, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    if (entry.windowId) {
+      openWindow(entry.windowId);
+    }
+  };
+
   return (
     <div className="desktop-root">
+      <DesktopWallpaper />
       <TopBar onOpenWindow={openWindow} />
 
       <main ref={workspaceRef} className="desktop-workspace">
         <DesktopIcons
-          icons={icons}
+          icons={rootIcons}
           onMoveIcon={moveIcon}
-          onOpenIcon={openWindow}
-          onSelectIcon={setSelectedIconId}
-          selectedIconId={selectedIconId}
+          onMoveIconToFolder={moveIconToFolder}
+          onPreviewMoveIcon={previewMoveIcon}
+          onOpenIcon={openDesktopEntry}
+          onSelectIcons={setSelectedIconIds}
+          selectedIconIds={selectedIconIds}
         />
 
         {openWindows.map((windowState) => (
@@ -61,13 +100,17 @@ function App() {
             onRectChange={updateWindowRect}
             windowState={windowState}
           >
-            {renderWindowApp(windowState.id)}
+            {windowState.kind === "folder" && windowState.folderId ? (
+              <FolderApp entries={getFolderEntries(windowState.folderId)} onOpenEntry={openDesktopEntry} />
+            ) : (
+              renderWindowApp(windowState.id as WindowId)
+            )}
           </DesktopWindow>
         ))}
       </main>
 
       <Taskbar
-        activeWindowId={activeWindow?.id ?? null}
+        activeWindowId={activeWindow?.kind === "app" ? (activeWindow.id as WindowId) : null}
         onFocusWindow={focusWindow}
         onOpenWindow={openWindow}
         windows={windows}

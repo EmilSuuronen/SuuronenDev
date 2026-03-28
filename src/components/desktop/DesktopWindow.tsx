@@ -5,7 +5,7 @@ import type {
   DesktopBounds,
   DesktopWindowState,
   ResizeEdge,
-  WindowId,
+  WindowEntityId,
   WindowRect,
 } from "../../types/desktop";
 import { moveWindow, resizeWindow } from "../../utils/windowMath";
@@ -28,10 +28,10 @@ type Interaction =
 type DesktopWindowProps = {
   bounds: DesktopBounds;
   children: React.ReactNode;
-  onClose: (windowId: WindowId) => void;
-  onFocus: (windowId: WindowId) => void;
-  onMinimize: (windowId: WindowId) => void;
-  onRectChange: (windowId: WindowId, nextRect: WindowRect) => void;
+  onClose: (windowId: WindowEntityId) => void;
+  onFocus: (windowId: WindowEntityId) => void;
+  onMinimize: (windowId: WindowEntityId) => void;
+  onRectChange: (windowId: WindowEntityId, nextRect: WindowRect) => void;
   windowState: DesktopWindowState;
 };
 
@@ -48,6 +48,15 @@ function DesktopWindow({
 }: DesktopWindowProps) {
   const [interaction, setInteraction] = useState<Interaction | null>(null);
   const isAnimatingOut = windowState.animationState !== "idle";
+
+  const handleControlPointerDown =
+    (action: (windowId: WindowEntityId) => void) =>
+    (event: React.PointerEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      onFocus(windowState.id);
+      action(windowState.id);
+    };
 
   useEffect(() => {
     if (!interaction || isAnimatingOut) {
@@ -131,7 +140,7 @@ function DesktopWindow({
               : `translate(${windowState.position.x}px, ${windowState.position.y}px)`,
         zIndex: windowState.zIndex,
       }}
-      onMouseDown={() => {
+      onPointerDown={() => {
         if (!isAnimatingOut) {
           onFocus(windowState.id);
         }
@@ -140,7 +149,7 @@ function DesktopWindow({
       <header className="window-titlebar" onPointerDown={startDrag}>
         <div className="window-title">
           <span className="window-icon">
-            <AppGlyph appId={windowState.id} className="window-icon-glyph" />
+            <AppGlyph iconKey={windowState.icon} className="window-icon-glyph" />
           </span>
           <span>{windowState.title}</span>
         </div>
@@ -149,8 +158,7 @@ function DesktopWindow({
             className="window-control window-control--minimize"
             type="button"
             aria-label={`Minimize ${windowState.title}`}
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={() => onMinimize(windowState.id)}
+            onPointerDown={handleControlPointerDown(onMinimize)}
           >
             _
           </button>
@@ -158,8 +166,7 @@ function DesktopWindow({
             className="window-control window-control--close"
             type="button"
             aria-label={`Close ${windowState.title}`}
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={() => onClose(windowState.id)}
+            onPointerDown={handleControlPointerDown(onClose)}
           >
             x
           </button>

@@ -14,19 +14,25 @@ export function clampWindowToBounds(
     return windowState;
   }
 
-  const maxWidth = Math.max(windowState.minSize.width, bounds.width - WINDOW_GAP * 2);
-  const maxHeight = Math.max(windowState.minSize.height, bounds.height - WINDOW_GAP * 2);
+  const maxWidth = Math.max(
+    windowState.minSize.width,
+    Math.min(windowState.maxSize?.width ?? Number.POSITIVE_INFINITY, bounds.width),
+  );
+  const maxHeight = Math.max(
+    windowState.minSize.height,
+    Math.min(windowState.maxSize?.height ?? Number.POSITIVE_INFINITY, bounds.height),
+  );
   const width = Math.min(windowState.size.width, maxWidth);
   const height = Math.min(windowState.size.height, maxHeight);
-  const maxX = Math.max(WINDOW_GAP, bounds.width - width - WINDOW_GAP);
-  const maxY = Math.max(WINDOW_GAP, bounds.height - height - WINDOW_GAP);
+  const maxX = Math.max(0, bounds.width - width);
+  const maxY = Math.max(0, bounds.height - height);
 
   return {
     ...windowState,
     size: { width, height },
     position: {
-      x: clamp(windowState.position.x, WINDOW_GAP, maxX),
-      y: clamp(windowState.position.y, WINDOW_GAP, maxY),
+      x: clamp(windowState.position.x, 0, maxX),
+      y: clamp(windowState.position.y, 0, maxY),
     },
   };
 }
@@ -37,14 +43,14 @@ export function moveWindow(
   deltaY: number,
   bounds: DesktopBounds,
 ): WindowRect {
-  const maxX = Math.max(WINDOW_GAP, bounds.width - windowState.size.width - WINDOW_GAP);
-  const maxY = Math.max(WINDOW_GAP, bounds.height - windowState.size.height - WINDOW_GAP);
+  const maxX = Math.max(0, bounds.width - windowState.size.width);
+  const maxY = Math.max(0, bounds.height - windowState.size.height);
 
   return {
     size: windowState.size,
     position: {
-      x: clamp(windowState.position.x + deltaX, WINDOW_GAP, maxX),
-      y: clamp(windowState.position.y + deltaY, WINDOW_GAP, maxY),
+      x: clamp(windowState.position.x + deltaX, 0, maxX),
+      y: clamp(windowState.position.y + deltaY, 0, maxY),
     },
   };
 }
@@ -60,12 +66,20 @@ export function resizeWindow(
   let top = windowState.position.y;
   let right = windowState.position.x + windowState.size.width;
   let bottom = windowState.position.y + windowState.size.height;
+  const maxWidth = Math.min(
+    windowState.maxSize?.width ?? Number.POSITIVE_INFINITY,
+    bounds.width,
+  );
+  const maxHeight = Math.min(
+    windowState.maxSize?.height ?? Number.POSITIVE_INFINITY,
+    bounds.height,
+  );
 
   if (edge.includes("e")) {
     right = clamp(
       right + deltaX,
       left + windowState.minSize.width,
-      bounds.width - WINDOW_GAP,
+      Math.min(bounds.width, left + maxWidth),
     );
   }
 
@@ -73,16 +87,24 @@ export function resizeWindow(
     bottom = clamp(
       bottom + deltaY,
       top + windowState.minSize.height,
-      bounds.height - WINDOW_GAP,
+      Math.min(bounds.height, top + maxHeight),
     );
   }
 
   if (edge.includes("w")) {
-    left = clamp(left + deltaX, WINDOW_GAP, right - windowState.minSize.width);
+    left = clamp(
+      left + deltaX,
+      Math.max(0, right - maxWidth),
+      right - windowState.minSize.width,
+    );
   }
 
   if (edge.includes("n")) {
-    top = clamp(top + deltaY, WINDOW_GAP, bottom - windowState.minSize.height);
+    top = clamp(
+      top + deltaY,
+      Math.max(0, bottom - maxHeight),
+      bottom - windowState.minSize.height,
+    );
   }
 
   return {

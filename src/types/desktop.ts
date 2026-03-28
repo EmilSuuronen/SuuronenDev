@@ -1,4 +1,9 @@
 export type WindowId = "terminal" | "browser" | "calculator";
+export type DesktopAppId = WindowId | "molkkis";
+export type FolderId = "applications";
+export type DesktopEntryId = DesktopAppId | FolderId;
+export type DesktopIconKey = "terminal" | "browser" | "calculator" | "molkkis" | "folder";
+export type WindowEntityId = WindowId | `folder:${FolderId}`;
 
 export type Point = {
   x: number;
@@ -17,13 +22,16 @@ export type WindowAnimationState = "idle" | "minimizing" | "closing";
 
 export type DesktopWindowState = {
   animationState: WindowAnimationState;
-  id: WindowId;
-  title: string;
-  icon: string;
+  folderId?: FolderId;
+  icon: DesktopIconKey;
+  id: WindowEntityId;
   isOpen: boolean;
+  kind: "app" | "folder";
+  maxSize?: Size;
   position: Point;
   size: Size;
   minSize: Size;
+  title: string;
   zIndex: number;
 };
 
@@ -32,15 +40,19 @@ export type WindowRect = Pick<DesktopWindowState, "position" | "size">;
 export type DesktopLauncher = {
   id: WindowId;
   label: string;
-  icon: string;
+  icon: DesktopIconKey;
   subtitle: string;
 };
 
 export type DesktopIconState = {
-  id: WindowId;
-  icon: string;
+  id: DesktopEntryId;
+  icon: DesktopIconKey;
+  kind: "app" | "folder";
   label: string;
+  parentId: FolderId | null;
   position: Point;
+  windowId?: WindowId;
+  href?: string;
 };
 
 export type DesktopMenuItem = {

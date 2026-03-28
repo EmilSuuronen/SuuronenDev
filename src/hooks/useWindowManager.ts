@@ -4,7 +4,9 @@ import { createInitialWindows } from "../data/desktop";
 import type {
   DesktopBounds,
   DesktopWindowState,
+  FolderId,
   WindowAnimationState,
+  WindowEntityId,
   WindowId,
   WindowRect,
 } from "../types/desktop";
@@ -15,9 +17,9 @@ const WINDOW_EXIT_ANIMATION_MS = 220;
 export function useWindowManager(bounds: DesktopBounds) {
   const [windows, setWindows] = useState<DesktopWindowState[]>([]);
   const [nextZIndex, setNextZIndex] = useState(10);
-  const exitTimeoutsRef = useRef<Partial<Record<WindowId, number>>>({});
+  const exitTimeoutsRef = useRef<Partial<Record<WindowEntityId, number>>>({});
 
-  const clearExitTimeout = (windowId: WindowId) => {
+  const clearExitTimeout = (windowId: WindowEntityId) => {
     const timeoutId = exitTimeoutsRef.current[windowId];
 
     if (timeoutId) {
@@ -50,7 +52,7 @@ export function useWindowManager(bounds: DesktopBounds) {
     };
   }, []);
 
-  const bringToFront = (windowId: WindowId, shouldOpen: boolean) => {
+  const bringToFront = (windowId: WindowEntityId, shouldOpen: boolean) => {
     clearExitTimeout(windowId);
 
     setNextZIndex((currentZIndex) => {
@@ -73,7 +75,7 @@ export function useWindowManager(bounds: DesktopBounds) {
     });
   };
 
-  const beginWindowExit = (windowId: WindowId, animationState: WindowAnimationState) => {
+  const beginWindowExit = (windowId: WindowEntityId, animationState: WindowAnimationState) => {
     clearExitTimeout(windowId);
 
     setWindows((currentWindows) =>
@@ -105,15 +107,15 @@ export function useWindowManager(bounds: DesktopBounds) {
     }, WINDOW_EXIT_ANIMATION_MS);
   };
 
-  const closeWindow = (windowId: WindowId) => {
+  const closeWindow = (windowId: WindowEntityId) => {
     beginWindowExit(windowId, "closing");
   };
 
-  const minimizeWindow = (windowId: WindowId) => {
+  const minimizeWindow = (windowId: WindowEntityId) => {
     beginWindowExit(windowId, "minimizing");
   };
 
-  const updateWindowRect = (windowId: WindowId, nextRect: WindowRect) => {
+  const updateWindowRect = (windowId: WindowEntityId, nextRect: WindowRect) => {
     setWindows((currentWindows) =>
       currentWindows.map((windowState) =>
         windowState.id === windowId
@@ -127,7 +129,61 @@ export function useWindowManager(bounds: DesktopBounds) {
     bringToFront(windowId, true);
   };
 
-  const focusWindow = (windowId: WindowId) => {
+  const openFolderWindow = (folderEntry: { id: FolderId; label: string }) => {
+    const folderWindowId = `folder:${folderEntry.id}` as const;
+
+    clearExitTimeout(folderWindowId);
+
+    setNextZIndex((currentZIndex) => {
+      const raisedZIndex = currentZIndex + 1;
+
+      setWindows((currentWindows) => {
+        const existingWindow = currentWindows.find((windowState) => windowState.id === folderWindowId);
+
+        if (existingWindow) {
+          return currentWindows.map((windowState) =>
+            windowState.id === folderWindowId
+              ? {
+                  ...windowState,
+                  animationState: "idle",
+                  isOpen: true,
+                  zIndex: raisedZIndex,
+                }
+              : windowState,
+          );
+        }
+
+        const width = Math.min(560, Math.max(360, bounds.width * 0.36));
+        const height = Math.min(420, Math.max(280, bounds.height * 0.42));
+
+        const folderWindow: DesktopWindowState = clampWindowToBounds(
+          {
+            animationState: "idle",
+            folderId: folderEntry.id as FolderId,
+            icon: "folder",
+            id: folderWindowId,
+            isOpen: true,
+            kind: "folder",
+            minSize: { width: 320, height: 240 },
+            position: {
+              x: Math.max(32, bounds.width / 2 - width / 2),
+              y: Math.max(48, bounds.height / 2 - height / 2),
+            },
+            size: { width, height },
+            title: folderEntry.label,
+            zIndex: raisedZIndex,
+          },
+          bounds,
+        );
+
+        return [...currentWindows, folderWindow];
+      });
+
+      return raisedZIndex;
+    });
+  };
+
+  const focusWindow = (windowId: WindowEntityId) => {
     bringToFront(windowId, false);
   };
 
@@ -137,6 +193,7 @@ export function useWindowManager(bounds: DesktopBounds) {
     focusWindow,
     minimizeWindow,
     openWindow,
+    openFolderWindow,
     updateWindowRect,
   };
 }

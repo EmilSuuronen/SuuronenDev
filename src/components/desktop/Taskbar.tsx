@@ -59,7 +59,7 @@ function Taskbar({ activeWindowId, onFocusWindow, onOpenWindow, windows }: Taskb
                 onClick={() => (isOpen ? onFocusWindow(launcher.id) : onOpenWindow(launcher.id))}
               >
                 <span className="taskbar-launcher-icon" aria-hidden="true">
-                  <AppGlyph appId={launcher.id} className="taskbar-icon-glyph" />
+                  <AppGlyph iconKey={launcher.icon} className="taskbar-icon-glyph" />
                 </span>
                 <span className="taskbar-launcher-indicator" aria-hidden="true" />
               </button>

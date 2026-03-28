@@ -1,12 +1,30 @@
-import type { WindowId } from "../../types/desktop";
+import { FolderClosed } from "lucide-react";
+import molkkisIcon from "../../res/icon-192.png";
+import type { DesktopIconKey } from "../../types/desktop";
 
 type AppGlyphProps = {
-  appId: WindowId;
+  iconKey: DesktopIconKey;
   className?: string;
 };
 
-function AppGlyph({ appId, className = "" }: AppGlyphProps) {
-  if (appId === "browser") {
+function AppGlyph({ iconKey, className = "" }: AppGlyphProps) {
+  if (iconKey === "folder") {
+    return (
+      <span className={`app-glyph app-glyph--folder ${className}`.trim()} aria-hidden="true">
+        <FolderClosed className="app-glyph-folder" strokeWidth={1.7} />
+      </span>
+    );
+  }
+
+  if (iconKey === "molkkis") {
+    return (
+      <span className={`app-glyph app-glyph--molkkis ${className}`.trim()} aria-hidden="true">
+        <img className="app-glyph-molkkis-image" src={molkkisIcon} alt="" />
+      </span>
+    );
+  }
+
+  if (iconKey === "browser") {
     return (
       <span className={`app-glyph app-glyph--globe ${className}`.trim()} aria-hidden="true">
         <span className="app-glyph-globe">
@@ -17,7 +35,7 @@ function AppGlyph({ appId, className = "" }: AppGlyphProps) {
     );
   }
 
-  if (appId === "calculator") {
+  if (iconKey === "calculator") {
     return (
       <span className={`app-glyph app-glyph--calculator ${className}`.trim()} aria-hidden="true">
         <span className="app-glyph-calculator">
