@@ -1,11 +1,15 @@
 import { Check, Languages, MonitorCog, Palette } from "lucide-react";
 import { useState } from "react";
 
+import type { DesktopFilterId, DesktopFilterOption } from "../data/desktopFilters";
 import type { DesktopTheme } from "../data/themes";
 import { useLocale, type AppLocale } from "../i18n/locale";
 
 type SettingsAppProps = {
+  activeFilterId: string;
   currentTheme: DesktopTheme;
+  filterOptions: DesktopFilterOption[];
+  onSelectFilter: (filterId: DesktopFilterId) => void;
   onResetTheme: () => void;
   onSelectTheme: (themeId: string) => void;
   onSetThemeColor: (
@@ -31,7 +35,10 @@ const editableColors = [
 ] as const;
 
 function SettingsApp({
+  activeFilterId,
   currentTheme,
+  filterOptions,
+  onSelectFilter,
   onResetTheme,
   onSelectTheme,
   onSetThemeColor,
@@ -39,7 +46,7 @@ function SettingsApp({
 }: SettingsAppProps) {
   const { languageLabel, locale, setLocale, t, themeName } = useLocale();
   const localeOptions: AppLocale[] = ["en", "fi", "pirate", "alien"];
-  const [activePage, setActivePage] = useState<"appearance" | "language">("appearance");
+  const [activePage, setActivePage] = useState<"appearance" | "language" | "filters">("appearance");
 
   return (
     <div className="settings-app">
@@ -64,6 +71,14 @@ function SettingsApp({
             <span>{t("Appearance")}</span>
           </button>
           <button
+            className={`settings-nav-item${activePage === "filters" ? " is-active" : ""}`}
+            type="button"
+            onClick={() => setActivePage("filters")}
+          >
+            <span className="settings-nav-item-icon settings-nav-item-icon--spark">✦</span>
+            <span>{t("Filters")}</span>
+          </button>
+          <button
             className={`settings-nav-item${activePage === "language" ? " is-active" : ""}`}
             type="button"
             onClick={() => setActivePage("language")}
@@ -85,6 +100,10 @@ function SettingsApp({
               <strong>{languageLabel(locale)}</strong>
             </div>
             <div className="settings-sidebar-info-item">
+              <span>{t("Current filter")}</span>
+              <strong>{t(filterOptions.find((filterOption) => filterOption.id === activeFilterId)?.label ?? "No filter")}</strong>
+            </div>
+            <div className="settings-sidebar-info-item">
               <span>{t("Version")}</span>
               <strong>1.0.0</strong>
             </div>
@@ -94,7 +113,37 @@ function SettingsApp({
       </aside>
 
       <div className="settings-main">
-        {activePage === "language" ? (
+        {activePage === "filters" ? (
+          <section className="settings-panel-card">
+            <div className="settings-section-header">
+              <div>
+                <span className="settings-section-kicker">{t("Filters")}</span>
+                <h3>{t("Apply full-screen effects")}</h3>
+              </div>
+            </div>
+
+            <div className="settings-filter-grid">
+              {filterOptions.map((filterOption) => {
+                const isActive = filterOption.id === activeFilterId;
+
+                return (
+                  <button
+                    key={filterOption.id}
+                    className={`settings-filter-card settings-filter-card--${filterOption.id}${isActive ? " is-active" : ""}`}
+                    type="button"
+                    onClick={() => onSelectFilter(filterOption.id)}
+                  >
+                    <span className="settings-filter-preview" aria-hidden="true">
+                      <span className="settings-filter-preview-screen" />
+                    </span>
+                    <span className="settings-filter-card-label">{t(filterOption.label)}</span>
+                    <span className="settings-filter-card-description">{t(filterOption.description)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        ) : activePage === "language" ? (
           <section className="settings-panel-card">
             <div className="settings-section-header">
               <div>

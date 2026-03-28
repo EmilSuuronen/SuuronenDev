@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { findTerminalCommand, getHelpTerminalLines } from "../data/terminalCommands";
+import { getHelpTerminalLines, runTerminalCommand } from "../data/terminalCommands";
 import { getInitialTerminalLines } from "../data/terminalLines";
 import { useElementSize } from "../hooks/useElementSize";
 import { useLocale } from "../i18n/locale";
@@ -57,18 +57,25 @@ function TerminalApp() {
     event.preventDefault();
 
     const submittedCommand = command.trim();
+    const normalizedCommand = submittedCommand.toLowerCase();
     let nextEntries: TerminalLine[] = [...history, { kind: "prompt", value: submittedCommand }];
 
     if (submittedCommand) {
-      const normalizedCommand = submittedCommand.toLowerCase();
-
       if (normalizedCommand === "help") {
-        nextEntries = [...nextEntries, ...getHelpTerminalLines()];
+        nextEntries = [...nextEntries, ...getHelpTerminalLines(t)];
       } else {
-        const matchedCommand = findTerminalCommand(normalizedCommand);
+        const matchedCommand = runTerminalCommand(normalizedCommand, {
+          now: new Date(),
+          useCompactArt,
+        });
 
         if (matchedCommand) {
-          nextEntries = [...nextEntries, ...matchedCommand.output];
+          if (matchedCommand.type === "clear") {
+            nextEntries = getInitialTerminalLines(useCompactArt);
+            setHasCommandHistory(false);
+          } else {
+            nextEntries = [...nextEntries, ...matchedCommand.lines];
+          }
         } else {
           nextEntries.push({
             kind: "error",
@@ -79,7 +86,9 @@ function TerminalApp() {
     }
 
     setHistory(nextEntries);
-    setHasCommandHistory(true);
+    if (normalizedCommand !== "clear") {
+      setHasCommandHistory(true);
+    }
     setCommand("");
   };
 

@@ -63,6 +63,169 @@ button {
   isolation: isolate;
 }
 
+.desktop-root > .desktop-background,
+.desktop-root > .topbar,
+.desktop-root > .desktop-workspace,
+.desktop-root > .taskbar {
+  filter: var(--desktop-filter-effect, none);
+  transition: filter 220ms ease;
+}
+
+.desktop-root--filter-none {
+  --desktop-filter-effect: none;
+}
+
+.desktop-root--filter-invert {
+  --desktop-filter-effect: invert(1) hue-rotate(180deg);
+}
+
+.desktop-root--filter-crt {
+  --desktop-filter-effect: saturate(0.92) contrast(1.14) brightness(0.94);
+}
+
+.desktop-root--filter-glitch {
+  --desktop-filter-effect: saturate(1.18) contrast(1.12) brightness(1.02);
+}
+
+.desktop-root--filter-noir {
+  --desktop-filter-effect: grayscale(1) contrast(1.2) brightness(0.96);
+}
+
+.desktop-root--filter-hologram {
+  --desktop-filter-effect: hue-rotate(38deg) saturate(1.28) contrast(1.06);
+}
+
+.desktop-root--filter-sunset-bloom {
+  --desktop-filter-effect: sepia(0.24) saturate(1.24) brightness(1.03) contrast(1.02);
+}
+
+.desktop-root--filter-night-vision {
+  --desktop-filter-effect: grayscale(0.24) sepia(0.44) hue-rotate(38deg) saturate(1.55) brightness(0.88);
+}
+
+.desktop-filter-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.desktop-filter-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.desktop-filter-overlay--crt .desktop-filter-layer--a {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.04) 0 1px,
+      rgba(0, 0, 0, 0.12) 1px 3px
+    );
+  mix-blend-mode: soft-light;
+  opacity: 0.62;
+}
+
+.desktop-filter-overlay--crt .desktop-filter-layer--b {
+  background:
+    radial-gradient(circle at center, transparent 48%, rgba(0, 0, 0, 0.22) 100%);
+  opacity: 0.9;
+}
+
+.desktop-filter-overlay--crt .desktop-filter-layer--c {
+  background: rgba(255, 255, 255, 0.03);
+  animation: filter-flicker 2.8s steps(2, end) infinite;
+}
+
+.desktop-filter-overlay--glitch .desktop-filter-layer--a {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 24px,
+      rgba(255, 79, 181, 0.08) 24px 28px,
+      transparent 28px 66px,
+      rgba(69, 207, 255, 0.08) 66px 70px
+    );
+  mix-blend-mode: screen;
+  animation: filter-glitch-bars 3.2s steps(6, end) infinite;
+}
+
+.desktop-filter-overlay--glitch .desktop-filter-layer--b {
+  background:
+    linear-gradient(90deg, rgba(255, 0, 98, 0.06), transparent 34%, rgba(0, 213, 255, 0.08) 72%, transparent);
+  mix-blend-mode: screen;
+  animation: filter-glitch-shift 180ms steps(2, end) infinite alternate;
+}
+
+.desktop-filter-overlay--glitch .desktop-filter-layer--c {
+  background:
+    radial-gradient(circle at 20% 12%, rgba(255, 255, 255, 0.05), transparent 24%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0 2px, transparent 2px 5px);
+  opacity: 0.55;
+}
+
+.desktop-filter-overlay--hologram .desktop-filter-layer--a {
+  background:
+    linear-gradient(110deg, rgba(92, 250, 255, 0.12), transparent 32%, rgba(232, 92, 255, 0.1) 68%, transparent);
+  mix-blend-mode: screen;
+}
+
+.desktop-filter-overlay--hologram .desktop-filter-layer--b {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.025) 0 1px,
+      transparent 1px 5px
+    );
+  opacity: 0.42;
+}
+
+.desktop-filter-overlay--hologram .desktop-filter-layer--c {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(129, 255, 246, 0.12), transparent 34%),
+    radial-gradient(circle at 72% 76%, rgba(255, 129, 244, 0.1), transparent 30%);
+}
+
+.desktop-filter-overlay--sunset-bloom .desktop-filter-layer--a {
+  background:
+    radial-gradient(circle at 18% 14%, rgba(255, 194, 123, 0.2), transparent 26%),
+    radial-gradient(circle at 84% 18%, rgba(255, 131, 72, 0.14), transparent 24%),
+    linear-gradient(180deg, rgba(255, 172, 82, 0.08), transparent 34%);
+  mix-blend-mode: screen;
+}
+
+.desktop-filter-overlay--sunset-bloom .desktop-filter-layer--b {
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0.32;
+}
+
+.desktop-filter-overlay--sunset-bloom .desktop-filter-layer--c {
+  background: rgba(255, 197, 124, 0.04);
+}
+
+.desktop-filter-overlay--night-vision .desktop-filter-layer--a {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(196, 255, 167, 0.02) 0 1px,
+      rgba(0, 0, 0, 0.12) 1px 3px
+    );
+  opacity: 0.72;
+}
+
+.desktop-filter-overlay--night-vision .desktop-filter-layer--b {
+  background:
+    radial-gradient(circle at center, transparent 44%, rgba(0, 0, 0, 0.28) 100%);
+}
+
+.desktop-filter-overlay--night-vision .desktop-filter-layer--c {
+  background:
+    linear-gradient(180deg, rgba(164, 255, 123, 0.06), rgba(67, 129, 48, 0.04));
+  mix-blend-mode: screen;
+}
+
 .desktop-background {
   position: fixed;
   inset: 0;
@@ -1550,6 +1713,155 @@ button {
   transform: translateY(-1px);
   border-color: rgba(240, 140, 45, 0.24);
   background: rgba(240, 140, 45, 0.1);
+}
+
+.settings-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+}
+
+.settings-filter-card {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.68);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.settings-filter-card:hover,
+.settings-filter-card.is-active {
+  transform: translateY(-1px);
+  border-color: rgba(240, 140, 45, 0.24);
+  box-shadow: 0 16px 24px rgba(0, 0, 0, 0.06);
+}
+
+.settings-filter-preview {
+  position: relative;
+  display: block;
+  height: 84px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(244, 235, 223, 0.9)),
+    linear-gradient(135deg, rgba(240, 140, 45, 0.08), rgba(0, 0, 0, 0.06));
+}
+
+.settings-filter-preview-screen,
+.settings-filter-preview::before,
+.settings-filter-preview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.settings-filter-preview-screen {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 32%),
+    repeating-linear-gradient(90deg, rgba(18, 18, 18, 0.04) 0 1px, transparent 1px 20px),
+    repeating-linear-gradient(180deg, rgba(18, 18, 18, 0.04) 0 1px, transparent 1px 20px);
+}
+
+.settings-filter-card--invert .settings-filter-preview {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+.settings-filter-card--crt .settings-filter-preview::before {
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0 1px, rgba(0, 0, 0, 0.14) 1px 3px);
+}
+
+.settings-filter-card--crt .settings-filter-preview::after {
+  background: radial-gradient(circle at center, transparent 46%, rgba(0, 0, 0, 0.18) 100%);
+}
+
+.settings-filter-card--glitch .settings-filter-preview::before {
+  background:
+    repeating-linear-gradient(180deg, transparent 0 18px, rgba(255, 61, 112, 0.18) 18px 22px, transparent 22px 48px);
+}
+
+.settings-filter-card--glitch .settings-filter-preview::after {
+  background: linear-gradient(90deg, rgba(0, 213, 255, 0.12), transparent 52%, rgba(255, 0, 98, 0.12));
+}
+
+.settings-filter-card--noir .settings-filter-preview {
+  filter: grayscale(1) contrast(1.18);
+}
+
+.settings-filter-card--hologram .settings-filter-preview::before {
+  background: linear-gradient(90deg, rgba(91, 244, 255, 0.18), transparent 32%, rgba(236, 91, 255, 0.14));
+}
+
+.settings-filter-card--sunset-bloom .settings-filter-preview::before {
+  background: radial-gradient(circle at 20% 18%, rgba(255, 196, 120, 0.24), transparent 28%);
+}
+
+.settings-filter-card--sunset-bloom .settings-filter-preview::after {
+  background: linear-gradient(180deg, rgba(255, 164, 78, 0.1), transparent 34%);
+}
+
+.settings-filter-card--night-vision .settings-filter-preview {
+  filter: sepia(0.5) hue-rotate(34deg) saturate(1.45) brightness(0.86);
+}
+
+.settings-filter-card--night-vision .settings-filter-preview::before {
+  background:
+    repeating-linear-gradient(180deg, rgba(205, 255, 190, 0.04) 0 1px, rgba(0, 0, 0, 0.12) 1px 3px);
+}
+
+.settings-filter-card-label {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.settings-filter-card-description {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+@keyframes filter-flicker {
+  0%,
+  100% {
+    opacity: 0.03;
+  }
+
+  50% {
+    opacity: 0.08;
+  }
+}
+
+@keyframes filter-glitch-bars {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  20% {
+    transform: translateY(-4px);
+  }
+
+  60% {
+    transform: translateY(5px);
+  }
+}
+
+@keyframes filter-glitch-shift {
+  from {
+    transform: translateX(-2px);
+  }
+
+  to {
+    transform: translateX(2px);
+  }
 }
 
 .settings-theme-card {

@@ -40,6 +40,7 @@ const finnishTranslations: Record<string, string> = {
   "A reliable choice for large backend systems, infra-oriented services, and clean deployment paths.":
     "Luotettava valinta suuriin backend-järjestelmiin, infra-painotteisiin palveluihin ja selkeisiin toimituspolkuihin.",
   Accent: "Korosteväri",
+  "Apply full-screen effects": "Kayta koko nayton tehosteita",
   Alien: "Muukalainen",
   "Adjust core shell colors": "Säädä käyttöliittymän päävärejä",
   "AI + data tooling": "AI- ja datatyökalut",
@@ -49,6 +50,7 @@ const finnishTranslations: Record<string, string> = {
   Applications: "Sovellukset",
   "Available channels": "Yhteydenottokanavat",
   "available commands:": "käytettävissä olevat komennot:",
+  "list available commands": "listaa käytettävissä olevat komennot",
   "Backend APIs, data-heavy workflows, and AI or CV experiments without changing lanes.":
     "Backend-rajapintoja, dataintensiivisiä työnkulkuja sekä AI- ja konenäkö-kokeiluja ilman kaistanvaihtoa.",
   "Backend engineering, first": "Backend-kehitys ensin",
@@ -69,6 +71,7 @@ const finnishTranslations: Record<string, string> = {
   "Core languages and frameworks I reach for when building production backend systems.":
     "Keskeiset kielet ja kehykset, joihin nojaan rakentaessani tuotantotason backend-järjestelmiä.",
   "Current language": "Nykyinen kieli",
+  "Current filter": "Nykyinen suodatin",
   "Current shell build": "Nykyinen shell-versio",
   "Current theme": "Nykyinen teema",
   "Currently working as a backend engineer, I spend most of my time around backend systems, infrastructure, and implementation details. Currently making software to make game development accessible for anyone":
@@ -87,6 +90,12 @@ const finnishTranslations: Record<string, string> = {
   "Email for the quickest route. GitHub and LinkedIn for the public trail of what I build and what I work on.":
     "Sähköposti on nopein reitti. GitHub ja LinkedIn näyttävät julkisen jäljen siitä, mitä rakennan ja minkä parissa työskentelen.",
   "Fine tune": "Hienosäätö",
+  "Backend engineer by trade, terminal goblin by aesthetic, builder of systems that should behave under pressure.":
+    "Ammatiltani backend-insinööri, estetiikaltani terminaaligoblin, ja sellaisten järjestelmien rakentaja joiden pitää toimia paineen alla.",
+  "Python, Go, Kotlin, cloud-heavy backend work, a bit of AI curiosity, and enough frontend sense to make the interface worth opening.":
+    "Pythonia, Goa, Kotlinia, pilvipainotteista backend-työtä, ripaus AI-uteliaisuutta ja juuri tarpeeksi frontend-järkeä, jotta käyttöliittymän avaaminen kannattaa.",
+  "If you want the actual links, run contact.": "Jos haluat varsinaiset linkit, aja komento contact.",
+  Filters: "Suodattimet",
   Frontend: "Frontend",
   "Frontend and apps": "Frontend ja sovellukset",
   "Frontend to impress. User experience to actually stick them around. The best software is accessible for anyone.":
@@ -116,6 +125,8 @@ const finnishTranslations: Record<string, string> = {
   Minimize: "Pienennä",
   "Most comfortable": "Mukavin työkalupakki",
   "Mono Studio": "Mono Studio",
+  "No filter": "Ei suodatinta",
+  Noir: "Noir",
   "Open in new tab": "Avaa uudessa välilehdessä",
   "Open browser home": "Avaa selaimen etusivu",
   "Open Browser": "Avaa selain",
@@ -150,6 +161,17 @@ const finnishTranslations: Record<string, string> = {
   "Scientific and ML stack": "Tieteellinen ja ML-pino",
   "Service frameworks": "Palvelukehykset",
   "show contact links": "näytä yhteyslinkit",
+  "show startup banner again": "näytä käynnistysbanneri uudelleen",
+  "print current user": "näytä nykyinen käyttäjä",
+  "print working directory": "näytä nykyinen hakemisto",
+  "list desktop files": "listaa työpöydän tiedostot",
+  "show tiny workspace tree": "näytä pieni työtilapuu",
+  "print faux system information": "näytä tekaistut järjestelmätiedot",
+  "print current date and time": "näytä nykyinen päivämäärä ja aika",
+  "read short profile note": "lue lyhyt profiiliteksti",
+  "read stack summary": "lue teknologiapinon yhteenveto",
+  "read quick contact note": "lue lyhyt yhteysmuistio",
+  "clear terminal output": "tyhjennä terminaalin tuloste",
   "Some websites block iframe embedding or use security policies that prevent this in-browser desktop from rendering them.":
     "Jotkin sivustot estävät iframe-upotuksen tai käyttävät suojauskäytäntöjä, jotka estävät tämän selain-työpöydän renderöimästä niitä.",
   "Stacks if most often reach for and im most keen on.": "Pinoja, joihin tartun useimmin ja joista innostun eniten.",
@@ -183,9 +205,23 @@ const finnishTranslations: Record<string, string> = {
     "Kun backend tarvitsee viimeistellyn tuotekerroksen, nämä ovat työkalut, jotka tuon yleensä mukaan.",
   "Amber Drift": "Amber Drift",
   "Aurora Blueprint": "Aurora Blueprint",
+  CRT: "CRT",
   "Ember Terminal": "Ember Terminal",
   Close: "Sulje",
+  Glitch: "Glitch",
+  Hologram: "Hologrammi",
+  Inverted: "Kaannetty",
   "Midnight Copper": "Midnight Copper",
+  "Night Vision": "Yonakyma",
+  "Sunset Bloom": "Iltaruskon hehku",
+  "Clean desktop rendering with no extra post-processing.": "Puhdas tyopoytarenderointi ilman ylimaaraisia jalikatehosteita.",
+  "Full desktop inversion for a sharp negative-film look.": "Koko tyopoydan kaanto teravaksi negatiivifilmimaiseksi ilmeeksi.",
+  "Scanlines, vignette, and a tiny bit of old-monitor flicker.": "Skannausviivat, vinjetti ja pieni vanhan nayton valke.",
+  "Chromatic drift, data bars, and noisy distortion on top of the shell.": "Kromaattinen vaeltelu, databaarit ja kohinainen hairio shellin paalla.",
+  "Monochrome contrast pass with a cleaner editorial feel.": "Yksivarinen kontrastikierros siistimmalla editoriaalisella tunnelmalla.",
+  "Cool-toned cyan and magenta treatment with a subtle sci-fi cast.": "Viileasavyinen syaani-magenta-kasittely hienovaraisella scifi-fiiliksella.",
+  "Warm bloom and haze that softens the desktop into a cinematic glow.": "Lamminta hehkua ja sumua, joka pehmentaa tyopoydan elokuvamaiseksi.",
+  "Green-tinted tactical display with scan noise and darker shadows.": "Vihreasavyinen taktinen naytto skannauskohinalla ja tummemmilla varjoilla.",
 };
 
 const languageNames: Record<AppLocale, string> = {

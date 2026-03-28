@@ -5,11 +5,14 @@ import CalculatorApp from "./apps/CalculatorApp";
 import FolderApp from "./apps/FolderApp";
 import SettingsApp from "./apps/SettingsApp";
 import TerminalApp from "./apps/TerminalApp";
+import DesktopFilterOverlay from "./components/desktop/DesktopFilterOverlay";
 import DesktopWallpaper from "./components/desktop/DesktopWallpaper";
 import DesktopIcons from "./components/desktop/DesktopIcons";
 import DesktopWindow from "./components/desktop/DesktopWindow";
 import Taskbar from "./components/desktop/Taskbar";
 import TopBar from "./components/desktop/TopBar";
+import type { DesktopFilterId, DesktopFilterOption } from "./data/desktopFilters";
+import { useDesktopFilter } from "./hooks/useDesktopFilter";
 import { useDesktopIcons } from "./hooks/useDesktopIcons";
 import { useDesktopTheme } from "./hooks/useDesktopTheme";
 import { useElementSize } from "./hooks/useElementSize";
@@ -17,7 +20,10 @@ import { useWindowManager } from "./hooks/useWindowManager";
 import type { DesktopEntryId, FolderId, WindowId } from "./types/desktop";
 
 type RenderWindowAppProps = {
+  activeFilterId: string;
   currentTheme: ReturnType<typeof useDesktopTheme>["currentTheme"];
+  filterOptions: DesktopFilterOption[];
+  onSelectFilter: (filterId: DesktopFilterId) => void;
   onResetTheme: ReturnType<typeof useDesktopTheme>["resetTheme"];
   onSelectTheme: ReturnType<typeof useDesktopTheme>["selectTheme"];
   onSetThemeColor: ReturnType<typeof useDesktopTheme>["setThemeColor"];
@@ -26,7 +32,10 @@ type RenderWindowAppProps = {
 };
 
 function renderWindowApp({
+  activeFilterId,
   currentTheme,
+  filterOptions,
+  onSelectFilter,
   onResetTheme,
   onSelectTheme,
   onSetThemeColor,
@@ -44,7 +53,10 @@ function renderWindowApp({
   if (windowId === "settings") {
     return (
       <SettingsApp
+        activeFilterId={activeFilterId}
         currentTheme={currentTheme}
+        filterOptions={filterOptions}
+        onSelectFilter={onSelectFilter}
         onResetTheme={onResetTheme}
         onSelectTheme={onSelectTheme}
         onSetThemeColor={onSetThemeColor}
@@ -60,6 +72,7 @@ function App() {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const bounds = useElementSize(workspaceRef);
   const { currentTheme, resetTheme, selectTheme, setThemeColor, themeOptions } = useDesktopTheme();
+  const { activeFilterId, filterOptions, setActiveFilterId } = useDesktopFilter();
   const {
     getEntry,
     getFolderEntries,
@@ -139,8 +152,9 @@ function App() {
   };
 
   return (
-    <div className="desktop-root" style={desktopThemeStyle}>
+    <div className={`desktop-root desktop-root--filter-${activeFilterId}`} style={desktopThemeStyle}>
       <DesktopWallpaper theme={currentTheme} />
+      <DesktopFilterOverlay filterId={activeFilterId} />
       <TopBar onOpenWindow={openWindow} />
 
       <main ref={workspaceRef} className="desktop-workspace">
@@ -170,7 +184,10 @@ function App() {
               <FolderApp entries={getFolderEntries(windowState.folderId)} onOpenEntry={openDesktopEntry} />
             ) : (
               renderWindowApp({
+                activeFilterId,
                 currentTheme,
+                filterOptions,
+                onSelectFilter: setActiveFilterId,
                 onResetTheme: resetTheme,
                 onSelectTheme: selectTheme,
                 onSetThemeColor: setThemeColor,

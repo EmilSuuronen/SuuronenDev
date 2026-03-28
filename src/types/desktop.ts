@@ -151,5 +151,19 @@ export type TerminalLine =
 export type TerminalCommandDefinition = {
   description: string;
   input: string;
-  output: TerminalLine[];
+  run: (context: TerminalCommandContext) => TerminalCommandResult;
 };
+
+export type TerminalCommandContext = {
+  now: Date;
+  useCompactArt: boolean;
+};
+
+export type TerminalCommandResult =
+  | {
+      type: "clear";
+    }
+  | {
+      lines: TerminalLine[];
+      type: "output";
+    };
