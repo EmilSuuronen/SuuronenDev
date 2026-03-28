@@ -26,9 +26,11 @@ export type DesktopWindowState = {
   icon: DesktopIconKey;
   id: WindowEntityId;
   isOpen: boolean;
+  isMaximized: boolean;
   kind: "app" | "folder";
   maxSize?: Size;
   position: Point;
+  restoreRect?: WindowRect | null;
   size: Size;
   minSize: Size;
   title: string;

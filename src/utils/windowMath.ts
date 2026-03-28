@@ -6,12 +6,31 @@ export function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
+export function getMaximizedWindowRect(bounds: DesktopBounds): WindowRect {
+  return {
+    position: { x: 0, y: 0 },
+    size: {
+      width: Math.max(0, bounds.width),
+      height: Math.max(0, bounds.height),
+    },
+  };
+}
+
 export function clampWindowToBounds(
   windowState: DesktopWindowState,
   bounds: DesktopBounds,
 ): DesktopWindowState {
   if (!bounds.width || !bounds.height) {
     return windowState;
+  }
+
+  if (windowState.isMaximized) {
+    const maximizedRect = getMaximizedWindowRect(bounds);
+
+    return {
+      ...windowState,
+      ...maximizedRect,
+    };
   }
 
   const maxWidth = Math.max(

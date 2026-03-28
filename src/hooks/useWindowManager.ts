@@ -10,7 +10,7 @@ import type {
   WindowId,
   WindowRect,
 } from "../types/desktop";
-import { clampWindowToBounds } from "../utils/windowMath";
+import { clampWindowToBounds, getMaximizedWindowRect } from "../utils/windowMath";
 
 const WINDOW_EXIT_ANIMATION_MS = 220;
 
@@ -115,6 +115,60 @@ export function useWindowManager(bounds: DesktopBounds) {
     beginWindowExit(windowId, "minimizing");
   };
 
+  const restoreWindowFromDrag = (windowId: WindowEntityId, nextRect: WindowRect) => {
+    setWindows((currentWindows) =>
+      currentWindows.map((windowState) =>
+        windowState.id === windowId
+          ? clampWindowToBounds(
+              {
+                ...windowState,
+                ...nextRect,
+                isMaximized: false,
+                restoreRect: null,
+              },
+              bounds,
+            )
+          : windowState,
+      ),
+    );
+
+    bringToFront(windowId, false);
+  };
+
+  const toggleMaximizeWindow = (windowId: WindowEntityId) => {
+    setWindows((currentWindows) =>
+      currentWindows.map((windowState) => {
+        if (windowState.id !== windowId) {
+          return windowState;
+        }
+
+        if (windowState.isMaximized) {
+          const restoredWindow = {
+            ...windowState,
+            isMaximized: false,
+            position: windowState.restoreRect?.position ?? windowState.position,
+            restoreRect: null,
+            size: windowState.restoreRect?.size ?? windowState.size,
+          };
+
+          return clampWindowToBounds(restoredWindow, bounds);
+        }
+
+        return {
+          ...windowState,
+          ...getMaximizedWindowRect(bounds),
+          isMaximized: true,
+          restoreRect: {
+            position: windowState.position,
+            size: windowState.size,
+          },
+        };
+      }),
+    );
+
+    bringToFront(windowId, false);
+  };
+
   const updateWindowRect = (windowId: WindowEntityId, nextRect: WindowRect) => {
     setWindows((currentWindows) =>
       currentWindows.map((windowState) =>
@@ -147,6 +201,7 @@ export function useWindowManager(bounds: DesktopBounds) {
                   ...windowState,
                   animationState: "idle",
                   isOpen: true,
+                  isMaximized: false,
                   zIndex: raisedZIndex,
                 }
               : windowState,
@@ -163,12 +218,14 @@ export function useWindowManager(bounds: DesktopBounds) {
             icon: "folder",
             id: folderWindowId,
             isOpen: true,
+            isMaximized: false,
             kind: "folder",
             minSize: { width: 320, height: 240 },
             position: {
               x: Math.max(32, bounds.width / 2 - width / 2),
               y: Math.max(48, bounds.height / 2 - height / 2),
             },
+            restoreRect: null,
             size: { width, height },
             title: folderEntry.label,
             zIndex: raisedZIndex,
@@ -194,6 +251,8 @@ export function useWindowManager(bounds: DesktopBounds) {
     minimizeWindow,
     openWindow,
     openFolderWindow,
+    restoreWindowFromDrag,
+    toggleMaximizeWindow,
     updateWindowRect,
   };
 }

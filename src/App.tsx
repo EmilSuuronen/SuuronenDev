@@ -39,8 +39,17 @@ function App() {
     selectedIconIds,
     setSelectedIconIds,
   } = useDesktopIcons(bounds);
-  const { windows, closeWindow, focusWindow, minimizeWindow, openFolderWindow, openWindow, updateWindowRect } =
-    useWindowManager(bounds);
+  const {
+    windows,
+    closeWindow,
+    focusWindow,
+    minimizeWindow,
+    openFolderWindow,
+    openWindow,
+    restoreWindowFromDrag,
+    toggleMaximizeWindow,
+    updateWindowRect,
+  } = useWindowManager(bounds);
 
   const openWindows = windows
     .filter((windowState) => windowState.isOpen)
@@ -97,6 +106,8 @@ function App() {
             onClose={closeWindow}
             onFocus={focusWindow}
             onMinimize={minimizeWindow}
+            onRestoreFromDrag={restoreWindowFromDrag}
+            onToggleMaximize={toggleMaximizeWindow}
             onRectChange={updateWindowRect}
             windowState={windowState}
           >

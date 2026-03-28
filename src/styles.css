@@ -421,10 +421,15 @@ button {
   backdrop-filter: blur(18px) saturate(118%);
   -webkit-backdrop-filter: blur(18px) saturate(118%);
   transition:
+    width 220ms cubic-bezier(0.2, 0.75, 0.16, 1),
+    height 220ms cubic-bezier(0.2, 0.75, 0.16, 1),
+    border-radius 220ms cubic-bezier(0.2, 0.75, 0.16, 1),
+    box-shadow 220ms ease,
     transform 220ms cubic-bezier(0.2, 0.75, 0.16, 1),
     opacity 220ms ease,
     filter 220ms ease;
   transform-origin: center bottom;
+  will-change: width, height, transform;
 }
 
 .desktop-window--terminal {
@@ -443,6 +448,15 @@ button {
   opacity: 0;
   filter: blur(1px);
   pointer-events: none;
+}
+
+.desktop-window--maximized {
+  border-radius: 6px;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.24);
+}
+
+.desktop-window--interacting {
+  transition: none;
 }
 
 .window-titlebar {
@@ -527,6 +541,10 @@ button {
 
 .window-control--minimize {
   padding-bottom: 0.32rem;
+}
+
+.window-control--maximize {
+  font-size: 0.76rem;
 }
 
 .window-control--close {

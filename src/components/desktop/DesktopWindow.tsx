@@ -8,7 +8,7 @@ import type {
   WindowEntityId,
   WindowRect,
 } from "../../types/desktop";
-import { moveWindow, resizeWindow } from "../../utils/windowMath";
+import { clamp, moveWindow, resizeWindow } from "../../utils/windowMath";
 
 type Interaction =
   | {
@@ -31,6 +31,8 @@ type DesktopWindowProps = {
   onClose: (windowId: WindowEntityId) => void;
   onFocus: (windowId: WindowEntityId) => void;
   onMinimize: (windowId: WindowEntityId) => void;
+  onRestoreFromDrag: (windowId: WindowEntityId, nextRect: WindowRect) => void;
+  onToggleMaximize: (windowId: WindowEntityId) => void;
   onRectChange: (windowId: WindowEntityId, nextRect: WindowRect) => void;
   windowState: DesktopWindowState;
 };
@@ -43,6 +45,8 @@ function DesktopWindow({
   onClose,
   onFocus,
   onMinimize,
+  onRestoreFromDrag,
+  onToggleMaximize,
   onRectChange,
   windowState,
 }: DesktopWindowProps) {
@@ -100,6 +104,44 @@ function DesktopWindow({
 
     event.preventDefault();
     onFocus(windowState.id);
+
+    if (windowState.isMaximized && windowState.restoreRect) {
+      const restoredWidth = windowState.restoreRect.size.width;
+      const restoredHeight = windowState.restoreRect.size.height;
+      const pointerRatioX =
+        (event.clientX - windowState.position.x) / Math.max(windowState.size.width, 1);
+      const pointerOffsetY = event.clientY - windowState.position.y;
+      const restoredRect = {
+        position: {
+          x: clamp(
+            event.clientX - restoredWidth * pointerRatioX,
+            0,
+            Math.max(0, bounds.width - restoredWidth),
+          ),
+          y: clamp(
+            event.clientY - Math.min(pointerOffsetY, 32),
+            0,
+            Math.max(0, bounds.height - restoredHeight),
+          ),
+        },
+        size: windowState.restoreRect.size,
+      };
+
+      onRestoreFromDrag(windowState.id, restoredRect);
+      setInteraction({
+        mode: "drag",
+        startX: event.clientX,
+        startY: event.clientY,
+        snapshot: {
+          ...windowState,
+          ...restoredRect,
+          isMaximized: false,
+          restoreRect: null,
+        },
+      });
+      return;
+    }
+
     setInteraction({
       mode: "drag",
       startX: event.clientX,
@@ -110,7 +152,7 @@ function DesktopWindow({
 
   const startResize =
     (edge: ResizeEdge) => (event: React.PointerEvent<HTMLDivElement>) => {
-      if (isAnimatingOut) {
+      if (isAnimatingOut || windowState.isMaximized) {
         return;
       }
 
@@ -128,7 +170,7 @@ function DesktopWindow({
 
   return (
     <section
-      className={`desktop-window desktop-window--${windowState.id} desktop-window--${windowState.animationState}`}
+      className={`desktop-window desktop-window--${windowState.id} desktop-window--${windowState.animationState}${windowState.isMaximized ? " desktop-window--maximized" : ""}${interaction ? " desktop-window--interacting" : ""}`}
       style={{
         width: `${windowState.size.width}px`,
         height: `${windowState.size.height}px`,
@@ -163,6 +205,14 @@ function DesktopWindow({
             _
           </button>
           <button
+            className="window-control window-control--maximize"
+            type="button"
+            aria-label={`${windowState.isMaximized ? "Restore" : "Maximize"} ${windowState.title}`}
+            onPointerDown={handleControlPointerDown(onToggleMaximize)}
+          >
+            {windowState.isMaximized ? "❐" : "□"}
+          </button>
+          <button
             className="window-control window-control--close"
             type="button"
             aria-label={`Close ${windowState.title}`}
@@ -175,13 +225,15 @@ function DesktopWindow({
 
       <div className="window-content">{children}</div>
 
-      {resizeEdges.map((edge) => (
-        <div
-          key={edge}
-          className={`resize-handle resize-handle--${edge}`}
-          onPointerDown={startResize(edge)}
-        />
-      ))}
+      {!windowState.isMaximized
+        ? resizeEdges.map((edge) => (
+            <div
+              key={edge}
+              className={`resize-handle resize-handle--${edge}`}
+              onPointerDown={startResize(edge)}
+            />
+          ))
+        : null}
     </section>
   );
 }
