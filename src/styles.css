@@ -101,6 +101,8 @@ button {
   background: linear-gradient(180deg, rgba(8, 8, 8, 0.18), rgba(8, 8, 8, 0.04));
   backdrop-filter: blur(8px) saturate(120%);
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .topbar-menu-strip {
@@ -240,6 +242,8 @@ button {
   border-radius: 16px;
   cursor: pointer;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
   transition:
     background-color 140ms ease,
     transform 120ms ease;
@@ -1082,6 +1086,8 @@ button {
   background: linear-gradient(180deg, rgba(11, 11, 11, 0.76), rgba(5, 5, 5, 0.68));
   backdrop-filter: blur(20px) saturate(118%);
   -webkit-backdrop-filter: blur(20px) saturate(118%);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .taskbar-spacer {
