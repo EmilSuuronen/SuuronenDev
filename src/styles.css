@@ -1403,6 +1403,52 @@ button {
   gap: 0.55rem;
 }
 
+.settings-sidebar-section {
+  display: grid;
+  gap: 0.7rem;
+  padding-top: 0.2rem;
+}
+
+.settings-sidebar-section-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.settings-sidebar-info-list {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.settings-sidebar-info-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+}
+
+.settings-sidebar-info-item strong {
+  color: var(--ink);
+  font-weight: 600;
+  text-transform: capitalize;
+  text-align: right;
+}
+
+.settings-sidebar-note {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  font-size: 0.82rem;
+}
+
 .settings-nav-item {
   display: flex;
   align-items: center;
@@ -1421,10 +1467,6 @@ button {
 
 .settings-nav-item.is-active {
   color: var(--ink);
-}
-
-.settings-nav-item.is-active-secondary {
-  background: rgba(255, 255, 255, 0.32);
 }
 
 .settings-nav-item-icon {
@@ -1478,6 +1520,36 @@ button {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 0.8rem;
+}
+
+.settings-language-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.settings-language-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.settings-language-chip:hover,
+.settings-language-chip.is-active {
+  transform: translateY(-1px);
+  border-color: rgba(240, 140, 45, 0.24);
+  background: rgba(240, 140, 45, 0.1);
 }
 
 .settings-theme-card {

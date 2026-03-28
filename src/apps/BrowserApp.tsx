@@ -6,6 +6,7 @@ import BrowserLoading from "../components/browser/BrowserLoading";
 import BrowserTechStack from "../components/browser/BrowserTechStack";
 import BrowserUnavailable from "../components/browser/BrowserUnavailable";
 import { browserSections } from "../data/browserSections";
+import { useLocale } from "../i18n/locale";
 
 const EMBED_TIMEOUT_MS = 2800;
 
@@ -44,6 +45,7 @@ function normalizeAddressInput(value: string) {
 }
 
 function BrowserApp() {
+  const { t } = useLocale();
   const defaultSectionId = browserSections[0].id;
   const [pageState, setPageState] = useState<BrowserPageState>({
     kind: "internal",
@@ -118,7 +120,7 @@ function BrowserApp() {
         <button
           className="browser-home-button"
           type="button"
-          aria-label="Open browser home"
+          aria-label={t("Open browser home")}
           onClick={() => openInternalSection(defaultSectionId)}
         >
           <House className="browser-home-icon" />
@@ -126,7 +128,7 @@ function BrowserApp() {
         <form className="browser-address-form" onSubmit={handleAddressSubmit}>
           <input
             className="browser-address-input"
-            aria-label="Browser address"
+            aria-label={t("Browser address")}
             type="text"
             value={addressInput}
             onChange={(event) => setAddressInput(event.target.value)}
@@ -139,7 +141,7 @@ function BrowserApp() {
 
       <div className={`browser-layout${isExternalPage ? " is-external" : ""}`}>
         {!isExternalPage ? (
-          <nav className="browser-nav" aria-label="Browser sections">
+          <nav className="browser-nav" aria-label={t("Browser sections")}>
             {browserSections.map((section) => (
               <button
                 key={section.id}
@@ -147,7 +149,7 @@ function BrowserApp() {
                 type="button"
                 onClick={() => openInternalSection(section.id)}
               >
-                {section.label}
+                {t(section.label)}
               </button>
             ))}
           </nav>
@@ -190,15 +192,15 @@ function BrowserApp() {
             )
           ) : (
             <>
-              <p className="browser-eyebrow">{activeSection.eyebrow}</p>
-              <h2>{activeSection.heading}</h2>
-              <p className="browser-description">{activeSection.description}</p>
-              {activeSection.note ? <div className="browser-note-banner">{activeSection.note}</div> : null}
+              <p className="browser-eyebrow">{t(activeSection.eyebrow)}</p>
+              <h2>{t(activeSection.heading)}</h2>
+              <p className="browser-description">{t(activeSection.description)}</p>
+              {activeSection.note ? <div className="browser-note-banner">{t(activeSection.note)}</div> : null}
               {activeSection.highlights?.length ? (
-                <div className="browser-highlight-row" aria-label="Section highlights">
+                <div className="browser-highlight-row" aria-label={t("Section highlights")}>
                   {activeSection.highlights.map((highlight) => (
                     <span key={highlight} className="browser-highlight-chip">
-                      {highlight}
+                      {t(highlight)}
                     </span>
                   ))}
                 </div>
@@ -225,9 +227,9 @@ function BrowserApp() {
                             }
                           : {})}
                       >
-                        <span className="browser-card-label">{card.label}</span>
-                        <h3>{card.title}</h3>
-                        <p>{card.description}</p>
+                        <span className="browser-card-label">{t(card.label)}</span>
+                        <h3>{t(card.title)}</h3>
+                        <p>{t(card.description)}</p>
                       </CardTag>
                     );
                   })}

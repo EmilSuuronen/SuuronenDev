@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { desktopLaunchers } from "../../data/desktop";
+import { useLocale } from "../../i18n/locale";
 import AppGlyph from "./AppGlyph";
 import StartMenu from "./StartMenu";
 import type { DesktopEntryId, DesktopWindowState, WindowId } from "../../types/desktop";
@@ -14,6 +15,7 @@ type TaskbarProps = {
 };
 
 function Taskbar({ activeWindowId, onFocusWindow, onOpenEntry, onOpenWindow, windows }: TaskbarProps) {
+  const { t } = useLocale();
   const [clock, setClock] = useState(() => new Date());
   const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
 
@@ -41,7 +43,7 @@ function Taskbar({ activeWindowId, onFocusWindow, onOpenEntry, onOpenWindow, win
         <button
           className={`taskbar-start${isStartMenuOpen ? " is-active" : ""}`}
           type="button"
-          aria-label="Start"
+          aria-label={t("Start")}
           aria-expanded={isStartMenuOpen}
           aria-haspopup="dialog"
           onClick={() => setIsStartMenuOpen((currentState) => !currentState)}
@@ -54,7 +56,7 @@ function Taskbar({ activeWindowId, onFocusWindow, onOpenEntry, onOpenWindow, win
           </span>
         </button>
 
-        <div className="taskbar-launchers" role="toolbar" aria-label="Desktop launchers">
+        <div className="taskbar-launchers" role="toolbar" aria-label={t("Desktop launchers")}>
           {desktopLaunchers.map((launcher) => {
             const windowState = windows.find((item) => item.id === launcher.id);
             const isOpen = Boolean(windowState?.isOpen && windowState.animationState === "idle");
@@ -65,8 +67,8 @@ function Taskbar({ activeWindowId, onFocusWindow, onOpenEntry, onOpenWindow, win
                 key={launcher.id}
                 className={`taskbar-launcher taskbar-launcher--${launcher.id}${isOpen ? " is-open" : ""}${isActive ? " is-active" : ""}`}
                 type="button"
-                aria-label={launcher.label}
-                title={launcher.label}
+                aria-label={t(launcher.label)}
+                title={t(launcher.label)}
                 onClick={() => {
                   setIsStartMenuOpen(false);
                   if (isOpen) {

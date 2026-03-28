@@ -3,6 +3,7 @@ import { MdOutlineMail } from "react-icons/md";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 
 import { systemMenus } from "../../data/systemMenus";
+import { useLocale } from "../../i18n/locale";
 import type { DesktopMenu, WindowId } from "../../types/desktop";
 
 type TopBarProps = {
@@ -26,6 +27,7 @@ function MenuItemIcon({ icon }: { icon?: DesktopMenu["items"][number]["icon"] })
 }
 
 function TopBar({ onOpenWindow }: TopBarProps) {
+  const { t } = useLocale();
   const [activeMenuLabel, setActiveMenuLabel] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -76,11 +78,11 @@ function TopBar({ onOpenWindow }: TopBarProps) {
                 setActiveMenuLabel((current) => (current === menu.label ? null : menu.label))
               }
             >
-              {menu.label}
+              {t(menu.label)}
             </button>
 
             {activeMenu?.label === menu.label ? (
-              <div className="topbar-menu-panel" role="menu" aria-label={menu.label}>
+              <div className="topbar-menu-panel" role="menu" aria-label={t(menu.label)}>
                 {menu.items.map((item) => (
                   item.href ? (
                     <a
@@ -94,9 +96,9 @@ function TopBar({ onOpenWindow }: TopBarProps) {
                       <span className="topbar-menu-item-main">
                         <MenuItemIcon icon={item.icon} />
                         <span className="topbar-menu-item-text">
-                          <span className="topbar-menu-item-label">{item.label}</span>
+                          <span className="topbar-menu-item-label">{t(item.label)}</span>
                           {item.description ? (
-                            <span className="topbar-menu-item-description">{item.description}</span>
+                            <span className="topbar-menu-item-description">{t(item.description)}</span>
                           ) : null}
                         </span>
                       </span>
@@ -111,9 +113,9 @@ function TopBar({ onOpenWindow }: TopBarProps) {
                       <span className="topbar-menu-item-main">
                         <MenuItemIcon icon={item.icon} />
                         <span className="topbar-menu-item-text">
-                          <span className="topbar-menu-item-label">{item.label}</span>
+                          <span className="topbar-menu-item-label">{t(item.label)}</span>
                           {item.description ? (
-                            <span className="topbar-menu-item-description">{item.description}</span>
+                            <span className="topbar-menu-item-description">{t(item.description)}</span>
                           ) : null}
                         </span>
                       </span>

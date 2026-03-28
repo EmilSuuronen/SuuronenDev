@@ -39,6 +39,7 @@ import {
   type TechStackGroup,
   type TechStackIconKey,
 } from "../../data/techStackGroups";
+import { useLocale } from "../../i18n/locale";
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement> | { className?: string }>;
 
@@ -90,9 +91,10 @@ function getStackStyle({ accent, surface }: Pick<TechStackFeature | TechStackGro
 }
 
 function BrowserTechStack() {
+  const { t } = useLocale();
   return (
     <div className="tech-stack-view">
-      <div className="tech-stack-feature-grid" aria-label="Primary stack comfort zones">
+      <div className="tech-stack-feature-grid" aria-label={t("Most comfortable")}>
         {techStackFeatured.map((feature) => {
           const Icon = iconMap[feature.icon];
 
@@ -103,17 +105,17 @@ function BrowserTechStack() {
                   <Icon className="tech-stack-icon" />
                 </span>
                 <div>
-                  <span className="tech-stack-kicker">Most comfortable</span>
-                  <h3>{feature.label}</h3>
+                  <span className="tech-stack-kicker">{t("Most comfortable")}</span>
+                  <h3>{t(feature.label)}</h3>
                 </div>
               </div>
 
-              <p>{feature.description}</p>
+              <p>{t(feature.description)}</p>
 
-              <div className="tech-stack-feature-list" aria-label={`${feature.label} focus areas`}>
+              <div className="tech-stack-feature-list" aria-label={`${t(feature.label)} ${t("Focus area")}`}>
                 {feature.details.map((detail) => (
                   <span key={detail} className="tech-stack-inline-pill">
-                    {detail}
+                    {t(detail)}
                   </span>
                 ))}
               </div>
@@ -122,7 +124,7 @@ function BrowserTechStack() {
         })}
       </div>
 
-      <div className="tech-stack-grid" aria-label="Technology categories">
+      <div className="tech-stack-grid" aria-label={t("Tech Stack")}>
         {techStackGroups.map((group) => {
           const GroupIcon = iconMap[group.icon];
 
@@ -133,17 +135,17 @@ function BrowserTechStack() {
                   <GroupIcon className="tech-stack-icon" />
                 </span>
                 <div>
-                  <span className="tech-stack-kicker">Category</span>
-                  <h3>{group.label}</h3>
+                  <span className="tech-stack-kicker">{t("Category")}</span>
+                  <h3>{t(group.label)}</h3>
                 </div>
               </header>
 
-              <p className="tech-stack-group-description">{group.description}</p>
+              <p className="tech-stack-group-description">{t(group.description)}</p>
 
               <div className="tech-stack-sections">
                 {group.sections.map((section) => (
                   <section key={section.title} className="tech-stack-section-block">
-                    <h4>{section.title}</h4>
+                    <h4>{t(section.title)}</h4>
                     <div className="tech-stack-skill-grid">
                       {section.items.map((skill) => {
                         const SkillIcon = iconMap[skill.icon];
@@ -153,7 +155,7 @@ function BrowserTechStack() {
                             <span className="tech-stack-skill-icon" aria-hidden="true">
                               <SkillIcon className="tech-stack-icon" />
                             </span>
-                            <span>{skill.label}</span>
+                            <span>{t(skill.label)}</span>
                           </div>
                         );
                       })}

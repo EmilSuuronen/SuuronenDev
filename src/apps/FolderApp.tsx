@@ -1,4 +1,5 @@
 import AppGlyph from "../components/desktop/AppGlyph";
+import { useLocale } from "../i18n/locale";
 import type { DesktopEntryId, DesktopIconState } from "../types/desktop";
 
 type FolderAppProps = {
@@ -7,10 +8,11 @@ type FolderAppProps = {
 };
 
 function FolderApp({ entries, onOpenEntry }: FolderAppProps) {
+  const { t } = useLocale();
   return (
     <div className="folder-app">
       {entries.length === 0 ? (
-        <div className="folder-empty-state">This folder is empty.</div>
+        <div className="folder-empty-state">{t("This folder is empty.")}</div>
       ) : (
         <div className="folder-grid" role="list">
           {entries.map((entry) => (
@@ -23,7 +25,7 @@ function FolderApp({ entries, onOpenEntry }: FolderAppProps) {
               <span className="folder-item-art" aria-hidden="true">
                 <AppGlyph iconKey={entry.icon} className="folder-item-glyph" />
               </span>
-              <span className="folder-item-label">{entry.label}</span>
+              <span className="folder-item-label">{t(entry.label)}</span>
             </button>
           ))}
         </div>

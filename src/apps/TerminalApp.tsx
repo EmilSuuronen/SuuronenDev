@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { findTerminalCommand, getHelpTerminalLines } from "../data/terminalCommands";
 import { getInitialTerminalLines } from "../data/terminalLines";
 import { useElementSize } from "../hooks/useElementSize";
+import { useLocale } from "../i18n/locale";
 import type { TerminalLine } from "../types/desktop";
 
 const PROMPT_PREFIX = "emil@desktop:~$";
@@ -22,6 +23,7 @@ function TerminalPromptPrefix() {
 }
 
 function TerminalApp() {
+  const { commandNotFound, t } = useLocale();
   const terminalRef = useRef<HTMLDivElement>(null);
   const terminalSize = useElementSize(terminalRef);
   const useCompactArt = terminalSize.width > 0 && terminalSize.width < COMPACT_TERMINAL_WIDTH;
@@ -70,7 +72,7 @@ function TerminalApp() {
         } else {
           nextEntries.push({
             kind: "error",
-            value: `bash: ${submittedCommand}: command not found`,
+            value: commandNotFound(submittedCommand),
           });
         }
       }
@@ -99,7 +101,7 @@ function TerminalApp() {
               </div>
             ) : line.kind === "link" ? (
               <p key={`${line.kind}-${index}`} className="terminal-line terminal-line--link">
-                <span className="terminal-link-label">{line.label}: </span>
+                <span className="terminal-link-label">{t(line.label)}: </span>
                 <a
                   className="terminal-link"
                   href={line.href}
@@ -112,7 +114,7 @@ function TerminalApp() {
               </p>
             ) : (
               <p key={`${line.kind}-${index}`} className={`terminal-line terminal-line--${line.kind}`}>
-                {line.value}
+                {line.kind === "accent" || line.kind === "error" ? line.value : t(line.value)}
               </p>
             ),
           )}

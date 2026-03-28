@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import AppGlyph from "./AppGlyph";
 import { DESKTOP_ICON_HEIGHT, DESKTOP_ICON_WIDTH } from "../../data/desktop";
+import { useLocale } from "../../i18n/locale";
 import type { DesktopEntryId, DesktopIconState, FolderId } from "../../types/desktop";
 
 type DragState = {
@@ -51,6 +52,7 @@ function DesktopIcon({
   onOpenIcon,
   onSelectIcons,
 }: DesktopIconProps) {
+  const { t } = useLocale();
   const [dragState, setDragState] = useState<DragState | null>(null);
 
   useEffect(() => {
@@ -117,7 +119,7 @@ function DesktopIcon({
         transform: `translate(${icon.position.x}px, ${icon.position.y}px)`,
       }}
       type="button"
-      title={icon.label}
+      title={t(icon.label)}
       onClick={(event) => {
         event.stopPropagation();
         onSelectIcons([icon.id]);
@@ -140,7 +142,7 @@ function DesktopIcon({
       <span className="desktop-icon-art" aria-hidden="true">
         <AppGlyph iconKey={icon.icon} className="desktop-icon-glyph" />
       </span>
-      <span className="desktop-icon-label">{icon.label}</span>
+      <span className="desktop-icon-label">{t(icon.label)}</span>
     </button>
   );
 }

@@ -3,6 +3,7 @@ import { FiGithub, FiLinkedin, FiMail } from "react-icons/fi";
 
 import AppGlyph from "./AppGlyph";
 import { startMenuSections } from "../../data/startMenu";
+import { useLocale } from "../../i18n/locale";
 import type { DesktopEntryId, StartMenuItem } from "../../types/desktop";
 
 type StartMenuProps = {
@@ -28,6 +29,7 @@ function renderAuxIcon(icon: StartMenuItem["icon"]) {
 }
 
 function StartMenu({ isOpen, onClose, onOpenEntry }: StartMenuProps) {
+  const { t } = useLocale();
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -74,18 +76,18 @@ function StartMenu({ isOpen, onClose, onOpenEntry }: StartMenuProps) {
   };
 
   return (
-    <div ref={menuRef} className="start-menu" role="dialog" aria-label="Start menu">
+    <div ref={menuRef} className="start-menu" role="dialog" aria-label={t("Start")}>
       <div className="start-menu-header">
         <div>
-          <div className="start-menu-title">Start</div>
-          <div className="start-menu-subtitle">Pinned apps and quick links</div>
+          <div className="start-menu-title">{t("Start")}</div>
+          <div className="start-menu-subtitle">{t("Pinned apps and quick links")}</div>
         </div>
       </div>
 
       <div className="start-menu-sections">
         {startMenuSections.map((section) => (
-          <section key={section.label} className="start-menu-section" aria-label={section.label}>
-            <div className="start-menu-section-title">{section.label}</div>
+          <section key={section.label} className="start-menu-section" aria-label={t(section.label)}>
+            <div className="start-menu-section-title">{t(section.label)}</div>
             <div className="start-menu-grid">
               {section.items.map((item) => (
                 <button
@@ -98,9 +100,9 @@ function StartMenu({ isOpen, onClose, onOpenEntry }: StartMenuProps) {
                     {renderAuxIcon(item.icon)}
                   </span>
                   <span className="start-menu-item-text">
-                    <span className="start-menu-item-label">{item.label}</span>
+                    <span className="start-menu-item-label">{t(item.label)}</span>
                     {item.description ? (
-                      <span className="start-menu-item-description">{item.description}</span>
+                      <span className="start-menu-item-description">{t(item.description)}</span>
                     ) : null}
                   </span>
                 </button>
@@ -112,7 +114,7 @@ function StartMenu({ isOpen, onClose, onOpenEntry }: StartMenuProps) {
 
       <div className="start-menu-footer">
         <div className="start-menu-footer-user">emil@desktop</div>
-        <div className="start-menu-footer-hint">Placeholder shell menu</div>
+        <div className="start-menu-footer-hint">{t("Placeholder shell menu")}</div>
       </div>
     </div>
   );

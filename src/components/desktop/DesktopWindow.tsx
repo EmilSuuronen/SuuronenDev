@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useLocale } from "../../i18n/locale";
 import AppGlyph from "./AppGlyph";
 import type {
   DesktopBounds,
@@ -50,6 +51,7 @@ function DesktopWindow({
   onRectChange,
   windowState,
 }: DesktopWindowProps) {
+  const { t } = useLocale();
   const [interaction, setInteraction] = useState<Interaction | null>(null);
   const isAnimatingOut = windowState.animationState !== "idle";
 
@@ -193,13 +195,13 @@ function DesktopWindow({
           <span className="window-icon">
             <AppGlyph iconKey={windowState.icon} className="window-icon-glyph" />
           </span>
-          <span>{windowState.title}</span>
+          <span>{t(windowState.title)}</span>
         </div>
         <div className="window-controls">
           <button
             className="window-control window-control--minimize"
             type="button"
-            aria-label={`Minimize ${windowState.title}`}
+            aria-label={`${t("Minimize")} ${t(windowState.title)}`}
             onPointerDown={handleControlPointerDown(onMinimize)}
           >
             _
@@ -207,7 +209,7 @@ function DesktopWindow({
           <button
             className="window-control window-control--maximize"
             type="button"
-            aria-label={`${windowState.isMaximized ? "Restore" : "Maximize"} ${windowState.title}`}
+            aria-label={`${t(windowState.isMaximized ? "Restore" : "Maximize")} ${t(windowState.title)}`}
             onPointerDown={handleControlPointerDown(onToggleMaximize)}
           >
             {windowState.isMaximized ? "❐" : "□"}
@@ -215,7 +217,7 @@ function DesktopWindow({
           <button
             className="window-control window-control--close"
             type="button"
-            aria-label={`Close ${windowState.title}`}
+            aria-label={`${t("Close")} ${t(windowState.title)}`}
             onPointerDown={handleControlPointerDown(onClose)}
           >
             x
