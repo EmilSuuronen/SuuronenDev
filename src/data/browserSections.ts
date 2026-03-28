@@ -2,81 +2,55 @@ import type { BrowserSection } from "../types/desktop";
 
 export const browserSections: BrowserSection[] = [
   {
-    id: "overview",
-    label: "Overview",
-    eyebrow: "Desktop concept",
-    heading: "A personal site that behaves like a tiny operating system.",
+    id: "about",
+    label: "About",
+    eyebrow: "Profile",
+    heading: "Hi, im Emil.",
     description:
-      "This first pass focuses on the shell itself: reusable windows, a taskbar, and a page that stays inside one fixed desktop view.",
+      "Currently working as a backend engineer, I spend most of my time around backend systems, infrastructure, and implementation details. Currently making software to make game development accessible for anyone",
     cards: [
       {
-        title: "Single-page desktop",
-        description: "No long landing page. Everything lives inside windows and apps.",
-        label: "Layout",
+        title: "Backend engineering, first",
+        description:
+          "Delivering real world infrastructure with reliability and scalability in mind. Full end to end ownership of projects, from design to implementation.",
+        label: "Currently working on",
       },
       {
-        title: "Reusable windows",
-        description: "Drag, resize, close, and relaunch each app without rewriting the chrome.",
-        label: "System",
+        title: "AI with curiosity",
+        description:
+          "Interested in AI workflows and integrations. Experimenting with diffusion models and generative AI, and interested in integrating custom AI tooling to actual workflows.",
+        label: "Focus area",
       },
       {
-        title: "Expandable foundation",
-        description: "Projects, notes, media, experiments, and tools can become their own apps later.",
-        label: "Roadmap",
+        title: "UX + frontend ❤️",
+        description:
+          "Frontend to impress. User experience to actually stick them around. The best software is accessible for anyone.",
+        label: "Frontend",
       },
     ],
   },
   {
-    id: "links",
-    label: "Links",
-    eyebrow: "Quick access",
-    heading: "The browser window can hold structured content, navigation, and external links.",
+    id: "tech-stack",
+    label: "Tech Stack",
+    view: "tech-stack",
+    eyebrow: "Stack map",
+    heading: "The tools I’m most comfortable shipping with.",
     description:
-      "For now it acts like a compact dashboard. Later you can turn each section into a richer in-window experience.",
-    cards: [
-      {
-        title: "GitHub",
-        description: "Code, experiments, and repository history.",
-        label: "Open profile",
-        href: "https://github.com/EmilSuuronen",
-      },
-      {
-        title: "LinkedIn",
-        description: "Background, studies, and professional context.",
-        label: "Open profile",
-        href: "https://www.linkedin.com/in/emil-suuronen/",
-      },
-      {
-        title: "Email",
-        description: "Direct route for collaboration or project discussions.",
-        label: "Compose",
-        href: "mailto:emilsuuronen@gmail.com",
-      },
-    ],
+      "Learning a lot of stuff and trying to keep up with the latest and greatest. Not a master of all, but confident in a few.",
+    note:
+      "Stacks if most often reach for and im most keen on.",
+    highlights: ["Backend systems", "Cloud infrastructure", "AI + data tooling", "Frontend and apps"],
+    cards: [],
   },
   {
-    id: "lab",
-    label: "Lab",
-    eyebrow: "Next apps",
-    heading: "The long-term goal is a browser-based desktop with multiple purpose-built tools.",
+    id: "contact",
+    label: "Contact",
+    view: "contact",
+    eyebrow: "contact",
+    heading: "Get in touch.",
     description:
-      "Obvious next candidates are a projects app, a media player, a notes app, and a small file explorer or command palette.",
-    cards: [
-      {
-        title: "Projects app",
-        description: "Dedicated space for case studies, screenshots, and changelogs.",
-        label: "Planned",
-      },
-      {
-        title: "Media app",
-        description: "A place for music links, visuals, and embedded content.",
-        label: "Planned",
-      },
-      {
-        title: "Command palette",
-        description: "Fast navigation across apps and desktop actions.",
-        label: "Planned",
-      },
-    ],
+      "Hit me up for collaboration or inquiries.",
+    highlights: ["Email", "GitHub", "LinkedIn"],
+    cards: [],
   },
 ];

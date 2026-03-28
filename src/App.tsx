@@ -122,6 +122,7 @@ function App() {
 
       <Taskbar
         activeWindowId={activeWindow?.kind === "app" ? (activeWindow.id as WindowId) : null}
+        onOpenEntry={openDesktopEntry}
         onFocusWindow={focusWindow}
         onOpenWindow={openWindow}
         windows={windows}

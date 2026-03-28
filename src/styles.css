@@ -218,10 +218,10 @@ button {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.068) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.068) 1px, transparent 1px);
   background-size: 36px 36px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.78), transparent 100%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.22) 82%, transparent 100%);
   pointer-events: none;
 }
 
@@ -893,6 +893,41 @@ button {
   line-height: 1.55;
 }
 
+.browser-note-banner {
+  margin-bottom: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(240, 140, 45, 0.18);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(240, 140, 45, 0.1), rgba(255, 255, 255, 0.36)),
+    rgba(255, 255, 255, 0.44);
+  color: rgba(18, 18, 18, 0.78);
+  line-height: 1.6;
+}
+
+.browser-highlight-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 1.2rem;
+}
+
+.browser-highlight-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.45)),
+    rgba(240, 140, 45, 0.08);
+  color: var(--ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.71rem;
+  letter-spacing: 0.01em;
+}
+
 .browser-card-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -913,6 +948,300 @@ button {
 }
 
 .browser-card p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+.tech-stack-view {
+  display: grid;
+  gap: 1rem;
+}
+
+.tech-stack-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.tech-stack-feature-card,
+.tech-stack-group-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--stack-accent) 18%, rgba(18, 18, 18, 0.06));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.62)),
+    var(--stack-surface);
+  box-shadow: 0 16px 28px rgba(16, 16, 16, 0.07);
+}
+
+.tech-stack-feature-card {
+  display: grid;
+  gap: 0.85rem;
+  min-height: 212px;
+  padding: 1rem;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.tech-stack-feature-card:hover,
+.tech-stack-group-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 34px rgba(16, 16, 16, 0.09);
+  border-color: color-mix(in srgb, var(--stack-accent) 28%, rgba(18, 18, 18, 0.08));
+}
+
+.tech-stack-feature-card::before,
+.tech-stack-group-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--stack-accent), transparent 88%);
+  pointer-events: none;
+}
+
+.tech-stack-feature-head,
+.tech-stack-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.tech-stack-feature-icon,
+.tech-stack-group-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--stack-accent) 12%, rgba(255, 255, 255, 0.82));
+  color: var(--stack-accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--stack-accent) 16%, transparent);
+}
+
+.tech-stack-kicker {
+  display: inline-block;
+  margin-bottom: 0.2rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.68rem;
+  color: var(--stack-accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tech-stack-icon {
+  width: 19px;
+  height: 19px;
+}
+
+.tech-stack-feature-card h3,
+.tech-stack-group-card h3,
+.tech-stack-section-block h4 {
+  margin: 0;
+}
+
+.tech-stack-feature-card p,
+.tech-stack-group-description {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.tech-stack-feature-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tech-stack-inline-pill,
+.tech-stack-skill-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+  font-size: 0.78rem;
+}
+
+.tech-stack-inline-pill {
+  padding: 0.45rem 0.8rem;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.tech-stack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.9rem;
+}
+
+.tech-stack-group-card {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.tech-stack-sections {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.tech-stack-section-block {
+  display: grid;
+  gap: 0.55rem;
+  padding-top: 0.15rem;
+}
+
+.tech-stack-section-block h4 {
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.tech-stack-skill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.tech-stack-skill-pill {
+  padding: 0.42rem 0.78rem;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.tech-stack-skill-pill:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--stack-accent) 26%, rgba(18, 18, 18, 0.08));
+  background: color-mix(in srgb, var(--stack-accent) 5%, rgba(255, 255, 255, 0.82));
+}
+
+.tech-stack-skill-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--stack-accent);
+}
+
+.browser-contact-view {
+  display: grid;
+  gap: 1rem;
+}
+
+.browser-contact-intro {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(240, 140, 45, 0.08), rgba(255, 255, 255, 0.42)),
+    rgba(255, 255, 255, 0.5);
+}
+
+.browser-contact-intro p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.browser-contact-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 32px;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  color: var(--accent);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.browser-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.browser-contact-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9rem;
+  align-items: start;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--contact-accent) 18%, rgba(18, 18, 18, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.68)),
+    color-mix(in srgb, var(--contact-accent) 8%, rgba(255, 255, 255, 0.7));
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.browser-contact-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 30px rgba(18, 18, 18, 0.08);
+  border-color: color-mix(in srgb, var(--contact-accent) 28%, rgba(18, 18, 18, 0.1));
+}
+
+.browser-contact-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--contact-accent) 14%, rgba(255, 255, 255, 0.84));
+  color: var(--contact-accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--contact-accent) 18%, transparent);
+}
+
+.browser-contact-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.browser-contact-card-content {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.browser-contact-card-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--contact-accent);
+}
+
+.browser-contact-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.browser-contact-card p {
   margin: 0;
   color: var(--ink-soft);
   line-height: 1.55;
@@ -1095,6 +1424,7 @@ button {
 }
 
 .taskbar-center {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1104,6 +1434,177 @@ button {
   background: rgba(255, 255, 255, 0.03);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   justify-self: center;
+}
+
+.start-menu {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 14px);
+  width: min(620px, calc(100vw - 32px));
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(18, 18, 18, 0.92), rgba(9, 9, 9, 0.9)),
+    rgba(14, 14, 14, 0.88);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 30px 70px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(22px) saturate(118%);
+  -webkit-backdrop-filter: blur(22px) saturate(118%);
+  transform: translateX(-50%);
+}
+
+.start-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0.2rem 0.95rem;
+}
+
+.start-menu-title {
+  color: #fff6ec;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.start-menu-subtitle {
+  margin-top: 0.15rem;
+  color: var(--text-light-soft);
+  font-size: 0.75rem;
+}
+
+.start-menu-sections {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.start-menu-section {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.start-menu-section-title {
+  padding: 0 0.2rem;
+  color: rgba(255, 255, 255, 0.76);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.start-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.start-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 64px;
+  padding: 0.75rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.03);
+  color: var(--text-light);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.start-menu-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(240, 140, 45, 0.18);
+  background:
+    linear-gradient(180deg, rgba(240, 140, 45, 0.08), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.04);
+}
+
+.start-menu-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  flex: 0 0 auto;
+}
+
+.start-menu-item-glyph {
+  width: 100%;
+  height: 100%;
+}
+
+.start-menu-item-glyph .app-glyph-globe,
+.start-menu-item-glyph .app-glyph-calculator {
+  width: 18px;
+  height: 18px;
+}
+
+.start-menu-item-glyph .app-glyph-folder {
+  width: 20px;
+  height: 20px;
+}
+
+.start-menu-item-glyph .app-glyph-text {
+  font-size: 0.84rem;
+}
+
+.start-menu-item-meta-icon {
+  width: 17px;
+  height: 17px;
+  color: var(--accent-strong);
+}
+
+.start-menu-item-text {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.start-menu-item-label {
+  color: #fff8f1;
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.start-menu-item-description {
+  color: var(--text-light-soft);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.start-menu-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.start-menu-footer-user {
+  color: #fff6ea;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.76rem;
+}
+
+.start-menu-footer-hint {
+  color: var(--text-light-soft);
+  font-size: 0.72rem;
 }
 
 .taskbar-start,
@@ -1124,6 +1625,7 @@ button {
 }
 
 .taskbar-start:hover,
+.taskbar-start.is-active,
 .taskbar-launcher:hover,
 .taskbar-launcher.is-active {
   transform: translateY(-1px);
@@ -1222,6 +1724,17 @@ button {
 }
 
 @media (max-width: 900px) {
+  .start-menu {
+    width: min(560px, calc(100vw - 20px));
+    bottom: calc(100% + 10px);
+    padding: 0.85rem;
+    border-radius: 20px;
+  }
+
+  .start-menu-grid {
+    grid-template-columns: 1fr;
+  }
+
   .browser-layout {
     grid-template-columns: 1fr;
   }
@@ -1262,5 +1775,10 @@ button {
   .taskbar-center {
     width: 100%;
     justify-content: center;
+  }
+
+  .tech-stack-feature-grid,
+  .tech-stack-grid {
+    grid-template-columns: 1fr;
   }
 }

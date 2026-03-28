@@ -80,6 +80,39 @@ export type DesktopMenu = {
   label: string;
 };
 
+export type StartMenuItem =
+  | {
+      action:
+        | {
+            type: "open_entry";
+            entryId: DesktopEntryId;
+          }
+        | {
+            type: "none";
+          };
+      description?: string;
+      icon: DesktopIconKey;
+      label: string;
+    }
+  | {
+      action:
+        | {
+            type: "open_link";
+            href: string;
+          }
+        | {
+            type: "none";
+          };
+      description?: string;
+      icon: "mail" | "github" | "linkedin";
+      label: string;
+    };
+
+export type StartMenuSection = {
+  items: StartMenuItem[];
+  label: string;
+};
+
 export type BrowserCard = {
   title: string;
   description: string;
@@ -94,6 +127,9 @@ export type BrowserSection = {
   heading: string;
   description: string;
   cards: BrowserCard[];
+  note?: string;
+  highlights?: string[];
+  view?: "cards" | "tech-stack" | "contact";
 };
 
 export type TerminalLine =

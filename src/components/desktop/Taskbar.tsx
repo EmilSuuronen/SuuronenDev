@@ -2,17 +2,20 @@ import { useEffect, useState } from "react";
 
 import { desktopLaunchers } from "../../data/desktop";
 import AppGlyph from "./AppGlyph";
-import type { DesktopWindowState, WindowId } from "../../types/desktop";
+import StartMenu from "./StartMenu";
+import type { DesktopEntryId, DesktopWindowState, WindowId } from "../../types/desktop";
 
 type TaskbarProps = {
   activeWindowId: WindowId | null;
+  onOpenEntry: (entryId: DesktopEntryId) => void;
   onOpenWindow: (windowId: WindowId) => void;
   onFocusWindow: (windowId: WindowId) => void;
   windows: DesktopWindowState[];
 };
 
-function Taskbar({ activeWindowId, onFocusWindow, onOpenWindow, windows }: TaskbarProps) {
+function Taskbar({ activeWindowId, onFocusWindow, onOpenEntry, onOpenWindow, windows }: TaskbarProps) {
   const [clock, setClock] = useState(() => new Date());
+  const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
 
   useEffect(() => {
     const timerId = window.setInterval(() => {
@@ -29,11 +32,19 @@ function Taskbar({ activeWindowId, onFocusWindow, onOpenWindow, windows }: Taskb
       <div className="taskbar-spacer" aria-hidden="true" />
 
       <div className="taskbar-center">
+        <StartMenu
+          isOpen={isStartMenuOpen}
+          onClose={() => setIsStartMenuOpen(false)}
+          onOpenEntry={onOpenEntry}
+        />
+
         <button
-          className="taskbar-start"
+          className={`taskbar-start${isStartMenuOpen ? " is-active" : ""}`}
           type="button"
-          aria-label="Home"
-          onClick={() => onOpenWindow("browser")}
+          aria-label="Start"
+          aria-expanded={isStartMenuOpen}
+          aria-haspopup="dialog"
+          onClick={() => setIsStartMenuOpen((currentState) => !currentState)}
         >
           <span className="taskbar-start-logo" aria-hidden="true">
             <span />
@@ -56,7 +67,15 @@ function Taskbar({ activeWindowId, onFocusWindow, onOpenWindow, windows }: Taskb
                 type="button"
                 aria-label={launcher.label}
                 title={launcher.label}
-                onClick={() => (isOpen ? onFocusWindow(launcher.id) : onOpenWindow(launcher.id))}
+                onClick={() => {
+                  setIsStartMenuOpen(false);
+                  if (isOpen) {
+                    onFocusWindow(launcher.id);
+                    return;
+                  }
+
+                  onOpenWindow(launcher.id);
+                }}
               >
                 <span className="taskbar-launcher-icon" aria-hidden="true">
                   <AppGlyph iconKey={launcher.icon} className="taskbar-icon-glyph" />
