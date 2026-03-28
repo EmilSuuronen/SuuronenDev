@@ -40,6 +40,14 @@ export const systemMenus: DesktopMenu[] = [
           windowId: "calculator",
         },
       },
+      {
+        label: "Open Settings",
+        description: "Themes and personalization",
+        action: {
+          type: "open_window",
+          windowId: "settings",
+        },
+      },
     ],
   },
   {

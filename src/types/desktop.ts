@@ -1,8 +1,8 @@
-export type WindowId = "terminal" | "browser" | "calculator";
+export type WindowId = "terminal" | "browser" | "calculator" | "settings";
 export type DesktopAppId = WindowId | "molkkis";
 export type FolderId = "applications";
 export type DesktopEntryId = DesktopAppId | FolderId;
-export type DesktopIconKey = "terminal" | "browser" | "calculator" | "molkkis" | "folder";
+export type DesktopIconKey = "terminal" | "browser" | "calculator" | "settings" | "molkkis" | "folder";
 export type WindowEntityId = WindowId | `folder:${FolderId}`;
 
 export type Point = {

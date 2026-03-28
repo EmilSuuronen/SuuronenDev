@@ -1,6 +1,11 @@
+import type { DesktopTheme } from "../../data/themes";
 import Grainient from "../Grainient";
 
-function DesktopWallpaper() {
+type DesktopWallpaperProps = {
+  theme: DesktopTheme;
+};
+
+function DesktopWallpaper({ theme }: DesktopWallpaperProps) {
   return (
     <div aria-hidden="true" className="desktop-background">
       <Grainient
@@ -24,9 +29,9 @@ function DesktopWallpaper() {
         centerX={-0.02}
         centerY={0}
         zoom={0.78}
-        color1="#ffbba6"
-        color2="#fa5102"
-        color3="#474645"
+        color1={theme.wallpaperColor1}
+        color2={theme.wallpaperColor2}
+        color3={theme.wallpaperColor3}
       />
       <div className="desktop-wallpaper-glow" />
     </div>

@@ -25,6 +25,12 @@ export const desktopLaunchers: DesktopLauncher[] = [
     icon: "calculator",
     subtitle: "Quick math",
   },
+  {
+    id: "settings",
+    label: "Settings",
+    icon: "settings",
+    subtitle: "Themes and personalization",
+  },
 ];
 
 export const DESKTOP_ICON_WIDTH = 88;
@@ -127,6 +133,20 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
     ? WINDOW_GAP
     : Math.max(WINDOW_GAP, safeWidth / 2 - calculatorWidth / 2 + 120);
   const calculatorY = isCompact ? 84 : 84;
+  const settingsWidth = clamp(
+    isCompact ? 360 : 760,
+    340,
+    Math.min(860, safeWidth - WINDOW_GAP * 2),
+  );
+  const settingsHeight = clamp(
+    isCompact ? 520 : 560,
+    420,
+    Math.min(620, safeHeight - WINDOW_GAP * 2),
+  );
+  const settingsX = isCompact
+    ? WINDOW_GAP
+    : Math.max(WINDOW_GAP, safeWidth / 2 - settingsWidth / 2 + 40);
+  const settingsY = isCompact ? 60 : 62;
 
   return [
     {
@@ -171,6 +191,21 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
       minSize: { width: 300, height: 460 },
       maxSize: { width: 360, height: 540 },
       zIndex: 1,
+    },
+    {
+      animationState: "idle",
+      id: "settings",
+      kind: "app",
+      title: "system.settings",
+      icon: "settings",
+      isOpen: false,
+      isMaximized: false,
+      position: { x: settingsX, y: settingsY },
+      restoreRect: null,
+      size: { width: settingsWidth, height: settingsHeight },
+      minSize: { width: 520, height: 420 },
+      maxSize: { width: 980, height: 760 },
+      zIndex: 0,
     },
   ];
 }

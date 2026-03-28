@@ -1,4 +1,4 @@
-import { FolderClosed } from "lucide-react";
+import { FolderClosed, Settings2 } from "lucide-react";
 import molkkisIcon from "../../res/icon-192.png";
 import type { DesktopIconKey } from "../../types/desktop";
 
@@ -20,6 +20,14 @@ function AppGlyph({ iconKey, className = "" }: AppGlyphProps) {
     return (
       <span className={`app-glyph app-glyph--molkkis ${className}`.trim()} aria-hidden="true">
         <img className="app-glyph-molkkis-image" src={molkkisIcon} alt="" />
+      </span>
+    );
+  }
+
+  if (iconKey === "settings") {
+    return (
+      <span className={`app-glyph app-glyph--settings ${className}`.trim()} aria-hidden="true">
+        <Settings2 className="app-glyph-settings" strokeWidth={1.75} />
       </span>
     );
   }

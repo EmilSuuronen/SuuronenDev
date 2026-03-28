@@ -34,7 +34,7 @@ body,
 body {
   margin: 0;
   min-width: 320px;
-  background: #050505;
+  background: var(--bg);
   color: var(--text-light);
   font-family: "Space Grotesk", sans-serif;
 }
@@ -82,9 +82,9 @@ button {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(118% 86% at 12% 8%, rgba(255, 145, 54, 0.17), transparent 48%),
-    radial-gradient(88% 66% at 72% 18%, rgba(255, 218, 176, 0.035), transparent 42%),
-    radial-gradient(94% 88% at 80% 84%, rgba(180, 72, 12, 0.11), transparent 52%),
+    radial-gradient(118% 86% at 12% 8%, var(--wallpaper-glow-a), transparent 48%),
+    radial-gradient(88% 66% at 72% 18%, var(--wallpaper-glow-b), transparent 42%),
+    radial-gradient(94% 88% at 80% 84%, var(--wallpaper-glow-c), transparent 52%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.012), transparent 20%, rgba(0, 0, 0, 0.3));
   mix-blend-mode: screen;
   opacity: 0.4;
@@ -393,6 +393,12 @@ button {
   height: 5px;
 }
 
+.app-glyph-settings {
+  width: 21px;
+  height: 21px;
+  color: currentColor;
+}
+
 .desktop-icon-label {
   max-width: 100%;
   color: var(--text-light);
@@ -508,6 +514,11 @@ button {
 }
 
 .window-icon-glyph .app-glyph-calculator {
+  width: 16px;
+  height: 16px;
+}
+
+.window-icon-glyph .app-glyph-settings {
   width: 16px;
   height: 16px;
 }
@@ -1330,6 +1341,257 @@ button {
   line-height: 1.55;
 }
 
+.settings-app {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100%;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--panel) 92%, white), color-mix(in srgb, var(--panel) 85%, black 2%)),
+    var(--panel);
+}
+
+.settings-sidebar {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding: 1.15rem 1rem;
+  border-right: 1px solid rgba(18, 18, 18, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0.16)),
+    color-mix(in srgb, var(--panel) 92%, white);
+}
+
+.settings-sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.settings-sidebar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 12%, rgba(255, 255, 255, 0.88));
+  color: var(--accent);
+}
+
+.settings-sidebar-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.settings-sidebar-kicker,
+.settings-section-kicker {
+  display: inline-block;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.settings-sidebar-header h2,
+.settings-section-header h3 {
+  margin: 0.18rem 0 0;
+}
+
+.settings-nav {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.settings-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 42px;
+  padding: 0 0.8rem;
+  border-radius: 10px;
+  color: var(--ink-soft);
+}
+
+.settings-nav-item.is-active,
+.settings-nav-item.is-active-secondary {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(18, 18, 18, 0.08);
+}
+
+.settings-nav-item.is-active {
+  color: var(--ink);
+}
+
+.settings-nav-item.is-active-secondary {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.settings-nav-item-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+}
+
+.settings-main {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.settings-panel-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.54);
+}
+
+.settings-section-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.settings-reset-button {
+  min-height: 36px;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.settings-reset-button:hover {
+  border-color: rgba(240, 140, 45, 0.28);
+  background: rgba(240, 140, 45, 0.1);
+}
+
+.settings-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+}
+
+.settings-theme-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.68);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.settings-theme-card:hover,
+.settings-theme-card.is-active {
+  transform: translateY(-1px);
+  border-color: rgba(240, 140, 45, 0.24);
+  box-shadow: 0 16px 24px rgba(0, 0, 0, 0.06);
+}
+
+.settings-theme-preview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
+}
+
+.settings-theme-preview span {
+  display: block;
+  height: 54px;
+  border-radius: 12px;
+}
+
+.settings-theme-meta {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.settings-theme-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-transform: capitalize;
+}
+
+.settings-theme-check {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+}
+
+.settings-theme-subtitle {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+.settings-color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.8rem;
+}
+
+.settings-color-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.settings-color-label {
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.settings-color-control {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 48px;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid rgba(18, 18, 18, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.settings-color-control input[type="color"] {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.settings-color-control input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.settings-color-control input[type="color"]::-webkit-color-swatch {
+  border: 1px solid rgba(18, 18, 18, 0.1);
+  border-radius: 10px;
+}
+
+.settings-color-control code {
+  color: var(--ink-soft);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+}
+
 .browser-unavailable {
   display: grid;
   gap: 1rem;
@@ -1957,5 +2219,14 @@ button {
   .tech-stack-feature-grid,
   .tech-stack-grid {
     grid-template-columns: 1fr;
+  }
+
+  .settings-app {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-sidebar {
+    border-right: 0;
+    border-bottom: 1px solid rgba(18, 18, 18, 0.08);
   }
 }

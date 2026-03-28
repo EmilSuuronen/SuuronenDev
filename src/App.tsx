@@ -1,8 +1,9 @@
-import { useRef } from "react";
+import { useMemo, useRef, type CSSProperties } from "react";
 
 import BrowserApp from "./apps/BrowserApp";
 import CalculatorApp from "./apps/CalculatorApp";
 import FolderApp from "./apps/FolderApp";
+import SettingsApp from "./apps/SettingsApp";
 import TerminalApp from "./apps/TerminalApp";
 import DesktopWallpaper from "./components/desktop/DesktopWallpaper";
 import DesktopIcons from "./components/desktop/DesktopIcons";
@@ -10,11 +11,28 @@ import DesktopWindow from "./components/desktop/DesktopWindow";
 import Taskbar from "./components/desktop/Taskbar";
 import TopBar from "./components/desktop/TopBar";
 import { useDesktopIcons } from "./hooks/useDesktopIcons";
+import { useDesktopTheme } from "./hooks/useDesktopTheme";
 import { useElementSize } from "./hooks/useElementSize";
 import { useWindowManager } from "./hooks/useWindowManager";
 import type { DesktopEntryId, FolderId, WindowId } from "./types/desktop";
 
-function renderWindowApp(windowId: WindowId) {
+type RenderWindowAppProps = {
+  currentTheme: ReturnType<typeof useDesktopTheme>["currentTheme"];
+  onResetTheme: ReturnType<typeof useDesktopTheme>["resetTheme"];
+  onSelectTheme: ReturnType<typeof useDesktopTheme>["selectTheme"];
+  onSetThemeColor: ReturnType<typeof useDesktopTheme>["setThemeColor"];
+  themeOptions: ReturnType<typeof useDesktopTheme>["themeOptions"];
+  windowId: WindowId;
+};
+
+function renderWindowApp({
+  currentTheme,
+  onResetTheme,
+  onSelectTheme,
+  onSetThemeColor,
+  themeOptions,
+  windowId,
+}: RenderWindowAppProps) {
   if (windowId === "terminal") {
     return <TerminalApp />;
   }
@@ -23,12 +41,25 @@ function renderWindowApp(windowId: WindowId) {
     return <CalculatorApp />;
   }
 
+  if (windowId === "settings") {
+    return (
+      <SettingsApp
+        currentTheme={currentTheme}
+        onResetTheme={onResetTheme}
+        onSelectTheme={onSelectTheme}
+        onSetThemeColor={onSetThemeColor}
+        themeOptions={themeOptions}
+      />
+    );
+  }
+
   return <BrowserApp />;
 }
 
 function App() {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const bounds = useElementSize(workspaceRef);
+  const { currentTheme, resetTheme, selectTheme, setThemeColor, themeOptions } = useDesktopTheme();
   const {
     getEntry,
     getFolderEntries,
@@ -50,6 +81,30 @@ function App() {
     toggleMaximizeWindow,
     updateWindowRect,
   } = useWindowManager(bounds);
+
+  const desktopThemeStyle = useMemo(
+    () =>
+      ({
+        "--bg": currentTheme.background,
+        "--panel": currentTheme.panel,
+        "--panel-strong": currentTheme.panelStrong,
+        "--panel-border": currentTheme.panelBorder,
+        "--ink": currentTheme.ink,
+        "--ink-soft": currentTheme.inkSoft,
+        "--surface-dark": currentTheme.surfaceDark,
+        "--surface-dark-strong": currentTheme.surfaceDarkStrong,
+        "--surface-dark-border": currentTheme.surfaceDarkBorder,
+        "--text-light": currentTheme.textLight,
+        "--text-light-soft": currentTheme.textLightSoft,
+        "--accent": currentTheme.accent,
+        "--accent-soft": currentTheme.accentSoft,
+        "--accent-strong": currentTheme.accentStrong,
+        "--wallpaper-glow-a": currentTheme.wallpaperGlowA,
+        "--wallpaper-glow-b": currentTheme.wallpaperGlowB,
+        "--wallpaper-glow-c": currentTheme.wallpaperGlowC,
+      }) as CSSProperties,
+    [currentTheme],
+  );
 
   const openWindows = windows
     .filter((windowState) => windowState.isOpen)
@@ -84,8 +139,8 @@ function App() {
   };
 
   return (
-    <div className="desktop-root">
-      <DesktopWallpaper />
+    <div className="desktop-root" style={desktopThemeStyle}>
+      <DesktopWallpaper theme={currentTheme} />
       <TopBar onOpenWindow={openWindow} />
 
       <main ref={workspaceRef} className="desktop-workspace">
@@ -114,7 +169,14 @@ function App() {
             {windowState.kind === "folder" && windowState.folderId ? (
               <FolderApp entries={getFolderEntries(windowState.folderId)} onOpenEntry={openDesktopEntry} />
             ) : (
-              renderWindowApp(windowState.id as WindowId)
+              renderWindowApp({
+                currentTheme,
+                onResetTheme: resetTheme,
+                onSelectTheme: selectTheme,
+                onSetThemeColor: setThemeColor,
+                themeOptions,
+                windowId: windowState.id as WindowId,
+              })
             )}
           </DesktopWindow>
         ))}

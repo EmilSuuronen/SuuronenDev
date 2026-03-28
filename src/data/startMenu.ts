@@ -32,6 +32,15 @@ export const startMenuSections: StartMenuSection[] = [
         },
       },
       {
+        label: "Settings",
+        description: "Themes and personalization",
+        icon: "settings",
+        action: {
+          type: "open_entry",
+          entryId: "settings",
+        },
+      },
+      {
         label: "Applications",
         description: "Folder with additional apps",
         icon: "folder",
