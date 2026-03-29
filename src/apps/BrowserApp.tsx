@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { House } from "lucide-react";
+import { Globe2, House, Plus, X } from "lucide-react";
 
 import BrowserContact from "../components/browser/BrowserContact";
 import BrowserLoading from "../components/browser/BrowserLoading";
@@ -9,6 +9,9 @@ import { browserSections } from "../data/browserSections";
 import { useLocale } from "../i18n/locale";
 
 const EMBED_TIMEOUT_MS = 2800;
+const MAX_BROWSER_TABS = 12;
+
+let tabSequence = 0;
 
 type BrowserPageState =
   | {
@@ -20,6 +23,39 @@ type BrowserPageState =
       status: "loading" | "ready" | "unavailable";
       url: string;
     };
+
+type BrowserTab = {
+  id: string;
+  pageState: BrowserPageState;
+};
+
+function createTabId() {
+  tabSequence += 1;
+  return `browser-tab-${tabSequence}`;
+}
+
+function getInternalUrl(sectionId: string) {
+  return `https://suuronen.dev/${sectionId}`;
+}
+
+function createInternalTab(sectionId: string): BrowserTab {
+  return {
+    id: createTabId(),
+    pageState: {
+      kind: "internal",
+      sectionId,
+    },
+  };
+}
+
+function getExternalTabTitle(url: string) {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.hostname.replace(/^www\./i, "") || url;
+  } catch {
+    return url;
+  }
+}
 
 function normalizeAddressInput(value: string) {
   const trimmed = value.trim();
@@ -47,12 +83,15 @@ function normalizeAddressInput(value: string) {
 function BrowserApp() {
   const { t } = useLocale();
   const defaultSectionId = browserSections[0].id;
-  const [pageState, setPageState] = useState<BrowserPageState>({
-    kind: "internal",
-    sectionId: defaultSectionId,
-  });
-  const [addressInput, setAddressInput] = useState(`https://suuronen.dev/${defaultSectionId}`);
+  const [tabs, setTabs] = useState<BrowserTab[]>(() => [createInternalTab(defaultSectionId)]);
+  const [activeTabId, setActiveTabId] = useState(() => tabs[0]?.id ?? createTabId());
+  const [addressInput, setAddressInput] = useState(getInternalUrl(defaultSectionId));
 
+  const activeTab = useMemo(
+    () => tabs.find((tab) => tab.id === activeTabId) ?? tabs[0],
+    [activeTabId, tabs],
+  );
+  const pageState = activeTab?.pageState ?? { kind: "internal", sectionId: defaultSectionId };
   const activeSectionId = pageState.kind === "internal" ? pageState.sectionId : null;
   const activeSection = useMemo(
     () =>
@@ -62,26 +101,95 @@ function BrowserApp() {
     [activeSectionId, defaultSectionId],
   );
   const isExternalPage = pageState.kind === "external";
+  const canCloseTabs = tabs.length > 1;
+  const canOpenTabs = tabs.length < MAX_BROWSER_TABS;
 
   useEffect(() => {
-    if (pageState.kind !== "external" || pageState.status !== "loading") {
+    if (pageState.kind === "internal") {
+      setAddressInput(getInternalUrl(pageState.sectionId));
+      return;
+    }
+
+    setAddressInput(pageState.url);
+  }, [pageState]);
+
+  useEffect(() => {
+    if (!activeTab || pageState.kind !== "external" || pageState.status !== "loading") {
       return;
     }
 
     const timeoutId = window.setTimeout(() => {
-      setPageState((current) =>
-        current.kind === "external" && current.url === pageState.url && current.status === "loading"
-          ? { ...current, status: "unavailable" }
-          : current,
+      setTabs((currentTabs) =>
+        currentTabs.map((tab) =>
+          tab.id === activeTab.id &&
+          tab.pageState.kind === "external" &&
+          tab.pageState.url === pageState.url &&
+          tab.pageState.status === "loading"
+            ? {
+                ...tab,
+                pageState: {
+                  ...tab.pageState,
+                  status: "unavailable",
+                },
+              }
+            : tab,
+        ),
       );
     }, EMBED_TIMEOUT_MS);
 
     return () => window.clearTimeout(timeoutId);
-  }, [pageState]);
+  }, [activeTab, pageState]);
 
-  const openInternalSection = (sectionId: string) => {
-    setPageState({ kind: "internal", sectionId });
-    setAddressInput(`https://suuronen.dev/${sectionId}`);
+  const updateTabPageState = (tabId: string, nextPageState: BrowserPageState) => {
+    setTabs((currentTabs) =>
+      currentTabs.map((tab) =>
+        tab.id === tabId
+          ? {
+              ...tab,
+              pageState: nextPageState,
+            }
+          : tab,
+      ),
+    );
+  };
+
+  const openInternalSection = (sectionId: string, targetTabId = activeTab.id) => {
+    updateTabPageState(targetTabId, { kind: "internal", sectionId });
+    setActiveTabId(targetTabId);
+  };
+
+  const openNewTab = () => {
+    if (!canOpenTabs) {
+      return;
+    }
+
+    const nextTab = createInternalTab(defaultSectionId);
+    setTabs((currentTabs) => [...currentTabs, nextTab]);
+    setActiveTabId(nextTab.id);
+  };
+
+  const closeTab = (tabId: string) => {
+    setTabs((currentTabs) => {
+      const tabIndex = currentTabs.findIndex((tab) => tab.id === tabId);
+
+      if (tabIndex === -1) {
+        return currentTabs;
+      }
+
+      if (currentTabs.length === 1) {
+        const replacementTab = createInternalTab(defaultSectionId);
+        setActiveTabId(replacementTab.id);
+        return [replacementTab];
+      }
+
+      const nextTabs = currentTabs.filter((tab) => tab.id !== tabId);
+
+      if (activeTabId === tabId) {
+        setActiveTabId(nextTabs[Math.max(0, tabIndex - 1)]?.id ?? nextTabs[0].id);
+      }
+
+      return nextTabs;
+    });
   };
 
   const handleAddressSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -101,42 +209,111 @@ function BrowserApp() {
       return;
     }
 
-    setPageState({
+    updateTabPageState(activeTab.id, {
       kind: "external",
       status: "loading",
       url: nextTarget.url,
     });
-    setAddressInput(nextTarget.url);
+  };
+
+  const getTabTitle = (tab: BrowserTab) => {
+    if (tab.pageState.kind === "internal") {
+      const { sectionId } = tab.pageState;
+
+      return t(
+        browserSections.find((section) => section.id === sectionId)?.label ??
+          browserSections[0].label,
+      );
+    }
+
+    return getExternalTabTitle(tab.pageState.url);
   };
 
   return (
-    <div className="browser-app">
-      <div className="browser-toolbar">
-        <div className="browser-dots" aria-hidden="true">
-          <span />
-          <span />
-          <span />
+    <div className={`browser-app${isExternalPage ? " is-external" : ""}`}>
+      <div className="browser-chrome">
+        <div className="browser-tabs-shell">
+          <div className="browser-tabs" role="tablist" aria-label={t("Browser tabs")}>
+            {tabs.map((tab) => {
+              const isActive = tab.id === activeTab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  className={`browser-tab${isActive ? " is-active" : ""}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveTabId(tab.id)}
+                >
+                  <span className="browser-tab-icon" aria-hidden="true">
+                    {tab.pageState.kind === "internal" ? (
+                      <House className="browser-tab-icon-glyph" />
+                    ) : (
+                      <Globe2 className="browser-tab-icon-glyph" />
+                    )}
+                  </span>
+                  <span className="browser-tab-label">{getTabTitle(tab)}</span>
+                  <span
+                    className={`browser-tab-close-shell${canCloseTabs ? "" : " is-disabled"}`}
+                    aria-hidden="true"
+                  >
+                    <span
+                      className="browser-tab-close"
+                      onClick={(event) => {
+                        if (!canCloseTabs) {
+                          return;
+                        }
+                        event.stopPropagation();
+                        closeTab(tab.id);
+                      }}
+                    >
+                      <X className="browser-tab-close-icon" />
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+
+            <button
+              className="browser-tab-new"
+              type="button"
+              aria-label={t("New tab")}
+              disabled={!canOpenTabs}
+              onClick={openNewTab}
+            >
+              <Plus className="browser-tab-new-icon" />
+            </button>
+          </div>
         </div>
-        <button
-          className="browser-home-button"
-          type="button"
-          aria-label={t("Open browser home")}
-          onClick={() => openInternalSection(defaultSectionId)}
-        >
-          <House className="browser-home-icon" />
-        </button>
-        <form className="browser-address-form" onSubmit={handleAddressSubmit}>
-          <input
-            className="browser-address-input"
-            aria-label={t("Browser address")}
-            type="text"
-            value={addressInput}
-            onChange={(event) => setAddressInput(event.target.value)}
-            spellCheck={false}
-            autoCapitalize="none"
-            autoCorrect="off"
-          />
-        </form>
+
+        <div className="browser-toolbar">
+          <div className="browser-dots" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <button
+            className="browser-home-button"
+            type="button"
+            aria-label={t("Open browser home")}
+            onClick={() => openInternalSection(defaultSectionId)}
+          >
+            <House className="browser-home-icon" />
+          </button>
+          <form className="browser-address-form" onSubmit={handleAddressSubmit}>
+            <input
+              className="browser-address-input"
+              aria-label={t("Browser address")}
+              type="text"
+              value={addressInput}
+              onChange={(event) => setAddressInput(event.target.value)}
+              spellCheck={false}
+              autoCapitalize="none"
+              autoCorrect="off"
+            />
+          </form>
+        </div>
       </div>
 
       <div className={`browser-layout${isExternalPage ? " is-external" : ""}`}>
@@ -179,10 +356,20 @@ function BrowserApp() {
                   loading="eager"
                   referrerPolicy="strict-origin-when-cross-origin"
                   onLoad={() =>
-                    setPageState((current) =>
-                      current.kind === "external" && current.url === pageState.url
-                        ? { ...current, status: "ready" }
-                        : current,
+                    setTabs((currentTabs) =>
+                      currentTabs.map((tab) =>
+                        tab.id === activeTab.id &&
+                        tab.pageState.kind === "external" &&
+                        tab.pageState.url === pageState.url
+                          ? {
+                              ...tab,
+                              pageState: {
+                                ...tab.pageState,
+                                status: "ready",
+                              },
+                            }
+                          : tab,
+                      ),
                     )
                   }
                 />
