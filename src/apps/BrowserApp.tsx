@@ -611,10 +611,6 @@ function BrowserApp() {
                       Emil Suuronen, backend engineer, infrastructure builder, and curious product tinkerer.
                     </p>
                   </div>
-                  <div className="browser-site-meta">
-                    <span>{t(activeSection.label)}</span>
-                    <span>Emil Suuronen</span>
-                  </div>
                 </div>
 
                 <nav className="browser-site-nav" aria-label={t("Browser sections")}>
