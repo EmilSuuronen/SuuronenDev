@@ -59,6 +59,7 @@ export function useWindowManager(bounds: DesktopBounds) {
   const [windows, setWindows] = useState<DesktopWindowState[]>([]);
   const [nextZIndex, setNextZIndex] = useState(10);
   const exitTimeoutsRef = useRef<Partial<Record<WindowEntityId, number>>>({});
+  const openedWindowIdsRef = useRef<Set<WindowEntityId>>(new Set());
   const isMobile = isMobileDesktopViewport(bounds);
 
   const clearExitTimeout = (windowId: WindowEntityId) => {
@@ -77,7 +78,15 @@ export function useWindowManager(bounds: DesktopBounds) {
 
     setWindows((currentWindows) => {
       if (currentWindows.length === 0) {
-        return createInitialWindows(bounds);
+        const initialWindows = createInitialWindows(bounds);
+
+        initialWindows.forEach((windowState) => {
+          if (windowState.isOpen) {
+            openedWindowIdsRef.current.add(windowState.id);
+          }
+        });
+
+        return initialWindows;
       }
 
       return currentWindows.map((windowState) =>
@@ -98,6 +107,7 @@ export function useWindowManager(bounds: DesktopBounds) {
 
   const bringToFront = (windowId: WindowEntityId, shouldOpen: boolean) => {
     clearExitTimeout(windowId);
+    const wasOpenedBefore = openedWindowIdsRef.current.has(windowId);
 
     setNextZIndex((currentZIndex) => {
       const raisedZIndex = currentZIndex + 1;
@@ -105,18 +115,45 @@ export function useWindowManager(bounds: DesktopBounds) {
       setWindows((currentWindows) =>
         currentWindows.map((windowState) =>
           windowState.id === windowId
-            ? {
-                ...applyWindowViewportMode(windowState, bounds, isMobile),
-                animationState: "idle",
-                isOpen: shouldOpen ? true : windowState.isOpen,
-                zIndex: raisedZIndex,
-              }
+            ? (() => {
+                const viewportWindow = applyWindowViewportMode(windowState, bounds, isMobile);
+                const shouldOpenInFullscreen =
+                  shouldOpen &&
+                  !isMobile &&
+                  !windowState.isOpen &&
+                  !wasOpenedBefore &&
+                  windowState.openMode === "fullscreen";
+
+                const nextWindow = shouldOpenInFullscreen
+                  ? {
+                      ...viewportWindow,
+                      ...getMaximizedWindowRect(bounds),
+                      isMaximized: true,
+                      maximizeMode: "manual" as const,
+                      restoreRect: viewportWindow.restoreRect ?? {
+                        position: viewportWindow.position,
+                        size: viewportWindow.size,
+                      },
+                    }
+                  : viewportWindow;
+
+                return {
+                  ...nextWindow,
+                  animationState: "idle",
+                  isOpen: shouldOpen ? true : windowState.isOpen,
+                  zIndex: raisedZIndex,
+                };
+              })()
             : windowState,
         ),
       );
 
       return raisedZIndex;
     });
+
+    if (shouldOpen) {
+      openedWindowIdsRef.current.add(windowId);
+    }
   };
 
   const beginWindowExit = (windowId: WindowEntityId, animationState: WindowAnimationState) => {

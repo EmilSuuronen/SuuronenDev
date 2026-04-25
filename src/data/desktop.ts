@@ -6,6 +6,8 @@ import type {
 } from "../types/desktop";
 import { WINDOW_GAP, clamp } from "../utils/windowMath";
 
+const OPEN_MODE_FULLSCREEN: DesktopWindowState["openMode"] = "fullscreen";
+
 export const desktopLaunchers: DesktopLauncher[] = [
   {
     id: "terminal",
@@ -116,6 +118,15 @@ export function createInitialDesktopIcons(bounds: DesktopBounds): DesktopIconSta
       label: "Mölkkis",
       parentId: "applications",
       position: { x: 0, y: 0 },
+    },
+    {
+      id: "antgame",
+      icon: "antgame",
+      kind: "app" as const,
+      label: "Ant Exterminator",
+      parentId: "applications",
+      position: { x: 0, y: 0 },
+      windowId: "antgame",
     },
   ];
 
@@ -230,6 +241,18 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
   );
   const notesX = isCompact ? WINDOW_GAP : Math.max(WINDOW_GAP, safeWidth / 2 - notesWidth / 2 - 30);
   const notesY = isCompact ? 72 : 50;
+  const antGameWidth = clamp(
+    isCompact ? 360 : 900,
+    360,
+    Math.min(1080, safeWidth - WINDOW_GAP * 2),
+  );
+  const antGameHeight = clamp(
+    isCompact ? 520 : 680,
+    460,
+    Math.min(760, safeHeight - WINDOW_GAP * 2),
+  );
+  const antGameX = isCompact ? WINDOW_GAP : Math.max(WINDOW_GAP, safeWidth / 2 - antGameWidth / 2);
+  const antGameY = isCompact ? 82 : 36;
 
   return [
     {
@@ -309,6 +332,23 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
       minSize: { width: 560, height: 420 },
       maxSize: { width: 1180, height: 860 },
       zIndex: -1,
+    },
+    {
+      animationState: "idle",
+      id: "antgame",
+      kind: "app",
+      title: "ant.exterminator.exe",
+      icon: "antgame",
+      isOpen: false,
+      isMaximized: false,
+      maximizeMode: null,
+      openMode: OPEN_MODE_FULLSCREEN,
+      position: { x: antGameX, y: antGameY },
+      restoreRect: null,
+      size: { width: antGameWidth, height: antGameHeight },
+      minSize: { width: 360, height: 420 },
+      maxSize: { width: 1200, height: 860 },
+      zIndex: -2,
     },
   ];
 }
