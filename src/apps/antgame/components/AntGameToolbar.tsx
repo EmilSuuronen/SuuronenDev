@@ -33,6 +33,20 @@ function AntGameToolbar({
   weaponProgress,
   upgradeStats,
 }: Props) {
+  const stats = [
+    { label: `Coins: ${hud.coins}`, primary: true },
+    { label: `Wave: ${hud.wave}/${hud.wavesTotal}`, primary: true },
+    { label: `Ants: ${hud.ants}`, primary: true },
+    { label: `Nests: ${hud.nestsAlive}/${hud.nestsTotal}`, primary: true },
+    { label: `Sandwich: ${Math.round((hud.sandwichHp / Math.max(1, hud.sandwichMaxHp)) * 100)}%`, primary: true },
+    { label: `Rate: ${hud.spawnRate.toFixed(1)}/s`, primary: false },
+    { label: `Ant Value: ${hud.coinPerAnt}`, primary: false },
+    { label: `Time: ${hud.waveTimeSeconds.toFixed(1)}s`, primary: false },
+    { label: `Spawned: ${hud.waveSpawned}`, primary: false },
+    { label: `Eliminated: ${hud.kills}`, primary: false },
+    { label: `Total Spawned: ${hud.spawned}`, primary: false },
+  ];
+
   return (
     <div className="antgame-toolbar">
       <div className="antgame-weapon-group" role="toolbar" aria-label="Weapons">
@@ -49,17 +63,14 @@ function AntGameToolbar({
       </div>
 
       <div className="antgame-toolbar-stats">
-        <span>Coins: {hud.coins}</span>
-        <span>Wave: {hud.wave}/{hud.wavesTotal}</span>
-        <span>Time: {hud.waveTimeSeconds.toFixed(1)}s</span>
-        <span>Spawned: {hud.waveSpawned}</span>
-        <span>Rate: {hud.spawnRate.toFixed(1)}/s</span>
-        <span>Ant Value: {hud.coinPerAnt}</span>
-        <span>Ants: {hud.ants}</span>
-        <span>Nests: {hud.nestsAlive}/{hud.nestsTotal}</span>
-        <span>Sandwich: {Math.round((hud.sandwichHp / Math.max(1, hud.sandwichMaxHp)) * 100)}%</span>
-        <span>Eliminated: {hud.kills}</span>
-        <span>Total Spawned: {hud.spawned}</span>
+        {stats.map((item) => (
+          <span
+            key={item.label}
+            className={item.primary ? "antgame-stat-chip antgame-stat-chip--primary" : "antgame-stat-chip antgame-stat-chip--secondary"}
+          >
+            {item.label}
+          </span>
+        ))}
       </div>
 
       <button className="antgame-reset-button" type="button" onClick={onReset}>
