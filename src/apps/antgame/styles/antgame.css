@@ -418,7 +418,7 @@
   touch-action: none;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .desktop-window--antgame .window-content {
     height: 100%;
   }
@@ -562,7 +562,7 @@
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 520px) and (pointer: coarse) {
   .antgame-toolbar {
     max-height: 48dvh;
     grid-template-columns: 1fr;
