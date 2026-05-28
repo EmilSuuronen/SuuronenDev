@@ -1032,12 +1032,19 @@ function AntGameApp() {
       previousTimestamp = timestamp;
       stepSimulation(deltaSeconds, timestamp);
 
-      context.fillStyle = "#c0c0c0";
+      context.fillStyle = "#6ea44a";
       context.fillRect(0, 0, GRID_WIDTH, GRID_HEIGHT);
 
-      context.fillStyle = "#cbcbcb";
+      context.fillStyle = "#7eb857";
       for (let y = 0; y < GRID_HEIGHT; y += 2) {
         for (let x = (y / 2) % 2; x < GRID_WIDTH; x += 2) {
+          context.fillRect(x, y, 1, 1);
+        }
+      }
+
+      context.fillStyle = "#5f963f";
+      for (let y = 1; y < GRID_HEIGHT; y += 4) {
+        for (let x = (y % 3); x < GRID_WIDTH; x += 5) {
           context.fillRect(x, y, 1, 1);
         }
       }
@@ -1129,6 +1136,8 @@ function AntGameApp() {
       const sandwichBarX = sandwichCenterX - Math.floor(sandwichBarWidth / 2);
       const sandwichBarY = sandwichCenterY - 6;
       const sandwichFilledWidth = Math.max(0, Math.round(sandwichBarWidth * sandwichRatio));
+      context.fillStyle = "#1f1f1f";
+      context.fillRect(sandwichBarX - 1, sandwichBarY - 1, sandwichBarWidth + 2, 4);
       context.fillStyle = "#2f2f2f";
       context.fillRect(sandwichBarX, sandwichBarY, sandwichBarWidth, 2);
       context.fillStyle = sandwich.hp > 0 ? "#4fbf57" : "#7f4f49";
@@ -1165,6 +1174,8 @@ function AntGameApp() {
         const barY = centerY - 6;
         const filledWidth = Math.max(0, Math.round(barWidth * hpRatio));
 
+        context.fillStyle = "#1f1f1f";
+        context.fillRect(barX - 1, barY - 1, barWidth + 2, 4);
         context.fillStyle = "#2f2f2f";
         context.fillRect(barX, barY, barWidth, 2);
         context.fillStyle = hpRatio > 0.45 ? "#66bb55" : hpRatio > 0.2 ? "#d5b84a" : "#d2623f";
@@ -1186,6 +1197,21 @@ function AntGameApp() {
         context.fillRect(x + 2, y, 1, 1);
         if (blink) {
           context.fillRect(x, y + 1, 1, 1);
+        }
+
+        if (ant.hp < 110) {
+          const antHpRatio = clamp(ant.hp / 110, 0, 1);
+          const antBarWidth = 3;
+          const antBarX = x;
+          const antBarY = y - 3;
+          const antFilled = Math.max(0, Math.round(antBarWidth * antHpRatio));
+
+          context.fillStyle = "#1f1f1f";
+          context.fillRect(antBarX - 1, antBarY - 1, antBarWidth + 2, 3);
+          context.fillStyle = "#2f2f2f";
+          context.fillRect(antBarX, antBarY, antBarWidth, 1);
+          context.fillStyle = antHpRatio > 0.5 ? "#66bb55" : antHpRatio > 0.25 ? "#d5b84a" : "#d2623f";
+          context.fillRect(antBarX, antBarY, antFilled, 1);
         }
       }
 
