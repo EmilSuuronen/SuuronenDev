@@ -43,6 +43,7 @@ export function createPixelBatch(gl: OGLRenderingContext, scene: Transform, maxR
   const program = new Program(gl, {
     vertex,
     fragment,
+    cullFace: false,
     transparent: true,
     depthTest: false,
     depthWrite: false,

@@ -48,6 +48,7 @@ export function createBackgroundPass(gl: OGLRenderingContext, scene: Transform) 
   const program = new Program(gl, {
     vertex,
     fragment,
+    cullFace: false,
     depthTest: false,
     depthWrite: false,
   });
