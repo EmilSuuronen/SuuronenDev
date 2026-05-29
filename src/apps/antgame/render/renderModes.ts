@@ -9,7 +9,7 @@ function isRendererMode(value: string | null): value is RendererMode {
 
 export function resolveInitialRendererMode(): RendererMode {
   if (typeof window === "undefined") {
-    return "canvas2d";
+    return "ogl";
   }
 
   const params = new URLSearchParams(window.location.search);
@@ -20,7 +20,7 @@ export function resolveInitialRendererMode(): RendererMode {
   }
 
   const storedMode = window.localStorage.getItem(RENDERER_MODE_STORAGE_KEY);
-  return isRendererMode(storedMode) ? storedMode : "canvas2d";
+  return isRendererMode(storedMode) ? storedMode : "ogl";
 }
 
 export function resolveRendererDebugEnabled() {
