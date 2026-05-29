@@ -47,6 +47,7 @@ import {
 } from "./engine/world";
 import {
   getActiveRendererMode,
+  getCappedRendererDpr,
   resolveInitialRendererMode,
   resolveRendererDebugEnabled,
 } from "./render/renderModes";
@@ -1601,6 +1602,18 @@ function AntGameApp() {
         : rawCanvasScale;
   const canvasRenderWidth = Math.max(1, Math.round(GRID_WIDTH * canvasScale));
   const canvasRenderHeight = Math.max(1, Math.round(GRID_HEIGHT * canvasScale));
+
+  useEffect(() => {
+    if (activeRendererModeRef.current !== "ogl") {
+      return;
+    }
+
+    oglRendererRef.current?.resize(
+      canvasRenderWidth,
+      canvasRenderHeight,
+      getCappedRendererDpr(),
+    );
+  }, [canvasRenderHeight, canvasRenderWidth]);
 
   return (
     <div className="antgame-app">

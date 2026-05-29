@@ -46,3 +46,13 @@ export function resolveRendererDebugEnabled() {
 export function getActiveRendererMode(requestedMode: RendererMode): RendererMode {
   return requestedMode;
 }
+
+export function getCappedRendererDpr() {
+  if (typeof window === "undefined") {
+    return 1;
+  }
+
+  const isTouchViewport = window.matchMedia("(pointer: coarse)").matches;
+  const maxDpr = isTouchViewport ? 1.5 : 2;
+  return Math.max(1, Math.min(maxDpr, window.devicePixelRatio || 1));
+}
