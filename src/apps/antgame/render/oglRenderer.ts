@@ -1,6 +1,7 @@
 import { Camera, Renderer, Transform } from "ogl";
 import { GRID_HEIGHT, GRID_WIDTH } from "../engine/constants";
 import { createBackgroundPass } from "./passes/backgroundPass";
+import { createEntityPass } from "./passes/entityPass";
 
 import type { GameRenderSnapshot } from "../types";
 
@@ -31,6 +32,7 @@ export function createAntGameOglRenderer({ canvas }: OglRendererOptions): AntGam
     far: 10,
   });
   const backgroundPass = createBackgroundPass(gl, scene);
+  const entityPass = createEntityPass(gl, scene);
 
   gl.clearColor(0.43, 0.64, 0.29, 1);
   camera.position.set(0, 0, 1);
@@ -45,9 +47,11 @@ export function createAntGameOglRenderer({ canvas }: OglRendererOptions): AntGam
 
   return {
     dispose() {
+      entityPass.dispose();
       backgroundPass.dispose();
     },
-    render(_snapshot) {
+    render(snapshot) {
+      entityPass.render(snapshot);
       renderer.render({
         scene,
         camera,
