@@ -44,7 +44,7 @@ export function resolveRendererDebugEnabled() {
 }
 
 export function getActiveRendererMode(requestedMode: RendererMode): RendererMode {
-  return requestedMode;
+  return requestedMode === "canvas2d" ? "ogl" : requestedMode;
 }
 
 export function getCappedRendererDpr() {
