@@ -1,4 +1,5 @@
 export type WeaponId = "flamethrower" | "lightning" | "acid" | "bomb";
+export type RendererMode = "canvas2d" | "ogl";
 
 export type Ant = {
   acid: number;

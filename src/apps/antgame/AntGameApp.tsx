@@ -44,6 +44,11 @@ import {
   makeAnt,
   rand,
 } from "./engine/world";
+import {
+  getActiveRendererMode,
+  resolveInitialRendererMode,
+  resolveRendererDebugEnabled,
+} from "./render/renderModes";
 import type {
   Ant,
   DeathSplat,
@@ -53,6 +58,7 @@ import type {
   LightningStrike,
   Nest,
   Particle,
+  RendererMode,
   Sandwich,
   UpgradeStatId,
   WaveSettings,
@@ -64,6 +70,15 @@ import "./styles/antgame.css";
 function AntGameApp() {
   const initialWaveSettings = getWaveSettings(1);
   const initialWeaponProgress = createInitialWeaponProgress();
+  const requestedRendererModeRef = useRef<RendererMode>(resolveInitialRendererMode());
+  const activeRendererModeRef = useRef<RendererMode>(
+    getActiveRendererMode(requestedRendererModeRef.current),
+  );
+  const rendererDebugEnabledRef = useRef(resolveRendererDebugEnabled());
+  const rendererDebugRef = useRef({
+    frameCount: 0,
+    lastReportMs: performance.now(),
+  });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasShellRef = useRef<HTMLDivElement>(null);
   const canvasShellSize = useElementSize(canvasShellRef);
@@ -1031,6 +1046,21 @@ function AntGameApp() {
       const deltaSeconds = Math.min((timestamp - previousTimestamp) / 1000, 0.05);
       previousTimestamp = timestamp;
       stepSimulation(deltaSeconds, timestamp);
+
+      if (rendererDebugEnabledRef.current) {
+        rendererDebugRef.current.frameCount += 1;
+        if (timestamp - rendererDebugRef.current.lastReportMs >= 1000) {
+          console.debug("[AntGame renderer]", {
+            activeRenderer: activeRendererModeRef.current,
+            ants: antsRef.current.length,
+            fps: rendererDebugRef.current.frameCount,
+            particles: particlesRef.current.length,
+            requestedRenderer: requestedRendererModeRef.current,
+          });
+          rendererDebugRef.current.frameCount = 0;
+          rendererDebugRef.current.lastReportMs = timestamp;
+        }
+      }
 
       context.fillStyle = "#6ea44a";
       context.fillRect(0, 0, GRID_WIDTH, GRID_HEIGHT);
