@@ -1,40 +1,10 @@
-import { Geometry, Mesh, Program } from "ogl";
 import { clamp } from "../../engine/world";
+import { createPixelBatch, type Rgba } from "./pixelBatch";
 
 import type { GameRenderSnapshot } from "../../types";
 import type { OGLRenderingContext, Transform } from "ogl";
 
 const MAX_RECTS = 3200;
-const VERTICES_PER_RECT = 6;
-const POSITION_COMPONENTS = 2;
-const COLOR_COMPONENTS = 4;
-
-const vertex = /* glsl */ `
-  attribute vec2 position;
-  attribute vec4 color;
-
-  uniform mat4 modelViewMatrix;
-  uniform mat4 projectionMatrix;
-
-  varying vec4 vColor;
-
-  void main() {
-    vColor = color;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 0.0, 1.0);
-  }
-`;
-
-const fragment = /* glsl */ `
-  precision highp float;
-
-  varying vec4 vColor;
-
-  void main() {
-    gl_FragColor = vColor;
-  }
-`;
-
-type Rgba = [number, number, number, number];
 
 const colors = {
   ant: [0.1, 0.1, 0.1, 1] as Rgba,
@@ -68,43 +38,8 @@ function getHpColor(ratio: number): Rgba {
 }
 
 export function createEntityPass(gl: OGLRenderingContext, scene: Transform) {
-  const positions = new Float32Array(MAX_RECTS * VERTICES_PER_RECT * POSITION_COMPONENTS);
-  const colorData = new Float32Array(MAX_RECTS * VERTICES_PER_RECT * COLOR_COMPONENTS);
-  const geometry = new Geometry(gl, {
-    position: { size: POSITION_COMPONENTS, data: positions },
-    color: { size: COLOR_COMPONENTS, data: colorData },
-  });
-  const program = new Program(gl, {
-    vertex,
-    fragment,
-    depthTest: false,
-    depthWrite: false,
-  });
-  const mesh = new Mesh(gl, {
-    geometry,
-    program,
-    frustumCulled: false,
-  });
-  let rectCount = 0;
-
-  mesh.setParent(scene);
-
-  const pushRect = (x: number, y: number, width: number, height: number, color: Rgba) => {
-    if (rectCount >= MAX_RECTS || width <= 0 || height <= 0) return;
-
-    const vertexOffset = rectCount * VERTICES_PER_RECT;
-    const positionOffset = vertexOffset * POSITION_COMPONENTS;
-    const colorOffset = vertexOffset * COLOR_COMPONENTS;
-    const x2 = x + width;
-    const y2 = y + height;
-    positions.set([x, y, x2, y, x, y2, x, y2, x2, y, x2, y2], positionOffset);
-
-    for (let i = 0; i < VERTICES_PER_RECT; i += 1) {
-      colorData.set(color, colorOffset + i * COLOR_COMPONENTS);
-    }
-
-    rectCount += 1;
-  };
+  const batch = createPixelBatch(gl, scene, MAX_RECTS);
+  const pushRect = batch.pushRect;
 
   const drawSandwich = (snapshot: GameRenderSnapshot) => {
     const sandwich = snapshot.sandwich;
@@ -181,17 +116,14 @@ export function createEntityPass(gl: OGLRenderingContext, scene: Transform) {
 
   return {
     dispose() {
-      geometry.remove();
-      program.remove();
+      batch.dispose();
     },
     render(snapshot: GameRenderSnapshot) {
-      rectCount = 0;
+      batch.clear();
       drawSandwich(snapshot);
       drawNests(snapshot);
       drawAnts(snapshot);
-      geometry.attributes.position.needsUpdate = true;
-      geometry.attributes.color.needsUpdate = true;
-      geometry.setDrawRange(0, rectCount * VERTICES_PER_RECT);
+      batch.upload();
     },
   };
 }

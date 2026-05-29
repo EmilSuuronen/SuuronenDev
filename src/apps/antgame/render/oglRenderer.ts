@@ -2,6 +2,7 @@ import { Camera, Renderer, Transform } from "ogl";
 import { GRID_HEIGHT, GRID_WIDTH } from "../engine/constants";
 import { createBackgroundPass } from "./passes/backgroundPass";
 import { createEntityPass } from "./passes/entityPass";
+import { createEffectPass } from "./passes/effectPass";
 
 import type { GameRenderSnapshot } from "../types";
 
@@ -27,12 +28,22 @@ export function createAntGameOglRenderer({ canvas }: OglRendererOptions): AntGam
   });
   const { gl } = renderer;
   const scene = new Transform();
+  const backgroundLayer = new Transform();
+  const effectUnderlayLayer = new Transform();
+  const entityLayer = new Transform();
+  const effectOverlayLayer = new Transform();
   const camera = new Camera(gl, {
     near: -10,
     far: 10,
   });
-  const backgroundPass = createBackgroundPass(gl, scene);
-  const entityPass = createEntityPass(gl, scene);
+  backgroundLayer.setParent(scene);
+  effectUnderlayLayer.setParent(scene);
+  entityLayer.setParent(scene);
+  effectOverlayLayer.setParent(scene);
+
+  const backgroundPass = createBackgroundPass(gl, backgroundLayer);
+  const effectPass = createEffectPass(gl, effectUnderlayLayer, effectOverlayLayer);
+  const entityPass = createEntityPass(gl, entityLayer);
 
   gl.clearColor(0.43, 0.64, 0.29, 1);
   camera.position.set(0, 0, 1);
@@ -48,15 +59,18 @@ export function createAntGameOglRenderer({ canvas }: OglRendererOptions): AntGam
   return {
     dispose() {
       entityPass.dispose();
+      effectPass.dispose();
       backgroundPass.dispose();
     },
     render(snapshot) {
+      effectPass.render(snapshot);
       entityPass.render(snapshot);
       renderer.render({
         scene,
         camera,
         clear: true,
         frustumCull: false,
+        sort: false,
       });
     },
     resize(width, height, dpr) {
