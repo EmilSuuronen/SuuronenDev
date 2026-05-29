@@ -128,3 +128,18 @@ export type HudState = {
   waveTimeSeconds: number;
   wavesTotal: number;
 };
+
+export type GameRenderSnapshot = {
+  acid: Uint8Array;
+  ants: Ant[];
+  deathSplats: DeathSplat[];
+  explosions: Explosion[];
+  fire: Uint8Array;
+  lightning: LightningStrike[];
+  nests: Nest[];
+  particles: Particle[];
+  sandwich: Sandwich;
+  scorch: Uint8Array;
+  timeMs: number;
+  wave: number;
+};

@@ -31,6 +31,7 @@ import {
   getWeaponRuntimeStats,
   upgradeLevelField,
 } from "./engine/upgrades";
+import { createGameRenderSnapshot } from "./engine/renderSnapshot";
 import {
   clamp,
   clampWave,
@@ -54,6 +55,7 @@ import type {
   DeathSplat,
   DeathType,
   Explosion,
+  GameRenderSnapshot,
   HudState,
   LightningStrike,
   Nest,
@@ -1046,16 +1048,31 @@ function AntGameApp() {
       const deltaSeconds = Math.min((timestamp - previousTimestamp) / 1000, 0.05);
       previousTimestamp = timestamp;
       stepSimulation(deltaSeconds, timestamp);
+      const renderSnapshot: GameRenderSnapshot = createGameRenderSnapshot({
+        acid: acidRef.current,
+        ants: antsRef.current,
+        deathSplats: deathSplatsRef.current,
+        explosions: explosionsRef.current,
+        fire: fireRef.current,
+        lightning: lightningRef.current,
+        nests: nestsRef.current,
+        particles: particlesRef.current,
+        sandwich: sandwichRef.current,
+        scorch: scorchRef.current,
+        timeMs: timestamp,
+        wave: waveRef.current,
+      });
 
       if (rendererDebugEnabledRef.current) {
         rendererDebugRef.current.frameCount += 1;
         if (timestamp - rendererDebugRef.current.lastReportMs >= 1000) {
           console.debug("[AntGame renderer]", {
             activeRenderer: activeRendererModeRef.current,
-            ants: antsRef.current.length,
+            ants: renderSnapshot.ants.length,
             fps: rendererDebugRef.current.frameCount,
-            particles: particlesRef.current.length,
+            particles: renderSnapshot.particles.length,
             requestedRenderer: requestedRendererModeRef.current,
+            wave: renderSnapshot.wave,
           });
           rendererDebugRef.current.frameCount = 0;
           rendererDebugRef.current.lastReportMs = timestamp;
