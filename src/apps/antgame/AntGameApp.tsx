@@ -50,6 +50,10 @@ import {
   resolveInitialRendererMode,
   resolveRendererDebugEnabled,
 } from "./render/renderModes";
+import {
+  createAntGameOglRenderer,
+  type AntGameOglRenderer,
+} from "./render/oglRenderer";
 import type {
   Ant,
   DeathSplat,
@@ -76,6 +80,7 @@ function AntGameApp() {
   const activeRendererModeRef = useRef<RendererMode>(
     getActiveRendererMode(requestedRendererModeRef.current),
   );
+  const oglRendererRef = useRef<AntGameOglRenderer | null>(null);
   const rendererDebugEnabledRef = useRef(resolveRendererDebugEnabled());
   const rendererDebugRef = useRef({
     frameCount: 0,
@@ -726,15 +731,23 @@ function AntGameApp() {
       return;
     }
 
-    const context = canvas.getContext("2d", { alpha: false });
+    let context: CanvasRenderingContext2D | null = null;
 
-    if (!context) {
-      return;
+    if (activeRendererModeRef.current === "ogl") {
+      canvas.width = GRID_WIDTH;
+      canvas.height = GRID_HEIGHT;
+      oglRendererRef.current = createAntGameOglRenderer({ canvas });
+    } else {
+      context = canvas.getContext("2d", { alpha: false });
+
+      if (!context) {
+        return;
+      }
+
+      canvas.width = GRID_WIDTH;
+      canvas.height = GRID_HEIGHT;
+      context.imageSmoothingEnabled = false;
     }
-
-    canvas.width = GRID_WIDTH;
-    canvas.height = GRID_HEIGHT;
-    context.imageSmoothingEnabled = false;
 
     let animationFrame = 0;
     let previousTimestamp = performance.now();
@@ -1079,6 +1092,16 @@ function AntGameApp() {
         }
       }
 
+      if (oglRendererRef.current) {
+        oglRendererRef.current.render(renderSnapshot);
+        animationFrame = window.requestAnimationFrame(renderFrame);
+        return;
+      }
+
+      if (!context) {
+        return;
+      }
+
       context.fillStyle = "#6ea44a";
       context.fillRect(0, 0, GRID_WIDTH, GRID_HEIGHT);
 
@@ -1305,6 +1328,8 @@ function AntGameApp() {
 
     return () => {
       window.cancelAnimationFrame(animationFrame);
+      oglRendererRef.current?.dispose();
+      oglRendererRef.current = null;
     };
   }, []);
 
