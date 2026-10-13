@@ -46,7 +46,7 @@ const float BANDS = 4.0;
 // Band coordinate: 0..BANDS, integer crossings are the blob edges.
 float field(vec2 px){
   vec2 p = px / iResolution.y;
-  float t = iTime * 0.035;
+  float t = iTime * 0.006;
   p += 0.14 * vec2(sin(p.y * 2.6 + t * 2.1), sin(p.x * 2.2 - t * 1.7));
   float f = noise(p * 1.25 + vec2(t, -t * 0.6)) * 0.7 + noise(p * 2.6 - vec2(t * 0.7, t * 0.3)) * 0.3;
   return clamp((f - 0.3) / 0.4, 0.0, 0.999) * BANDS;
