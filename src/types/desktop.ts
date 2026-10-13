@@ -160,10 +160,12 @@ export type TerminalLine =
   | {
       kind: "prompt";
       value: string;
+      path?: string;
     }
   | {
       kind: "output" | "accent" | "error";
       value: string;
+      literal?: boolean;
     }
   | {
       href: string;
