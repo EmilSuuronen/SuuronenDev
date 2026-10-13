@@ -5,7 +5,7 @@ type DesktopFilterOverlayProps = {
 };
 
 function DesktopFilterOverlay({ filterId }: DesktopFilterOverlayProps) {
-  if (filterId === "none" || filterId === "invert" || filterId === "noir") {
+  if (filterId === "none") {
     return null;
   }
 

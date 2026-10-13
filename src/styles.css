@@ -75,36 +75,37 @@ button {
   transition: filter 220ms ease;
 }
 
+
 .desktop-root--filter-none {
   --desktop-filter-effect: none;
 }
 
 .desktop-root--filter-invert {
-  --desktop-filter-effect: invert(1) hue-rotate(180deg);
+  --desktop-filter-effect: invert(1) hue-rotate(180deg) saturate(1.5) contrast(1.1);
 }
 
 .desktop-root--filter-crt {
-  --desktop-filter-effect: saturate(0.92) contrast(1.14) brightness(0.94);
+  --desktop-filter-effect: saturate(1.3) contrast(1.2) brightness(1.1) blur(0.5px);
 }
 
 .desktop-root--filter-glitch {
-  --desktop-filter-effect: saturate(1.18) contrast(1.12) brightness(1.02);
+  --desktop-filter-effect: saturate(1.5) contrast(1.3) brightness(1.05);
 }
 
 .desktop-root--filter-noir {
-  --desktop-filter-effect: grayscale(1) contrast(1.2) brightness(0.96);
+  --desktop-filter-effect: grayscale(1) contrast(1.6) brightness(0.9);
 }
 
 .desktop-root--filter-hologram {
-  --desktop-filter-effect: hue-rotate(38deg) saturate(1.28) contrast(1.06);
+  --desktop-filter-effect: sepia(1) hue-rotate(180deg) saturate(2) brightness(1.2) contrast(1.1);
 }
 
 .desktop-root--filter-sunset-bloom {
-  --desktop-filter-effect: sepia(0.24) saturate(1.24) brightness(1.03) contrast(1.02);
+  --desktop-filter-effect: sepia(0.6) hue-rotate(-30deg) saturate(2) brightness(1.1) contrast(1.1) blur(0.5px);
 }
 
 .desktop-root--filter-night-vision {
-  --desktop-filter-effect: grayscale(0.24) sepia(0.44) hue-rotate(38deg) saturate(1.55) brightness(0.88);
+  --desktop-filter-effect: sepia(1) hue-rotate(70deg) saturate(3) brightness(1.2) contrast(1.5);
 }
 
 .desktop-filter-overlay {
@@ -117,117 +118,152 @@ button {
 
 .desktop-filter-layer {
   position: absolute;
-  inset: 0;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  pointer-events: none;
+}
+
+.desktop-filter-overlay--invert .desktop-filter-layer--a {
+  background: radial-gradient(circle at center, transparent 30%, rgba(255, 255, 255, 0.08) 100%);
+  mix-blend-mode: overlay;
+}
+
+.desktop-filter-overlay--crt {
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.9);
 }
 
 .desktop-filter-overlay--crt .desktop-filter-layer--a {
-  background:
-    repeating-linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.04) 0 1px,
-      rgba(0, 0, 0, 0.12) 1px 3px
-    );
-  mix-blend-mode: soft-light;
-  opacity: 0.62;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
 }
 
 .desktop-filter-overlay--crt .desktop-filter-layer--b {
-  background:
-    radial-gradient(circle at center, transparent 48%, rgba(0, 0, 0, 0.22) 100%);
-  opacity: 0.9;
+  background: linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 3px 100%;
+  mix-blend-mode: screen;
 }
 
 .desktop-filter-overlay--crt .desktop-filter-layer--c {
-  background: rgba(255, 255, 255, 0.03);
-  animation: filter-flicker 2.8s steps(2, end) infinite;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0));
+  background-size: 100% 10%;
+  animation: filter-crt-scanline 6s linear infinite;
 }
 
 .desktop-filter-overlay--glitch .desktop-filter-layer--a {
-  background:
-    repeating-linear-gradient(
-      180deg,
-      transparent 0 24px,
-      rgba(255, 79, 181, 0.08) 24px 28px,
-      transparent 28px 66px,
-      rgba(69, 207, 255, 0.08) 66px 70px
-    );
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0 24px,
+    rgba(255, 79, 181, 0.15) 24px 28px,
+    transparent 28px 66px,
+    rgba(69, 207, 255, 0.15) 66px 70px
+  );
   mix-blend-mode: screen;
-  animation: filter-glitch-bars 3.2s steps(6, end) infinite;
+  backdrop-filter: hue-rotate(90deg) contrast(1.5) grayscale(0.2);
+  -webkit-backdrop-filter: hue-rotate(90deg) contrast(1.5) grayscale(0.2);
+  animation: filter-glitch-r 2s infinite steps(3) alternate-reverse;
 }
 
 .desktop-filter-overlay--glitch .desktop-filter-layer--b {
-  background:
-    linear-gradient(90deg, rgba(255, 0, 98, 0.06), transparent 34%, rgba(0, 213, 255, 0.08) 72%, transparent);
-  mix-blend-mode: screen;
-  animation: filter-glitch-shift 180ms steps(2, end) infinite alternate;
+  background: linear-gradient(90deg, rgba(255, 0, 98, 0.08), transparent 34%, rgba(0, 213, 255, 0.08) 72%, transparent);
+  mix-blend-mode: color-dodge;
+  animation: filter-glitch-b 1.5s infinite steps(4) alternate-reverse;
 }
 
 .desktop-filter-overlay--glitch .desktop-filter-layer--c {
-  background:
-    radial-gradient(circle at 20% 12%, rgba(255, 255, 255, 0.05), transparent 24%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0 2px, transparent 2px 5px);
-  opacity: 0.55;
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.15) 3px,
+    rgba(0, 0, 0, 0.15) 5px
+  );
+  animation: filter-glitch-scan 0.5s infinite steps(5);
+}
+
+.desktop-filter-overlay--noir {
+  box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.9);
+}
+
+.desktop-filter-overlay--noir .desktop-filter-layer--a {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+  animation: filter-noise 0.2s infinite steps(2);
+}
+
+.desktop-filter-overlay--noir .desktop-filter-layer--b {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 150px,
+    rgba(255, 255, 255, 0.05) 150px 151px,
+    transparent 151px 300px
+  );
+  animation: filter-film-scratch 4s infinite alternate;
+}
+
+.desktop-filter-overlay--hologram {
+  box-shadow: inset 0 0 80px rgba(0, 255, 255, 0.2);
 }
 
 .desktop-filter-overlay--hologram .desktop-filter-layer--a {
-  background:
-    linear-gradient(110deg, rgba(92, 250, 255, 0.12), transparent 32%, rgba(232, 92, 255, 0.1) 68%, transparent);
+  background-image: 
+    linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: center center;
   mix-blend-mode: screen;
+  transform: perspective(500px) rotateX(20deg) scale(1.2);
+  opacity: 0.3;
 }
 
 .desktop-filter-overlay--hologram .desktop-filter-layer--b {
-  background:
-    repeating-linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.025) 0 1px,
-      transparent 1px 5px
-    );
-  opacity: 0.42;
+  background: radial-gradient(circle at center, rgba(0, 255, 255, 0.1), transparent 60%);
+  animation: filter-holo-pulse 4s infinite alternate;
 }
 
 .desktop-filter-overlay--hologram .desktop-filter-layer--c {
-  background:
-    radial-gradient(circle at 50% 18%, rgba(129, 255, 246, 0.12), transparent 34%),
-    radial-gradient(circle at 72% 76%, rgba(255, 129, 244, 0.1), transparent 30%);
+  background: linear-gradient(to bottom, transparent, rgba(0, 255, 255, 0.2) 50%, transparent);
+  background-size: 100% 5px;
+  animation: filter-holo-scan 3s linear infinite;
 }
 
 .desktop-filter-overlay--sunset-bloom .desktop-filter-layer--a {
-  background:
-    radial-gradient(circle at 18% 14%, rgba(255, 194, 123, 0.2), transparent 26%),
-    radial-gradient(circle at 84% 18%, rgba(255, 131, 72, 0.14), transparent 24%),
-    linear-gradient(180deg, rgba(255, 172, 82, 0.08), transparent 34%);
+  background: radial-gradient(circle at 80% 0%, rgba(255, 100, 50, 0.4), transparent 50%),
+              radial-gradient(circle at 20% 100%, rgba(255, 200, 100, 0.3), transparent 60%);
   mix-blend-mode: screen;
 }
 
 .desktop-filter-overlay--sunset-bloom .desktop-filter-layer--b {
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  opacity: 0.32;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 150, 50, 0.1), transparent 70%);
+  mix-blend-mode: overlay;
+  animation: filter-bloom-pulse 6s infinite alternate;
 }
 
 .desktop-filter-overlay--sunset-bloom .desktop-filter-layer--c {
-  background: rgba(255, 197, 124, 0.04);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.08;
+  mix-blend-mode: color-burn;
+}
+
+.desktop-filter-overlay--night-vision {
+  box-shadow: inset 0 0 100px rgba(0, 50, 0, 0.9);
 }
 
 .desktop-filter-overlay--night-vision .desktop-filter-layer--a {
-  background:
-    repeating-linear-gradient(
-      180deg,
-      rgba(196, 255, 167, 0.02) 0 1px,
-      rgba(0, 0, 0, 0.12) 1px 3px
-    );
-  opacity: 0.72;
+  background: repeating-linear-gradient(rgba(0, 255, 0, 0.05) 0 2px, rgba(0, 0, 0, 0.1) 2px 4px);
+  mix-blend-mode: screen;
 }
 
 .desktop-filter-overlay--night-vision .desktop-filter-layer--b {
-  background:
-    radial-gradient(circle at center, transparent 44%, rgba(0, 0, 0, 0.28) 100%);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.2;
+  mix-blend-mode: overlay;
+  animation: filter-noise 0.15s infinite steps(3);
 }
 
 .desktop-filter-overlay--night-vision .desktop-filter-layer--c {
-  background:
-    linear-gradient(180deg, rgba(164, 255, 123, 0.06), rgba(67, 129, 48, 0.04));
-  mix-blend-mode: screen;
+  display: none;
 }
 
 .desktop-background {
@@ -2976,40 +3012,66 @@ button {
   color: #a42f2f;
 }
 
-@keyframes filter-flicker {
-  0%,
-  100% {
-    opacity: 0.03;
-  }
 
-  50% {
-    opacity: 0.08;
-  }
+@keyframes filter-crt-scanline {
+  0% { background-position: 0 -100vh; }
+  100% { background-position: 0 100vh; }
 }
 
-@keyframes filter-glitch-bars {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  20% {
-    transform: translateY(-4px);
-  }
-
-  60% {
-    transform: translateY(5px);
-  }
+@keyframes filter-glitch-r {
+  0% { transform: translate(0); opacity: 0.1; }
+  20% { transform: translate(-3px, 1px); opacity: 0.2; }
+  40% { transform: translate(-1px, -1px); opacity: 0.1; }
+  60% { transform: translate(3px, 2px); opacity: 0.3; }
+  80% { transform: translate(-2px, -2px); opacity: 0.1; }
+  100% { transform: translate(2px, 1px); opacity: 0.2; }
 }
 
-@keyframes filter-glitch-shift {
-  from {
-    transform: translateX(-2px);
-  }
+@keyframes filter-glitch-b {
+  0% { transform: translate(0); opacity: 0.1; }
+  20% { transform: translate(3px, -1px); opacity: 0.2; }
+  40% { transform: translate(1px, 2px); opacity: 0.1; }
+  60% { transform: translate(-3px, -2px); opacity: 0.3; }
+  80% { transform: translate(2px, 1px); opacity: 0.1; }
+  100% { transform: translate(-2px, -1px); opacity: 0.2; }
+}
 
-  to {
-    transform: translateX(2px);
-  }
+@keyframes filter-glitch-scan {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 20px; }
+}
+
+@keyframes filter-noise {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(-1%, -1%); }
+  100% { transform: translate(1%, 1%); }
+}
+
+@keyframes filter-film-scratch {
+  0% { transform: translateX(0); opacity: 0.2; }
+  10% { transform: translateX(50px); opacity: 0.5; }
+  20% { transform: translateX(-20px); opacity: 0.1; }
+  100% { transform: translateX(0); opacity: 0; }
+}
+
+@keyframes filter-holo-pulse {
+  0% { opacity: 0.4; }
+  100% { opacity: 0.8; }
+}
+
+@keyframes filter-holo-scan {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100vh; }
+}
+
+@keyframes filter-bloom-pulse {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes filter-radar-sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .settings-theme-card {
