@@ -46,7 +46,7 @@ export const browserSections: BrowserSection[] = [
     id: "contact",
     label: "Contact",
     view: "contact",
-    eyebrow: "contact",
+    eyebrow: "Contact",
     heading: "Get in touch.",
     description:
       "Hit me up for collaboration or inquiries.",

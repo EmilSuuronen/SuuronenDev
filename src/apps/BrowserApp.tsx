@@ -605,8 +605,9 @@ function BrowserApp() {
               <header className="browser-site-header">
                 <div className="browser-site-header-top">
                   <div className="browser-site-brand">
-                    <span className="browser-site-brand-kicker">{t("Personal web workspace")}</span>
-                    <strong>suuronen.dev</strong>
+                    <strong>
+                      suuronen<span>.dev</span>
+                    </strong>
                     <p className="browser-site-tagline">
                       Emil Suuronen, backend engineer, infrastructure builder, and curious product tinkerer.
                     </p>

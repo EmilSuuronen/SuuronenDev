@@ -154,7 +154,6 @@ const finnishTranslations: Record<string, string> = {
   "Ops + Observability": "Ylläpito + observability",
   "Page not available": "Sivu ei ole saatavilla",
   "Panel surface": "Paneelin pinta",
-  "Personal web workspace": "Henkilökohtainen verkkotyötila",
   "Pinned": "Kiinnitetyt",
   "Pinned apps and quick links": "Kiinnitetyt sovellukset ja pikalinkit",
   "Platform services": "Alustapalvelut",
