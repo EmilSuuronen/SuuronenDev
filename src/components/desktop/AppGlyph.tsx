@@ -1,4 +1,4 @@
-import { Calculator, FileText, FolderClosed, Globe2, NotebookPen, Settings2, Trash2 } from "lucide-react";
+import { Calculator, FileText, FolderClosed, Globe2, NotebookPen, ScanFace, Settings2, Trash2 } from "lucide-react";
 import molkkisIcon from "../../res/icon-192.png";
 import type { DesktopIconKey } from "../../types/desktop";
 
@@ -20,6 +20,14 @@ function AppGlyph({ iconKey, className = "" }: AppGlyphProps) {
     return (
       <span className={`app-glyph app-glyph--molkkis ${className}`.trim()} aria-hidden="true">
         <img className="app-glyph-molkkis-image" src={molkkisIcon} alt="" />
+      </span>
+    );
+  }
+
+  if (iconKey === "ar") {
+    return (
+      <span className={`app-glyph app-glyph--ar ${className}`.trim()} aria-hidden="true">
+        <ScanFace className="app-glyph-ar" strokeWidth={1.75} />
       </span>
     );
   }

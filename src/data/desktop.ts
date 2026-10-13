@@ -95,6 +95,15 @@ export function createInitialDesktopIcons(bounds: DesktopBounds): DesktopIconSta
       windowId: launcher.id,
     })),
     {
+      id: "ar-lenses",
+      href: "/ar/",
+      icon: "ar",
+      kind: "app" as const,
+      label: "AR Lenses",
+      parentId: null,
+      position: { x: 0, y: 0 },
+    },
+    {
       id: "applications",
       icon: "folder",
       kind: "folder" as const,

@@ -1,6 +1,6 @@
 export type WindowId = "terminal" | "browser" | "calculator" | "settings" | "notes" | "antgame";
 export type DesktopFileId = `note:${string}`;
-export type DesktopAppId = WindowId | "molkkis";
+export type DesktopAppId = WindowId | "molkkis" | "ar-lenses";
 export type FolderId = "applications" | "trash" | `user-folder:${string}`;
 export type DesktopEntryId = DesktopAppId | DesktopFileId | FolderId;
 export type DesktopIconKey =
@@ -12,6 +12,7 @@ export type DesktopIconKey =
   | "antgame"
   | "textfile"
   | "molkkis"
+  | "ar"
   | "trash"
   | "folder";
 export type WindowEntityId = WindowId | `folder:${FolderId}`;
