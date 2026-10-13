@@ -1146,11 +1146,12 @@ button {
   height: 100%;
   background: #0a0a0a;
   z-index: 1;
+  container-type: inline-size;
 }
 
 .terminal-screen {
-  display: grid;
-  grid-template-rows: 1fr auto;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   min-height: 0;
   padding: 0.9rem 1rem 1rem;
@@ -1174,7 +1175,12 @@ button {
 }
 
 .terminal-line--accent {
+  overflow: hidden;
   color: #ffb16d;
+  /* 0.6em per monospace glyph; the widest banner that renders here is ~54 columns */
+  font-size: min(0.82rem, calc((100cqw - 2rem) / 33));
+  line-height: 1.15;
+  white-space: pre;
 }
 
 .terminal-line--output {
