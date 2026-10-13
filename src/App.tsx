@@ -331,6 +331,7 @@ function App() {
   };
 
   const handleCreateFolderRequest = () => {
+    setDesktopContextMenu(null);
     setFolderDialog({ initialValue: t("New folder") });
   };
 
