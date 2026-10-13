@@ -6,7 +6,7 @@
 
 .antgame-app {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
   height: 100%;
   background: #c0c0c0;
   color: #141414;
@@ -25,10 +25,12 @@
   min-height: 0;
 }
 
+/* weapons + reset on the first row, stats and upgrades span full width below */
 .antgame-toolbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  gap: 0.45rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.4rem;
+  min-width: 0;
   align-items: center;
   padding: 0.48rem;
   border-bottom: 1px solid #777;
@@ -46,6 +48,7 @@
 .antgame-weapon-button,
 .antgame-reset-button {
   display: inline-flex;
+  white-space: nowrap;
   align-items: center;
   justify-content: center;
   min-height: 26px;
@@ -78,8 +81,11 @@
 }
 
 .antgame-toolbar-stats {
+  grid-column: 1 / -1;
+  grid-row: 2;
   display: flex;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.3rem;
   align-items: center;
   font-size: 0.68rem;
   color: #101010;
@@ -89,7 +95,7 @@
 .antgame-toolbar-stats span {
   display: inline-flex;
   align-items: center;
-  min-height: 24px;
+  min-height: 22px;
   padding: 0 0.45rem;
   border-top: 1px solid #8d8d8d;
   border-left: 1px solid #8d8d8d;
@@ -219,7 +225,8 @@
 }
 
 .antgame-canvas-shell {
-  position: relative;
+  position: absolute;
+  inset: 0;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -414,18 +421,46 @@
   touch-action: none;
 }
 
-@media (max-width: 900px) {
-  .antgame-toolbar {
-    grid-template-columns: 1fr;
-    align-items: start;
+@container (max-width: 560px) {
+  /* weapons 2x2 on top, one swipeable stats row beside the reset button */
+  .antgame-weapon-group {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.3rem;
+  }
+
+  .antgame-weapon-button {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .antgame-toolbar-stats {
-    flex-wrap: wrap;
+    grid-column: 1;
+    grid-row: 2;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
 
-  .antgame-upgrade-grid {
-    grid-template-columns: 1fr;
+  .antgame-toolbar-stats::-webkit-scrollbar {
+    display: none;
+  }
+
+  .antgame-toolbar-stats span {
+    flex: 0 0 auto;
+  }
+
+  .antgame-reset-button {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .antgame-upgrade-button {
+    min-height: 40px;
+    padding: 0.15rem 0.3rem;
   }
 
   .antgame-upgrade-lock {
@@ -433,8 +468,7 @@
     align-items: stretch;
   }
 
-  .antgame-roundscreen-grid,
-  .antgame-round-upgrades {
+  .antgame-roundscreen-grid {
     grid-template-columns: 1fr;
   }
 }

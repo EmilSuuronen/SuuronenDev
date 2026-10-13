@@ -1495,12 +1495,8 @@ function AntGameApp() {
     canvasShellSize.width / GRID_WIDTH,
     canvasShellSize.height / GRID_HEIGHT,
   );
-  const canvasScale =
-    !Number.isFinite(rawCanvasScale) || rawCanvasScale <= 0
-      ? 1
-      : rawCanvasScale >= 1
-        ? Math.max(1, Math.floor(rawCanvasScale))
-        : rawCanvasScale;
+  // fractional scales stay crisp with image-rendering: pixelated, so use all the space there is
+  const canvasScale = !Number.isFinite(rawCanvasScale) || rawCanvasScale <= 0 ? 1 : rawCanvasScale;
   const canvasRenderWidth = Math.max(1, Math.round(GRID_WIDTH * canvasScale));
   const canvasRenderHeight = Math.max(1, Math.round(GRID_HEIGHT * canvasScale));
 
