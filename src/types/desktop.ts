@@ -1,4 +1,4 @@
-export type WindowId = "terminal" | "browser" | "calculator" | "settings" | "notes";
+export type WindowId = "terminal" | "browser" | "calculator" | "settings" | "notes" | "antgame";
 export type DesktopFileId = `note:${string}`;
 export type DesktopAppId = WindowId | "molkkis";
 export type FolderId = "applications" | "trash" | `user-folder:${string}`;
@@ -9,6 +9,7 @@ export type DesktopIconKey =
   | "calculator"
   | "settings"
   | "notes"
+  | "antgame"
   | "textfile"
   | "molkkis"
   | "trash"
@@ -40,6 +41,7 @@ export type DesktopWindowState = {
   maximizeMode: "manual" | "mobile" | null;
   kind: "app" | "folder";
   maxSize?: Size;
+  openMode?: "windowed" | "fullscreen";
   position: Point;
   restoreRect?: WindowRect | null;
   size: Size;

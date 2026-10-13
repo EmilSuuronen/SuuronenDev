@@ -1,0 +1,440 @@
+.desktop-window--antgame .window-content {
+  padding: 0;
+  overflow: hidden;
+  background: #bdbdbd;
+}
+
+.antgame-app {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  background: #c0c0c0;
+  color: #141414;
+  font-family: "Courier New", "IBM Plex Mono", monospace;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.antgame-app * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.antgame-canvas-shell-wrap {
+  position: relative;
+  min-height: 0;
+}
+
+.antgame-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 0.45rem;
+  align-items: center;
+  padding: 0.48rem;
+  border-bottom: 1px solid #777;
+  background:
+    linear-gradient(180deg, #d4d4d4, #bcbcbc);
+  box-shadow: inset 1px 1px 0 #f6f6f6, inset -1px -1px 0 #8b8b8b;
+}
+
+.antgame-weapon-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.antgame-weapon-button,
+.antgame-reset-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 0.1rem 0.52rem;
+  border-top: 1px solid #fcfcfc;
+  border-left: 1px solid #fcfcfc;
+  border-right: 1px solid #5e5e5e;
+  border-bottom: 1px solid #5e5e5e;
+  background: #c0c0c0;
+  color: #101010;
+  font-size: 0.72rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.antgame-weapon-button:active,
+.antgame-reset-button:active,
+.antgame-weapon-button.is-active {
+  border-top-color: #5e5e5e;
+  border-left-color: #5e5e5e;
+  border-right-color: #f6f6f6;
+  border-bottom-color: #f6f6f6;
+  background: #aaaaaa;
+}
+
+.antgame-weapon-button.is-locked {
+  background: #b0b0b0;
+  color: #5a5a5a;
+}
+
+.antgame-toolbar-stats {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.68rem;
+  color: #101010;
+  white-space: nowrap;
+}
+
+.antgame-toolbar-stats span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 0.45rem;
+  border-top: 1px solid #8d8d8d;
+  border-left: 1px solid #8d8d8d;
+  border-right: 1px solid #f3f3f3;
+  border-bottom: 1px solid #f3f3f3;
+  background: #d2d2d2;
+}
+
+.antgame-upgrade-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.3rem 0.35rem;
+  border-top: 1px solid #f8f8f8;
+  border-left: 1px solid #f8f8f8;
+  border-right: 1px solid #7f7f7f;
+  border-bottom: 1px solid #7f7f7f;
+  background: #c6c6c6;
+}
+
+.antgame-upgrade-panel--flamethrower {
+  background: #d4b58f;
+}
+
+.antgame-upgrade-panel--acid {
+  background: #b9cfac;
+}
+
+.antgame-upgrade-panel--bomb {
+  background: #ccada4;
+}
+
+.antgame-upgrade-panel--lightning {
+  background: #adc9d4;
+}
+
+.antgame-upgrade-grid {
+  display: grid;
+  gap: 0.28rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.antgame-upgrade-lock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: #1a1a1a;
+}
+
+.antgame-upgrade-button {
+  display: grid;
+  justify-items: start;
+  gap: 0.04rem;
+  min-height: 48px;
+  padding: 0.18rem 0.42rem;
+  border-top: 1px solid #fcfcfc;
+  border-left: 1px solid #fcfcfc;
+  border-right: 1px solid #5e5e5e;
+  border-bottom: 1px solid #5e5e5e;
+  background: #c0c0c0;
+  color: #111111;
+  font-size: 0.62rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.antgame-upgrade-button span {
+  opacity: 0.9;
+}
+
+.antgame-upgrade-weapon--flamethrower {
+  border-top-color: #ffe1bf;
+  border-left-color: #ffe1bf;
+  border-right-color: #76513a;
+  border-bottom-color: #76513a;
+  background: #d8b393;
+  color: #24130a;
+}
+
+.antgame-upgrade-weapon--acid {
+  border-top-color: #e7f5dc;
+  border-left-color: #e7f5dc;
+  border-right-color: #4f6843;
+  border-bottom-color: #4f6843;
+  background: #c2d8b5;
+  color: #15230f;
+}
+
+.antgame-upgrade-weapon--bomb {
+  border-top-color: #f3ddd9;
+  border-left-color: #f3ddd9;
+  border-right-color: #6f4840;
+  border-bottom-color: #6f4840;
+  background: #d3b1aa;
+  color: #28110d;
+}
+
+.antgame-upgrade-weapon--lightning {
+  border-top-color: #e3f2f8;
+  border-left-color: #e3f2f8;
+  border-right-color: #44626f;
+  border-bottom-color: #44626f;
+  background: #b8d0db;
+  color: #0f1b22;
+}
+
+.antgame-upgrade-stat--damage {
+  box-shadow: inset 0 -2px 0 #a33a34;
+}
+
+.antgame-upgrade-stat--size {
+  box-shadow: inset 0 -2px 0 #9a7a2b;
+}
+
+.antgame-upgrade-stat--speed {
+  box-shadow: inset 0 -2px 0 #3579a3;
+}
+
+.antgame-upgrade-button:disabled {
+  background: #afafaf;
+  color: #555555;
+  cursor: not-allowed;
+}
+
+.antgame-canvas-shell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  min-height: 0;
+  background:
+    linear-gradient(#a9a9a9 1px, transparent 1px),
+    linear-gradient(90deg, #a9a9a9 1px, transparent 1px),
+    #c3c3c3;
+  background-size: 8px 8px;
+  box-shadow:
+    inset 1px 1px 0 #f0f0f0,
+    inset -1px -1px 0 #6f6f6f;
+}
+
+.antgame-stage {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.antgame-objective {
+  position: absolute;
+  top: 0.42rem;
+  left: 0.42rem;
+  z-index: 2;
+  max-width: calc(100% - 0.84rem);
+  padding: 0.18rem 0.4rem;
+  border-top: 1px solid #f8f8f8;
+  border-left: 1px solid #f8f8f8;
+  border-right: 1px solid #7f7f7f;
+  border-bottom: 1px solid #7f7f7f;
+  background: rgba(203, 203, 203, 0.88);
+  color: #181818;
+  font-size: 0.64rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+}
+
+.antgame-objective.is-victory {
+  background: rgba(170, 214, 160, 0.9);
+}
+
+.antgame-objective.is-defeat {
+  background: rgba(214, 146, 146, 0.9);
+}
+
+.antgame-endscreen {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 0.55rem;
+  padding: 1rem;
+  text-align: center;
+  background: rgba(36, 36, 36, 0.66);
+}
+
+.antgame-endscreen.is-victory {
+  background: rgba(34, 58, 38, 0.66);
+}
+
+.antgame-endscreen.is-defeat {
+  background: rgba(78, 38, 34, 0.66);
+}
+
+.antgame-roundscreen {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 0.45rem;
+  padding: 0.7rem;
+  background: rgba(45, 45, 45, 0.78);
+  overflow: auto;
+}
+
+.antgame-roundscreen-grid {
+  display: grid;
+  gap: 0.36rem;
+  align-content: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.antgame-round-weapon {
+  display: grid;
+  gap: 0.24rem;
+  padding: 0.34rem;
+  border-top: 1px solid #f8f8f8;
+  border-left: 1px solid #f8f8f8;
+  border-right: 1px solid #6e6e6e;
+  border-bottom: 1px solid #6e6e6e;
+  background: rgba(200, 200, 200, 0.96);
+}
+
+.antgame-round-weapon--flamethrower {
+  background: rgba(222, 186, 150, 0.97);
+}
+
+.antgame-round-weapon--acid {
+  background: rgba(190, 214, 177, 0.97);
+}
+
+.antgame-round-weapon--bomb {
+  background: rgba(213, 177, 168, 0.97);
+}
+
+.antgame-round-weapon--lightning {
+  background: rgba(176, 207, 220, 0.97);
+}
+
+.antgame-round-weapon-title {
+  margin: 0;
+  color: #101010;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.antgame-round-upgrades {
+  display: grid;
+  gap: 0.24rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.antgame-round-button {
+  min-height: 42px;
+  font-size: 0.58rem;
+}
+
+.antgame-endscreen-title {
+  margin: 0;
+  min-width: 162px;
+  padding: 0.28rem 0.6rem;
+  border-top: 1px solid #f8f8f8;
+  border-left: 1px solid #f8f8f8;
+  border-right: 1px solid #6e6e6e;
+  border-bottom: 1px solid #6e6e6e;
+  background: #c9c9c9;
+  color: #111111;
+  font-size: 0.82rem;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.antgame-endscreen-text {
+  margin: 0;
+  max-width: min(410px, 86%);
+  padding: 0.32rem 0.56rem;
+  border-top: 1px solid #f8f8f8;
+  border-left: 1px solid #f8f8f8;
+  border-right: 1px solid #6e6e6e;
+  border-bottom: 1px solid #6e6e6e;
+  background: rgba(210, 210, 210, 0.92);
+  color: #121212;
+  font-size: 0.7rem;
+  line-height: 1.25;
+}
+
+.antgame-endscreen-button {
+  min-height: 28px;
+  padding: 0.15rem 0.72rem;
+  border-top: 1px solid #fdfdfd;
+  border-left: 1px solid #fdfdfd;
+  border-right: 1px solid #545454;
+  border-bottom: 1px solid #545454;
+  background: #c0c0c0;
+  color: #141414;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+
+.antgame-endscreen-button:active {
+  border-top-color: #545454;
+  border-left-color: #545454;
+  border-right-color: #fdfdfd;
+  border-bottom-color: #fdfdfd;
+  background: #a7a7a7;
+}
+
+.antgame-canvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+@media (max-width: 900px) {
+  .antgame-toolbar {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .antgame-toolbar-stats {
+    flex-wrap: wrap;
+  }
+
+  .antgame-upgrade-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .antgame-upgrade-lock {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .antgame-roundscreen-grid,
+  .antgame-round-upgrades {
+    grid-template-columns: 1fr;
+  }
+}

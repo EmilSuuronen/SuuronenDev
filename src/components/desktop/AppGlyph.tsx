@@ -40,6 +40,14 @@ function AppGlyph({ iconKey, className = "" }: AppGlyphProps) {
     );
   }
 
+  if (iconKey === "antgame") {
+    return (
+      <span className={`app-glyph app-glyph--antgame ${className}`.trim()} aria-hidden="true">
+        <span className="app-glyph-antgame-pixel" />
+      </span>
+    );
+  }
+
   if (iconKey === "textfile") {
     return (
       <span className={`app-glyph app-glyph--textfile ${className}`.trim()} aria-hidden="true">

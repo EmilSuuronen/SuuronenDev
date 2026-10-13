@@ -6,6 +6,7 @@ import FolderApp from "./apps/FolderApp";
 import NotesApp from "./apps/NotesApp";
 import SettingsApp from "./apps/SettingsApp";
 import TerminalApp from "./apps/TerminalApp";
+import AntGameApp from "./apps/AntGameApp";
 import DesktopFilterOverlay from "./components/desktop/DesktopFilterOverlay";
 import DesktopContextMenu from "./components/desktop/DesktopContextMenu";
 import DesktopWallpaper from "./components/desktop/DesktopWallpaper";
@@ -65,6 +66,10 @@ function renderWindowApp({
 
   if (windowId === "calculator") {
     return <CalculatorApp />;
+  }
+
+  if (windowId === "antgame") {
+    return <AntGameApp />;
   }
 
   if (windowId === "settings") {
