@@ -6,7 +6,7 @@ import {
   type DesktopTheme,
 } from "../data/themes";
 
-const STORAGE_KEY = "suuronen.desktop.theme";
+const STORAGE_KEY = "suuronen.desktop.theme.v2";
 
 type ThemeState = {
   currentTheme: DesktopTheme;

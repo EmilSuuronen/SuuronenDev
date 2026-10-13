@@ -18,9 +18,6 @@ export type DesktopTheme = {
   wallpaperColor1: string;
   wallpaperColor2: string;
   wallpaperColor3: string;
-  wallpaperGlowA: string;
-  wallpaperGlowB: string;
-  wallpaperGlowC: string;
 };
 
 export const desktopThemes: DesktopTheme[] = [
@@ -40,12 +37,9 @@ export const desktopThemes: DesktopTheme[] = [
     surfaceDarkStrong: "#0c0c0c",
     textLight: "#f6f1e8",
     textLightSoft: "rgba(246, 241, 232, 0.66)",
-    wallpaperColor1: "#ffbba6",
-    wallpaperColor2: "#fa5102",
-    wallpaperColor3: "#474645",
-    wallpaperGlowA: "rgba(255, 145, 54, 0.17)",
-    wallpaperGlowB: "rgba(255, 218, 176, 0.035)",
-    wallpaperGlowC: "rgba(180, 72, 12, 0.11)",
+    wallpaperColor1: "#ffc48a",
+    wallpaperColor2: "#ff8a3d",
+    wallpaperColor3: "#e8572a",
   },
   {
     id: "midnight-copper",
@@ -63,12 +57,9 @@ export const desktopThemes: DesktopTheme[] = [
     surfaceDarkStrong: "#080808",
     textLight: "#f8f1e7",
     textLightSoft: "rgba(248, 241, 231, 0.66)",
-    wallpaperColor1: "#ffd6bf",
-    wallpaperColor2: "#ff6d1f",
-    wallpaperColor3: "#2e2a28",
-    wallpaperGlowA: "rgba(255, 126, 52, 0.18)",
-    wallpaperGlowB: "rgba(255, 229, 184, 0.04)",
-    wallpaperGlowC: "rgba(116, 46, 10, 0.14)",
+    wallpaperColor1: "#ffd2b0",
+    wallpaperColor2: "#f9793a",
+    wallpaperColor3: "#b8461c",
   },
   {
     id: "aurora-blueprint",
@@ -86,12 +77,9 @@ export const desktopThemes: DesktopTheme[] = [
     surfaceDarkStrong: "#091018",
     textLight: "#eff6ff",
     textLightSoft: "rgba(239, 246, 255, 0.66)",
-    wallpaperColor1: "#b7ddff",
-    wallpaperColor2: "#3673ff",
-    wallpaperColor3: "#2f3440",
-    wallpaperGlowA: "rgba(103, 167, 255, 0.17)",
-    wallpaperGlowB: "rgba(225, 242, 255, 0.045)",
-    wallpaperGlowC: "rgba(27, 61, 132, 0.12)",
+    wallpaperColor1: "#bfe0ff",
+    wallpaperColor2: "#7cb7ff",
+    wallpaperColor3: "#3f7df0",
   },
   {
     id: "sage-circuit",
@@ -109,12 +97,9 @@ export const desktopThemes: DesktopTheme[] = [
     surfaceDarkStrong: "#090c08",
     textLight: "#f0f4ec",
     textLightSoft: "rgba(240, 244, 236, 0.66)",
-    wallpaperColor1: "#d3efca",
-    wallpaperColor2: "#6ba16e",
-    wallpaperColor3: "#363933",
-    wallpaperGlowA: "rgba(133, 182, 144, 0.17)",
-    wallpaperGlowB: "rgba(238, 246, 220, 0.03)",
-    wallpaperGlowC: "rgba(58, 88, 42, 0.14)",
+    wallpaperColor1: "#d4f2c6",
+    wallpaperColor2: "#8fe0a0",
+    wallpaperColor3: "#4fae6c",
   },
   {
     id: "rose-signal",
@@ -132,12 +117,9 @@ export const desktopThemes: DesktopTheme[] = [
     surfaceDarkStrong: "#0c090d",
     textLight: "#fbf0f6",
     textLightSoft: "rgba(251, 240, 246, 0.66)",
-    wallpaperColor1: "#ffc1d7",
-    wallpaperColor2: "#ff4f8e",
-    wallpaperColor3: "#47323c",
-    wallpaperGlowA: "rgba(255, 102, 161, 0.18)",
-    wallpaperGlowB: "rgba(255, 225, 237, 0.04)",
-    wallpaperGlowC: "rgba(132, 38, 87, 0.13)",
+    wallpaperColor1: "#ffd0e4",
+    wallpaperColor2: "#ff9ac8",
+    wallpaperColor3: "#ef5b9c",
   },
   {
     id: "violet-afterglow",
@@ -155,12 +137,9 @@ export const desktopThemes: DesktopTheme[] = [
     surfaceDarkStrong: "#0b0810",
     textLight: "#f5efff",
     textLightSoft: "rgba(245, 239, 255, 0.66)",
-    wallpaperColor1: "#d4b7ff",
-    wallpaperColor2: "#8741ff",
-    wallpaperColor3: "#383343",
-    wallpaperGlowA: "rgba(161, 98, 255, 0.18)",
-    wallpaperGlowB: "rgba(237, 227, 255, 0.04)",
-    wallpaperGlowC: "rgba(82, 41, 140, 0.14)",
+    wallpaperColor1: "#e2d4ff",
+    wallpaperColor2: "#c3a8ff",
+    wallpaperColor3: "#8b5cf6",
   },
   {
     id: "amber-drift",
@@ -178,12 +157,9 @@ export const desktopThemes: DesktopTheme[] = [
     surfaceDarkStrong: "#0c0a06",
     textLight: "#faf4e2",
     textLightSoft: "rgba(250, 244, 226, 0.66)",
-    wallpaperColor1: "#ffe0a2",
-    wallpaperColor2: "#d89600",
-    wallpaperColor3: "#474139",
-    wallpaperGlowA: "rgba(244, 184, 55, 0.18)",
-    wallpaperGlowB: "rgba(255, 241, 197, 0.05)",
-    wallpaperGlowC: "rgba(132, 95, 17, 0.14)",
+    wallpaperColor1: "#ffe9a6",
+    wallpaperColor2: "#ffd84d",
+    wallpaperColor3: "#f2a922",
   },
   {
     id: "mono-studio",
@@ -201,12 +177,9 @@ export const desktopThemes: DesktopTheme[] = [
     surfaceDarkStrong: "#080808",
     textLight: "#f2f2f2",
     textLightSoft: "rgba(242, 242, 242, 0.66)",
-    wallpaperColor1: "#d6d6d6",
-    wallpaperColor2: "#6f6f6f",
-    wallpaperColor3: "#222222",
-    wallpaperGlowA: "rgba(210, 210, 210, 0.12)",
-    wallpaperGlowB: "rgba(255, 255, 255, 0.03)",
-    wallpaperGlowC: "rgba(92, 92, 92, 0.14)",
+    wallpaperColor1: "#ececec",
+    wallpaperColor2: "#bdbdbd",
+    wallpaperColor3: "#7a7a7a",
   },
 ];
 

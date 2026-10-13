@@ -165,9 +165,6 @@ function App() {
         "--accent": currentTheme.accent,
         "--accent-soft": currentTheme.accentSoft,
         "--accent-strong": currentTheme.accentStrong,
-        "--wallpaper-glow-a": currentTheme.wallpaperGlowA,
-        "--wallpaper-glow-b": currentTheme.wallpaperGlowB,
-        "--wallpaper-glow-c": currentTheme.wallpaperGlowC,
       }) as CSSProperties,
     [currentTheme],
   );

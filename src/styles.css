@@ -294,20 +294,6 @@ button {
 .desktop-wallpaper {
   width: 100%;
   height: 100%;
-  opacity: 0.94;
-  filter: saturate(1.04) brightness(0.72) contrast(1.04);
-}
-
-.desktop-wallpaper-glow {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(118% 86% at 12% 8%, var(--wallpaper-glow-a), transparent 48%),
-    radial-gradient(88% 66% at 72% 18%, var(--wallpaper-glow-b), transparent 42%),
-    radial-gradient(94% 88% at 80% 84%, var(--wallpaper-glow-c), transparent 52%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.012), transparent 20%, rgba(0, 0, 0, 0.3));
-  mix-blend-mode: screen;
-  opacity: 0.4;
 }
 
 .topbar {
