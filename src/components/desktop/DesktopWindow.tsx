@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Copy, Minus, Square, X } from "lucide-react";
 
 import { isMobileDesktopViewport } from "../../data/desktop";
 import { useLocale } from "../../i18n/locale";
@@ -206,7 +207,7 @@ function DesktopWindow({
             aria-label={`${t("Minimize")} ${t(windowState.title)}`}
             onPointerDown={handleControlPointerDown(onMinimize)}
           >
-            _
+            <Minus aria-hidden="true" />
           </button>
           {!isMobile ? (
             <button
@@ -215,7 +216,7 @@ function DesktopWindow({
               aria-label={`${t(windowState.isMaximized ? "Restore" : "Maximize")} ${t(windowState.title)}`}
               onPointerDown={handleControlPointerDown(onToggleMaximize)}
             >
-              {windowState.isMaximized ? "❐" : "□"}
+              {windowState.isMaximized ? <Copy aria-hidden="true" /> : <Square aria-hidden="true" />}
             </button>
           ) : null}
           <button
@@ -224,7 +225,7 @@ function DesktopWindow({
             aria-label={`${t("Close")} ${t(windowState.title)}`}
             onPointerDown={handleControlPointerDown(onClose)}
           >
-            x
+            <X aria-hidden="true" />
           </button>
         </div>
       </header>
