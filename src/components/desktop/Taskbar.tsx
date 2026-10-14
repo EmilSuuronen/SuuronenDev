@@ -4,21 +4,25 @@ import { desktopLaunchers } from "../../data/desktop";
 import { useLocale } from "../../i18n/locale";
 import AppGlyph from "./AppGlyph";
 import StartMenu from "./StartMenu";
-import type { DesktopEntryId, DesktopWindowState, WindowId } from "../../types/desktop";
+import type { DesktopEntryId, DesktopWindowState, WindowEntityId, WindowId } from "../../types/desktop";
 
 type TaskbarProps = {
-  activeWindowId: WindowId | null;
+  activeWindowId: WindowEntityId | null;
   isMobile: boolean;
+  onFocusWindow: (windowId: WindowEntityId) => void;
+  onMinimizeWindow: (windowId: WindowEntityId) => void;
   onOpenEntry: (entryId: DesktopEntryId) => void;
   onOpenWindow: (windowId: WindowId) => void;
-  onFocusWindow: (windowId: WindowId) => void;
   windows: DesktopWindowState[];
 };
+
+const launcherIds = new Set<WindowEntityId>(desktopLaunchers.map((launcher) => launcher.id));
 
 function Taskbar({
   activeWindowId,
   isMobile,
   onFocusWindow,
+  onMinimizeWindow,
   onOpenEntry,
   onOpenWindow,
   windows,
@@ -37,11 +41,51 @@ function Taskbar({
     };
   }, []);
 
+  const isRunning = (windowState?: DesktopWindowState) =>
+    Boolean(windowState?.isOpen && windowState.animationState === "idle");
+
+  // Like Windows: clicking the focused app minimizes it, clicking any other open app focuses it.
+  const handleWindowButton = (windowId: WindowEntityId, isOpen: boolean, open: () => void) => {
+    setIsStartMenuOpen(false);
+
+    if (!isOpen) {
+      open();
+    } else if (activeWindowId === windowId) {
+      onMinimizeWindow(windowId);
+    } else {
+      onFocusWindow(windowId);
+    }
+  };
+
+  // Open windows without a pinned launcher (folders, games) still get a taskbar button.
+  const otherWindows = windows.filter((windowState) => !launcherIds.has(windowState.id) && isRunning(windowState));
+
+  const renderButton = (
+    id: WindowEntityId,
+    label: string,
+    icon: DesktopWindowState["icon"],
+    isOpen: boolean,
+    open: () => void,
+  ) => (
+    <button
+      key={id}
+      aria-label={t(label)}
+      aria-pressed={activeWindowId === id}
+      className={`taskbar-launcher${isOpen ? " is-open" : ""}${activeWindowId === id ? " is-active" : ""}`}
+      onClick={() => handleWindowButton(id, isOpen, open)}
+      title={t(label)}
+      type="button"
+    >
+      <span className="taskbar-launcher-icon" aria-hidden="true">
+        <AppGlyph iconKey={icon} className="taskbar-icon-glyph" />
+      </span>
+      <span className="taskbar-launcher-indicator" aria-hidden="true" />
+    </button>
+  );
+
   return (
     <footer className={`taskbar${isMobile ? " taskbar--mobile" : ""}`}>
-      <div className="taskbar-spacer" aria-hidden="true" />
-
-      <div className="taskbar-center">
+      <div className="taskbar-start-area">
         <StartMenu
           isOpen={isStartMenuOpen}
           isMobile={isMobile}
@@ -64,54 +108,36 @@ function Taskbar({
             <span />
           </span>
         </button>
-
-        <div className="taskbar-launchers" role="toolbar" aria-label={t("Desktop launchers")}>
-          {desktopLaunchers.map((launcher) => {
-            const windowState = windows.find((item) => item.id === launcher.id);
-            const isOpen = Boolean(windowState?.isOpen && windowState.animationState === "idle");
-            const isActive = activeWindowId === launcher.id;
-
-            return (
-              <button
-                key={launcher.id}
-                className={`taskbar-launcher taskbar-launcher--${launcher.id}${isOpen ? " is-open" : ""}${isActive ? " is-active" : ""}`}
-                type="button"
-                aria-label={t(launcher.label)}
-                title={t(launcher.label)}
-                onClick={() => {
-                  setIsStartMenuOpen(false);
-                  if (isOpen) {
-                    onFocusWindow(launcher.id);
-                    return;
-                  }
-
-                  onOpenWindow(launcher.id);
-                }}
-              >
-                <span className="taskbar-launcher-icon" aria-hidden="true">
-                  <AppGlyph iconKey={launcher.icon} className="taskbar-icon-glyph" />
-                </span>
-                <span className="taskbar-launcher-indicator" aria-hidden="true" />
-              </button>
-            );
-          })}
-        </div>
       </div>
 
-      <div className="taskbar-clock" aria-label="Current time">
-        <strong>
+      <div className="taskbar-launchers" role="toolbar" aria-label={t("Desktop launchers")}>
+        {desktopLaunchers.map((launcher) => {
+          const windowState = windows.find((item) => item.id === launcher.id);
+          return renderButton(launcher.id, launcher.label, launcher.icon, isRunning(windowState), () =>
+            onOpenWindow(launcher.id),
+          );
+        })}
+        {otherWindows.length ? <span className="taskbar-divider" aria-hidden="true" /> : null}
+        {otherWindows.map((windowState) =>
+          renderButton(windowState.id, windowState.title, windowState.icon, true, () => onFocusWindow(windowState.id)),
+        )}
+      </div>
+
+      <time className="taskbar-clock" dateTime={clock.toISOString()} aria-label={t("Current time")}>
+        <span className="taskbar-clock-time">
           {clock.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
           })}
-        </strong>
-        <span>
+        </span>
+        <span className="taskbar-clock-date">
           {clock.toLocaleDateString([], {
-            month: "short",
             day: "numeric",
+            month: "numeric",
+            year: "numeric",
           })}
         </span>
-      </div>
+      </time>
     </footer>
   );
 }

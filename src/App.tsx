@@ -590,10 +590,11 @@ function App({ onReboot, onTextMode, theme }: AppProps) {
       ) : null}
 
       <Taskbar
-        activeWindowId={activeWindow?.kind === "app" ? (activeWindow.id as WindowId) : null}
+        activeWindowId={activeWindow?.id ?? null}
         isMobile={isMobile}
         onOpenEntry={openDesktopEntry}
         onFocusWindow={focusWindow}
+        onMinimizeWindow={minimizeWindow}
         onOpenWindow={openWindow}
         windows={windows}
       />

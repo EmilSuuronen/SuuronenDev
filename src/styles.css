@@ -18,7 +18,7 @@
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --topbar-height: 30px;
-  --dock-height: 72px;
+  --dock-height: 52px;
   --shadow: 0 30px 70px rgba(0, 0, 0, 0.36);
 
   --font-ui: "Bricolage Grotesque", system-ui, sans-serif;
@@ -3350,69 +3350,72 @@ button {
   grid-column: span 2;
 }
 
+/* Taskbar: a solid full-width bar like Windows or Ubuntu. Start and apps on the left, clock on the right. */
 .taskbar {
   position: relative;
   z-index: 20;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.9rem;
-  padding: 0 14px var(--safe-bottom);
+  gap: 0.4rem;
+  padding: 0 10px var(--safe-bottom);
+  border-top: var(--outline);
+  background: var(--panel-strong);
+  color: var(--ink);
   user-select: none;
   -webkit-user-select: none;
 }
 
-.taskbar-spacer {
-  min-width: 0;
-}
-
-.taskbar-center {
+.taskbar-start-area {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem;
-  border: var(--outline);
-  border-radius: 20px;
-  background: var(--panel-strong);
-  box-shadow: var(--pop);
-  justify-self: center;
 }
 
 .taskbar-start,
 .taskbar-launcher {
   position: relative;
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
   cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.taskbar-start:hover,
+.taskbar-launcher:hover,
+.taskbar-start.is-active {
+  background: var(--accent-soft);
+}
+
+.taskbar-launcher.is-active {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.taskbar-start:focus-visible,
+.taskbar-launcher:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
 }
 
 .taskbar-launcher-icon,
 .taskbar-start-logo {
-  width: 36px;
-  height: 36px;
-  border-radius: 11px;
-  font-size: 13px;
-  transition:
-    transform 260ms var(--spring),
-    box-shadow 160ms ease;
-}
-
-.taskbar-start:hover .taskbar-start-logo,
-.taskbar-start.is-active .taskbar-start-logo,
-.taskbar-launcher:hover .taskbar-launcher-icon {
-  transform: translateY(-5px) rotate(-6deg);
-  box-shadow: var(--pop-sm);
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  font-size: 11px;
+  transition: transform 120ms ease;
 }
 
 .taskbar-start:active .taskbar-start-logo,
 .taskbar-launcher:active .taskbar-launcher-icon {
-  transform: translateY(0) scale(0.92);
-  box-shadow: none;
+  transform: scale(0.9);
 }
 
 .taskbar-launchers {
@@ -3420,27 +3423,42 @@ button {
   align-items: center;
   gap: 0.15rem;
   min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.taskbar-launchers::-webkit-scrollbar {
+  display: none;
 }
 
 .taskbar-start {
-  margin-right: 0.2rem;
+  margin-right: 0.35rem;
 }
 
-.taskbar-start::after {
+.taskbar-start::after,
+.taskbar-divider {
   content: "";
-  position: absolute;
-  right: -0.3rem;
-  top: 10px;
-  bottom: 10px;
   width: 2px;
+  height: 24px;
   border-radius: 2px;
   background: color-mix(in srgb, var(--ink) 18%, transparent);
 }
 
+.taskbar-start::after {
+  position: absolute;
+  right: -0.3rem;
+}
+
+.taskbar-divider {
+  flex: 0 0 auto;
+  margin: 0 0.25rem;
+}
+
 .taskbar-start-logo {
   display: grid;
-  grid-template-columns: repeat(2, 9px);
-  grid-template-rows: repeat(2, 9px);
+  grid-template-columns: repeat(2, 8px);
+  grid-template-rows: repeat(2, 8px);
   place-content: center;
   gap: 3px;
   border: var(--outline);
@@ -3448,7 +3466,7 @@ button {
 }
 
 .taskbar-start-logo span {
-  border-radius: 3px;
+  border-radius: 2px;
   background: var(--ink);
 }
 
@@ -3456,49 +3474,47 @@ button {
   border-radius: 50%;
 }
 
+/* Running indicator: a dot under open apps, a wider bar under the focused one. */
 .taskbar-launcher-indicator {
   position: absolute;
   left: 50%;
-  bottom: -3px;
-  width: 5px;
-  height: 5px;
+  bottom: 2px;
+  width: 6px;
+  height: 3px;
   border-radius: 999px;
   background: transparent;
   transform: translateX(-50%);
   transition:
     background-color 160ms ease,
-    width 200ms var(--spring);
+    width 160ms ease;
 }
 
 .taskbar-launcher.is-open .taskbar-launcher-indicator {
-  background: var(--ink);
+  background: var(--ink-soft);
 }
 
 .taskbar-launcher.is-active .taskbar-launcher-indicator {
   width: 16px;
-  background: var(--ink);
+  background: var(--accent-strong);
 }
 
 .taskbar-clock {
   display: grid;
   justify-items: end;
-  justify-self: end;
-  padding: 0.3rem 0.7rem;
-  border: var(--outline);
-  border-radius: 12px;
-  background: var(--panel-strong);
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
   color: var(--ink);
-  box-shadow: var(--pop-sm);
-  line-height: 1.15;
-  transform: rotate(-2deg);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+  white-space: nowrap;
 }
 
-.taskbar-clock strong {
-  font-size: 0.95rem;
-  font-weight: 800;
+.taskbar-clock-time {
+  font-size: 0.82rem;
+  font-weight: 700;
 }
 
-.taskbar-clock span {
+.taskbar-clock-date {
   color: var(--ink-soft);
   font-size: 0.72rem;
   font-weight: 600;
@@ -3506,8 +3522,8 @@ button {
 
 .start-menu {
   position: absolute;
-  left: 50%;
-  bottom: calc(100% + 16px);
+  left: -2px;
+  bottom: calc(100% + 10px);
   width: min(600px, calc(100vw - 32px));
   padding: 1rem;
   border: var(--outline);
@@ -3515,7 +3531,6 @@ button {
   background: var(--panel-strong);
   color: var(--ink);
   box-shadow: var(--pop-lg);
-  transform: translateX(-50%);
   z-index: 130;
   overflow: hidden;
 }
@@ -3651,15 +3666,6 @@ button {
     grid-template-columns: 1fr;
   }
 
-  .taskbar {
-    grid-template-columns: 1fr auto;
-    gap: 0.6rem;
-    padding: 0 10px;
-  }
-
-  .taskbar-spacer {
-    display: none;
-  }
 }
 
 @media (max-width: 820px) {
@@ -3722,30 +3728,21 @@ button {
   }
 
   .taskbar {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    gap: 0.45rem;
-    padding-inline: 10px;
+    gap: 0.2rem;
+    padding-inline: 6px;
+  }
+
+  .taskbar-start,
+  .taskbar-launcher {
+    width: 40px;
   }
 
   .taskbar-clock {
+    padding-inline: 0.25rem;
+  }
+
+  .taskbar-clock-date {
     display: none;
-  }
-
-  .taskbar-center {
-    width: 100%;
-    justify-content: flex-start;
-    gap: 0.2rem;
-  }
-
-  .taskbar-start {
-    flex: 0 0 auto;
-  }
-
-  .taskbar-launchers {
-    flex: 1 1 auto;
-    overflow-x: auto;
-    overflow-y: hidden;
   }
 
   .start-menu,
