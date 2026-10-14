@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import {
   defaultDesktopTheme,
@@ -42,6 +42,25 @@ function hexToRgba(hex: string, alpha: number) {
   const blue = Number.parseInt(normalized.slice(4, 6), 16);
 
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
+export function getThemeVariables(theme: DesktopTheme) {
+  return {
+    "--bg": theme.background,
+    "--panel": theme.panel,
+    "--panel-strong": theme.panelStrong,
+    "--panel-border": theme.panelBorder,
+    "--ink": theme.ink,
+    "--ink-soft": theme.inkSoft,
+    "--surface-dark": theme.surfaceDark,
+    "--surface-dark-strong": theme.surfaceDarkStrong,
+    "--surface-dark-border": theme.surfaceDarkBorder,
+    "--text-light": theme.textLight,
+    "--text-light-soft": theme.textLightSoft,
+    "--accent": theme.accent,
+    "--accent-soft": theme.accentSoft,
+    "--accent-strong": theme.accentStrong,
+  } as CSSProperties;
 }
 
 export function useDesktopTheme(): ThemeState {

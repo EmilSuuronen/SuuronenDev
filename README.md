@@ -30,6 +30,10 @@ Home files and up to 500 history entries persist in this browser under `suuronen
 
 This is a browser sandbox, not a remote shell or native Ubuntu installation. It never executes host commands. System files are read-only; writes have file-count and byte limits. `man intro` documents supported syntax and limits, including the absence of native binaries, package installation, job control, and shell scripts.
 
+## Boot and text mode
+
+The first visit in a browser session plays a short CRT boot, then a boot manager that offers the full **Desktop** or **Text mode**, a single-page portfolio (about, projects, stack, contact) in the same terminal style. The highlighted entry boots after 10 seconds unless the visitor touches the menu. The pick is remembered for the session, so reloads skip the boot, and it becomes the default next visit. `reboot` in the terminal and the links at the bottom of text mode switch between them. Projects shown in text mode live in `src/data/projects.ts`.
+
 ## Source Code app
 
 The Source Code app (`src/apps/code/`) is a viewer for this site's own source, bundled at build time with `import.meta.glob`, so it always shows exactly what is deployed. It loads lazily: CodeMirror and the source text download only when the app is opened.

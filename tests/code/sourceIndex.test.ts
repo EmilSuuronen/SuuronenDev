@@ -71,7 +71,7 @@ test("architecture map links every source file, including lazy imports", () => {
   const nodes = buildImportGraph(files);
   const app = nodes.find((node) => node.id === "src/App.tsx")!;
   assert.ok(app.imports.includes("src/apps/code/CodeApp.tsx"), "dynamic import() counts as an edge");
-  assert.ok(app.importedBy.includes("src/main.tsx"));
+  assert.ok(app.importedBy.includes("src/SessionRoot.tsx"));
   assert.deepEqual(nodes.filter((node) => !node.imports.length && !node.importedBy.length).map((node) => node.id), []);
   assert.equal(getGroup("src/apps/antgame/engine/world.ts"), "antgame");
   assert.equal(getGroup("src/hooks/useNotes.ts"), "hooks");

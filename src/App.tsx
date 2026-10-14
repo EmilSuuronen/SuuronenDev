@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 
 import BrowserApp from "./apps/BrowserApp";
 import CalculatorApp from "./apps/CalculatorApp";
@@ -7,7 +7,6 @@ import NotesApp from "./apps/NotesApp";
 import SettingsApp from "./apps/SettingsApp";
 import TerminalApp from "./apps/TerminalApp";
 import AntGameApp from "./apps/AntGameApp";
-import BootSequence, { BOOT_STORAGE_KEY, shouldPlayBoot } from "./components/desktop/BootSequence";
 import DesktopFilterOverlay from "./components/desktop/DesktopFilterOverlay";
 import DesktopContextMenu from "./components/desktop/DesktopContextMenu";
 import DesktopWallpaper from "./components/desktop/DesktopWallpaper";
@@ -21,7 +20,7 @@ import { isMobileDesktopViewport } from "./data/desktop";
 import { useDesktopFilter } from "./hooks/useDesktopFilter";
 import { useDesktopIcons } from "./hooks/useDesktopIcons";
 import { useNotes } from "./hooks/useNotes";
-import { useDesktopTheme } from "./hooks/useDesktopTheme";
+import { getThemeVariables, useDesktopTheme } from "./hooks/useDesktopTheme";
 import { useElementSize } from "./hooks/useElementSize";
 import { getWindowSource, requestSource } from "./hooks/useSourceRequest";
 import { useWindowManager } from "./hooks/useWindowManager";
@@ -121,15 +120,20 @@ function renderWindowApp({
   return <BrowserApp />;
 }
 
-function App() {
+type AppProps = {
+  onReboot: () => void;
+  // Owned by the session root so the boot screen and text mode share the desktop's theme.
+  theme: ReturnType<typeof useDesktopTheme>;
+};
+
+function App({ onReboot, theme }: AppProps) {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const bounds = useElementSize(workspaceRef);
   const isMobile = isMobileDesktopViewport(bounds);
   const { t } = useLocale();
-  const { currentTheme, resetTheme, selectTheme, setThemeColor, themeOptions } = useDesktopTheme();
+  const { currentTheme, resetTheme, selectTheme, setThemeColor, themeOptions } = theme;
   const { activeFilterId, filterOptions, setActiveFilterId } = useDesktopFilter();
   const notesState = useNotes();
-  const [isBooting, setIsBooting] = useState(shouldPlayBoot);
   const [desktopContextMenu, setDesktopContextMenu] = useState<{
     windowId?: WindowEntityId;
     x: number;
@@ -170,26 +174,7 @@ function App() {
     updateWindowRect,
   } = useWindowManager(bounds);
 
-  const desktopThemeStyle = useMemo(
-    () =>
-      ({
-        "--bg": currentTheme.background,
-        "--panel": currentTheme.panel,
-        "--panel-strong": currentTheme.panelStrong,
-        "--panel-border": currentTheme.panelBorder,
-        "--ink": currentTheme.ink,
-        "--ink-soft": currentTheme.inkSoft,
-        "--surface-dark": currentTheme.surfaceDark,
-        "--surface-dark-strong": currentTheme.surfaceDarkStrong,
-        "--surface-dark-border": currentTheme.surfaceDarkBorder,
-        "--text-light": currentTheme.textLight,
-        "--text-light-soft": currentTheme.textLightSoft,
-        "--accent": currentTheme.accent,
-        "--accent-soft": currentTheme.accentSoft,
-        "--accent-strong": currentTheme.accentStrong,
-      }) as CSSProperties,
-    [currentTheme],
-  );
+  const desktopThemeStyle = useMemo(() => getThemeVariables(currentTheme), [currentTheme]);
 
   const openWindows = windows
     .filter((windowState) => windowState.isOpen)
@@ -490,7 +475,7 @@ function App() {
                     if (/^https?:\/\//.test(target)) {
                       window.open(target, "_blank", "noopener,noreferrer");
                     } else if (target === "reboot") {
-                      setIsBooting(true);
+                      onReboot();
                     } else if (target.startsWith("source:")) {
                       openSource(target.slice("source:".length));
                     } else if (target.startsWith("note:")) {
@@ -631,20 +616,6 @@ function App() {
             setRenameDialog(null);
           }}
           title={renameDialog.kind === "folder" ? t("Rename folder") : t("Rename note")}
-        />
-      ) : null}
-
-      {isBooting ? (
-        <BootSequence
-          onDone={() => {
-            try {
-              window.sessionStorage.setItem(BOOT_STORAGE_KEY, "1");
-            } catch {
-              // storage blocked: the boot just plays again next load
-            }
-            setIsBooting(false);
-          }}
-          themeId={currentTheme.id}
         />
       ) : null}
 

@@ -4670,3 +4670,241 @@ button.code-live-message {
   font-family: var(--font-mono);
   font-size: 0.75rem;
 }
+
+/* Session root: shares theme variables with the boot screen and text mode without affecting layout */
+.session-root {
+  display: contents;
+}
+
+.boot.is-static .boot-screen,
+.boot.is-static .boot-scanlines,
+.boot.is-static .boot-loader,
+.boot.is-static .boot-logo span,
+.boot.is-static .boot-cursor {
+  animation: none;
+}
+
+/* Boot manager (GRUB-style session picker) */
+.boot-menu {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.9rem;
+  width: min(44rem, calc(100% - 2rem));
+  margin: 0 auto;
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: clamp(12px, 2.8vw, 15px);
+  text-shadow: 0 0 6px var(--accent);
+}
+
+.boot-menu-title {
+  margin: 0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.boot-menu-box {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.6rem;
+  border: 2px solid var(--accent-strong);
+  box-shadow: 0 0 10px var(--accent-soft), inset 0 0 10px var(--accent-soft);
+}
+
+.boot-menu-item {
+  display: grid;
+  grid-template-columns: 1.4ch 11ch minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.6ch;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-shadow: inherit;
+  cursor: pointer;
+}
+
+.boot-menu-item.is-selected {
+  background: var(--accent-strong);
+  color: #0b0906;
+  text-shadow: none;
+}
+
+/* Focus always follows the selection, so the inverted highlight is the focus indicator. */
+.boot-menu-item:focus-visible {
+  outline: none;
+}
+
+.boot-menu-detail {
+  opacity: 0.8;
+}
+
+.boot-menu-hint {
+  margin: 0;
+  color: var(--text-light-soft);
+  font-size: 0.85em;
+  text-align: center;
+  text-shadow: none;
+}
+
+@media (max-width: 560px) {
+  .boot-menu-item {
+    grid-template-columns: 1.4ch minmax(0, 1fr);
+  }
+
+  .boot-menu-detail {
+    grid-column: 2;
+  }
+}
+
+/* Text mode: single-page portfolio in the boot screen's CRT style */
+.textmode {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  background: radial-gradient(ellipse at center, #14110d 0%, #070605 70%, #000 100%) fixed;
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: clamp(13px, 3.4vw, 15px);
+  line-height: 1.65;
+  text-shadow: 0 0 5px var(--accent-soft);
+}
+
+.textmode-page {
+  width: min(48rem, calc(100% - 32px));
+  margin: 0 auto;
+  padding: clamp(1.5rem, 6vh, 4rem) 0 4rem;
+}
+
+.textmode-section {
+  margin: 0 0 2.2rem;
+  animation: textmode-type 320ms steps(6) var(--reveal-delay, 0ms) both;
+}
+
+@keyframes textmode-type {
+  from {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.textmode p,
+.textmode dd {
+  margin: 0 0 0.5rem;
+}
+
+.textmode-command {
+  margin: 0 0 0.7rem;
+  color: var(--text-light);
+  font-size: 1em;
+  font-weight: 400;
+}
+
+.textmode-prompt {
+  color: var(--candy-green);
+}
+
+.textmode-name {
+  margin: 0 0 0.3rem;
+  color: var(--text-light);
+  font-size: clamp(1.8rem, 7vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-shadow: 0 0 10px var(--accent);
+}
+
+.textmode-lead {
+  color: var(--text-light);
+}
+
+.textmode-highlight {
+  color: var(--text-light);
+  font-weight: 700;
+}
+
+.textmode-dim {
+  color: var(--text-light-soft);
+  white-space: pre;
+}
+
+.textmode-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.textmode-project {
+  margin-bottom: 1.1rem;
+  padding-left: 1.2ch;
+  border-left: 2px solid var(--accent-soft);
+}
+
+.textmode-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2ch;
+}
+
+.textmode-link {
+  padding: 0 0.2ch;
+  border: 0;
+  background: transparent;
+  color: var(--accent-strong);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-shadow: inherit;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.textmode-link:hover,
+.textmode-link:focus-visible {
+  background: var(--accent-strong);
+  color: #0b0906;
+  text-decoration: none;
+  text-shadow: none;
+  outline: none;
+}
+
+.textmode-stack {
+  margin: 0;
+}
+
+.textmode-stack div {
+  margin-bottom: 0.6rem;
+}
+
+.textmode-stack dd {
+  margin-left: 2ch;
+}
+
+.textmode-contact li {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 0.3rem;
+}
+
+.textmode-scanlines {
+  position: fixed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .textmode-section,
+  .textmode-scanlines,
+  .textmode .boot-cursor {
+    animation: none;
+  }
+}
