@@ -23,8 +23,8 @@ const FADE_MS = 300;
 const AUTO_BOOT_MS = 10000;
 
 const MENU_OPTIONS: { detail: string; id: SessionMode; name: string }[] = [
-  { id: "desktop", name: "Desktop", detail: "full experience: windows, apps, terminal, games" },
-  { id: "text", name: "Text mode", detail: "one page: about, projects, contact" },
+  { id: "desktop", name: "Desktop", detail: "The cool mode" },
+  { id: "text", name: "Text mode", detail: "The boring mode" },
 ];
 
 function getBootLines(themeId: string) {
@@ -184,7 +184,7 @@ function BootSequence({ entry, initialChoice, onChoose, onDone, themeId }: BootS
         {phase === "menu" || (phase === "fade" && choice?.mode === "text") ? (
           <div aria-labelledby="boot-menu-title" aria-modal="true" className="boot-menu" role="dialog">
             <p className="boot-menu-title" id="boot-menu-title">
-              suuronen.dev {t("boot manager")}
+              {t("boot manager")}
             </p>
             <div className="boot-menu-box">
               {MENU_OPTIONS.map((option) => (

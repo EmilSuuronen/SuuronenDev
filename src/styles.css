@@ -4694,10 +4694,10 @@ button.code-live-message {
   gap: 0.9rem;
   width: min(44rem, calc(100% - 2rem));
   margin: 0 auto;
-  color: var(--accent-strong);
+  color: var(--text-light);
   font-family: var(--font-mono);
   font-size: clamp(12px, 2.8vw, 15px);
-  text-shadow: 0 0 6px var(--accent);
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
 }
 
 .boot-menu-title {
@@ -4731,10 +4731,16 @@ button.code-live-message {
   cursor: pointer;
 }
 
+/* Names stay orange and descriptions white, so selection is a tinted bar rather than an inverted one. */
 .boot-menu-item.is-selected {
-  background: var(--accent-strong);
-  color: #0b0906;
-  text-shadow: none;
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.boot-menu-marker,
+.boot-menu-name {
+  color: var(--accent-strong);
+  text-shadow: 0 0 6px var(--accent);
 }
 
 /* Focus always follows the selection, so the inverted highlight is the focus indicator. */
@@ -4743,12 +4749,12 @@ button.code-live-message {
 }
 
 .boot-menu-detail {
-  opacity: 0.8;
+  color: var(--text-light);
 }
 
 .boot-menu-hint {
   margin: 0;
-  color: var(--text-light-soft);
+  color: var(--text-light);
   font-size: 0.85em;
   text-align: center;
   text-shadow: none;
