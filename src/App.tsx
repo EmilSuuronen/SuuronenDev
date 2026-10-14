@@ -30,6 +30,7 @@ import { useLocale } from "./i18n/locale";
 const CodeApp = lazy(() => import("./apps/code/CodeApp"));
 
 type RenderWindowAppProps = {
+  terminalProps: React.ComponentProps<typeof TerminalApp>;
   activeFilterId: string;
   currentTheme: ReturnType<typeof useDesktopTheme>["currentTheme"];
   filterOptions: DesktopFilterOption[];
@@ -53,6 +54,7 @@ type RenderWindowAppProps = {
 };
 
 function renderWindowApp({
+  terminalProps,
   activeFilterId,
   currentTheme,
   filterOptions,
@@ -66,7 +68,7 @@ function renderWindowApp({
   windowId,
 }: RenderWindowAppProps) {
   if (windowId === "terminal") {
-    return <TerminalApp />;
+    return <TerminalApp {...terminalProps} />;
   }
 
   if (windowId === "calculator") {
@@ -466,6 +468,24 @@ function App() {
               />
             ) : (
               renderWindowApp({
+                terminalProps: {
+                  isActive: activeWindow?.id === "terminal",
+                  notes: notesState.notes,
+                  openApps: openWindows.map((open) => open.id),
+                  onExit: () => closeWindow("terminal"),
+                  onOpen: (target) => {
+                    if (/^https?:\/\//.test(target)) {
+                      window.open(target, "_blank", "noopener,noreferrer");
+                    } else if (target.startsWith("note:")) {
+                      notesState.openNote(target as `note:${string}`);
+                      openWindow("notes");
+                    } else if (target === "applications" || target === "trash" || target === "molkkis") {
+                      openDesktopEntry(target);
+                    } else {
+                      openWindow(target as WindowId);
+                    }
+                  },
+                },
                 activeFilterId,
                 currentTheme,
                 filterOptions,

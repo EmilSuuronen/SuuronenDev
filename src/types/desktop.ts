@@ -161,34 +161,16 @@ export type TerminalLine =
   | {
       kind: "prompt";
       value: string;
+      path?: string;
     }
   | {
       kind: "output" | "accent" | "error";
       value: string;
+      literal?: boolean;
     }
   | {
       href: string;
       kind: "link";
       label: string;
       value: string;
-    };
-
-export type TerminalCommandDefinition = {
-  description: string;
-  input: string;
-  run: (context: TerminalCommandContext) => TerminalCommandResult;
-};
-
-export type TerminalCommandContext = {
-  now: Date;
-  useCompactArt: boolean;
-};
-
-export type TerminalCommandResult =
-  | {
-      type: "clear";
-    }
-  | {
-      lines: TerminalLine[];
-      type: "output";
     };
