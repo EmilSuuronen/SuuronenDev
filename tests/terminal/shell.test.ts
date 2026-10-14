@@ -418,3 +418,9 @@ test("easter eggs and the adventure have a discoverable complete path", async ()
     { type: "open", target: "antgame" },
   ]);
 });
+
+test("reboot asks the desktop to replay the boot sequence", async () => {
+  const shell = new Shell();
+  assert.deepEqual((await shell.execute("reboot")).effects, [{ type: "open", target: "reboot" }]);
+  assert.match(await text(shell, "reboot now"), /usage: reboot/);
+});

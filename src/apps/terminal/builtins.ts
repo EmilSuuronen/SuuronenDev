@@ -358,6 +358,10 @@ export const builtins: Record<string, CommandHandler> = {
     return ok("", [{ type: "pager", content }]);
   },
   "xdg-open": (args, stdin, context) => builtins.open(args, stdin, context),
+  reboot: (args) => {
+    if (args.length) throw new Error("usage: reboot");
+    return ok("", [{ type: "open", target: "reboot" }]);
+  },
   // The Source Code app resolves FILE itself (fuzzy), since the bundled source isn't loaded here.
   code: (args) => {
     if (args.length > 1) throw new Error("usage: code [FILE]");

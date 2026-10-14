@@ -7,6 +7,7 @@ import NotesApp from "./apps/NotesApp";
 import SettingsApp from "./apps/SettingsApp";
 import TerminalApp from "./apps/TerminalApp";
 import AntGameApp from "./apps/AntGameApp";
+import BootSequence, { BOOT_STORAGE_KEY, shouldPlayBoot } from "./components/desktop/BootSequence";
 import DesktopFilterOverlay from "./components/desktop/DesktopFilterOverlay";
 import DesktopContextMenu from "./components/desktop/DesktopContextMenu";
 import DesktopWallpaper from "./components/desktop/DesktopWallpaper";
@@ -128,6 +129,7 @@ function App() {
   const { currentTheme, resetTheme, selectTheme, setThemeColor, themeOptions } = useDesktopTheme();
   const { activeFilterId, filterOptions, setActiveFilterId } = useDesktopFilter();
   const notesState = useNotes();
+  const [isBooting, setIsBooting] = useState(shouldPlayBoot);
   const [desktopContextMenu, setDesktopContextMenu] = useState<{
     windowId?: WindowEntityId;
     x: number;
@@ -487,6 +489,8 @@ function App() {
                   onOpen: (target) => {
                     if (/^https?:\/\//.test(target)) {
                       window.open(target, "_blank", "noopener,noreferrer");
+                    } else if (target === "reboot") {
+                      setIsBooting(true);
                     } else if (target.startsWith("source:")) {
                       openSource(target.slice("source:".length));
                     } else if (target.startsWith("note:")) {
@@ -627,6 +631,20 @@ function App() {
             setRenameDialog(null);
           }}
           title={renameDialog.kind === "folder" ? t("Rename folder") : t("Rename note")}
+        />
+      ) : null}
+
+      {isBooting ? (
+        <BootSequence
+          onDone={() => {
+            try {
+              window.sessionStorage.setItem(BOOT_STORAGE_KEY, "1");
+            } catch {
+              // storage blocked: the boot just plays again next load
+            }
+            setIsBooting(false);
+          }}
+          themeId={currentTheme.id}
         />
       ) : null}
 

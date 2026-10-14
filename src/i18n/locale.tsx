@@ -147,6 +147,8 @@ const finnishTranslations: Record<string, string> = {
   "not a source file": "ei lähdekooditiedosto",
   "Read-only": "Vain luku",
   "View source": "Näytä lähdekoodi",
+  "Starting desktop…": "Käynnistetään työpöytää…",
+  Welcome: "Tervetuloa",
   "View page source": "Näytä sivun lähdekoodi",
   "Close window": "Sulje ikkuna",
   "No source file matches": "Mikään lähdekooditiedosto ei vastaa hakua",
