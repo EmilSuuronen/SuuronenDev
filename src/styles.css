@@ -997,8 +997,6 @@ button {
 .settings-reset-button,
 .settings-reset-danger-button,
 .settings-language-chip,
-.notes-action-button,
-.notes-delete-button,
 .browser-unavailable-action {
   display: inline-flex;
   align-items: center;
@@ -1026,8 +1024,6 @@ button {
 .settings-reset-button:hover,
 .settings-reset-danger-button:hover,
 .settings-language-chip:hover,
-.notes-action-button:hover,
-.notes-delete-button:hover,
 .browser-unavailable-action:hover {
   transform: translate(-1px, -1px);
   box-shadow: var(--pop);
@@ -1038,23 +1034,19 @@ button {
 .settings-reset-button:active,
 .settings-reset-danger-button:active,
 .settings-language-chip:active,
-.notes-action-button:active,
-.notes-delete-button:active,
 .browser-unavailable-action:active {
   transform: translate(2px, 2px);
   box-shadow: none;
 }
 
 .desktop-dialog-button--primary,
-.notes-action-button,
 .settings-language-chip.is-active,
 .browser-unavailable-action.is-primary {
   background: var(--accent);
 }
 
 .settings-dialog-button--danger,
-.settings-reset-danger-button,
-.notes-delete-button:hover {
+.settings-reset-danger-button {
   background: var(--candy-red);
 }
 
@@ -2794,319 +2786,245 @@ button {
   font-size: 0.74rem;
 }
 
-.notes-app {
+/* Notes: modeled on Windows Notepad (tabs, File/Edit/View menu bar, plain text, status bar). */
+.notepad {
   display: grid;
-  grid-template-columns: 250px minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   height: 100%;
-  background: var(--panel);
-}
-
-.notes-sidebar {
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-  gap: 0.85rem;
-  min-width: 0;
-  min-height: 0;
-  padding: 1rem 0.8rem;
-  border-right: var(--outline);
   background: var(--panel-strong);
+  color: var(--ink);
 }
 
-.notes-sidebar-header {
+.notepad-tabs {
   display: flex;
-  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 0;
+  padding: 6px 6px 0;
+  overflow-x: auto;
+  background: var(--panel);
+  scrollbar-width: thin;
+}
+
+.notepad-tab {
+  display: flex;
+  flex: 0 1 200px;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-}
-
-.notes-kicker {
+  gap: 0.45rem;
+  min-width: 90px;
+  height: 34px;
+  padding: 0 0.75rem;
+  border-radius: 8px 8px 0 0;
   color: var(--ink-soft);
-  font-size: 0.78rem;
-  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: default;
 }
 
-.notes-sidebar-header h2 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+.notepad-tab:hover {
+  background: color-mix(in srgb, var(--panel-strong) 55%, transparent);
 }
 
-.notes-action-icon,
-.notes-delete-icon {
-  width: 16px;
-  height: 16px;
+.notepad-tab.is-active {
+  background: var(--panel-strong);
+  color: var(--ink);
+  font-weight: 600;
 }
 
-.notes-search {
-  position: relative;
-  display: block;
+.notepad-tab-icon {
+  flex: 0 0 auto;
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
-.notes-search input {
+.notepad-tab-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notepad-tab-rename {
   width: 100%;
-  height: 38px;
-  padding: 0 0.9rem 0 2.3rem;
-  border: var(--outline);
-  border-radius: 999px;
-  background: #fff;
+  min-width: 0;
+  padding: 0.1rem 0.25rem;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--panel-strong);
   color: var(--ink);
   font: inherit;
   outline: none;
 }
 
-.notes-search input:focus {
-  box-shadow: var(--pop-sm);
-}
-
-.notes-search-icon {
-  position: absolute;
-  left: 0.85rem;
-  top: 50%;
-  width: 15px;
-  height: 15px;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-.notes-list {
+.notepad-new-tab {
   display: grid;
-  align-content: start;
-  gap: 0.35rem;
-  min-height: 0;
-  margin: 0 -0.3rem;
-  padding: 0.1rem 0.3rem 0.4rem;
-  overflow: auto;
-}
-
-.notes-list-item {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.6rem;
-  align-items: center;
-  width: 100%;
-  padding: 0.5rem;
-  border: 2px solid transparent;
-  border-radius: 12px;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    background-color 120ms ease,
-    transform 200ms var(--spring);
-}
-
-.notes-list-item:hover {
-  background: var(--accent-soft);
-}
-
-.notes-list-item.is-active {
-  border-color: var(--ink);
-  background: var(--candy-yellow);
-  box-shadow: var(--pop-sm);
-  transform: translate(-1px, -1px) rotate(-0.5deg);
-}
-
-.notes-list-item-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 38px;
-  border: var(--outline);
-  border-radius: 5px 11px 5px 5px;
-  background: #fffdf8;
-}
-
-.notes-file-icon {
-  width: 16px;
-  height: 16px;
-}
-
-.notes-list-item-text {
-  display: grid;
-  gap: 0.1rem;
-  min-width: 0;
-}
-
-.notes-list-item-text strong {
-  overflow: hidden;
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.notes-list-item-text span {
-  overflow: hidden;
-  color: var(--ink-soft);
-  font-size: 0.74rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.notes-empty-list {
-  padding: 0.85rem;
-  border: 2px dashed color-mix(in srgb, var(--ink) 40%, transparent);
-  border-radius: 12px;
-  color: var(--ink-soft);
-  font-size: 0.86rem;
-  line-height: 1.5;
-}
-
-.notes-editor-shell {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: 0.75rem;
-  min-width: 0;
-  min-height: 0;
-  padding: 1rem;
-}
-
-.notes-editor-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  min-width: 0;
-}
-
-.notes-title-input {
-  flex: 1 1 12ch;
-  min-width: 0;
-  padding: 0.2rem 0;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin: 0 0 2px 2px;
   border: 0;
-  border-bottom: 2px dashed transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.notepad-new-tab:hover {
+  background: color-mix(in srgb, var(--panel-strong) 55%, transparent);
+}
+
+.notepad-new-tab svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.notepad-menubar {
+  display: flex;
+  gap: 2px;
+  padding: 4px 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.notepad-menu {
+  position: relative;
+}
+
+.notepad-menu-trigger {
+  padding: 0.25rem 0.7rem;
+  border: 0;
+  border-radius: 6px;
   background: transparent;
   color: var(--ink);
   font: inherit;
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  outline: none;
+  font-size: 0.82rem;
+  cursor: pointer;
 }
 
-.notes-title-input:focus {
-  border-bottom-color: var(--ink);
+.notepad-menu-trigger:hover,
+.notepad-menu-trigger.is-open {
+  background: var(--accent-soft);
 }
 
-.notes-editor-toolbar-actions {
-  display: inline-flex;
-  flex: 0 0 auto;
+.notepad-menu-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 5;
+  display: grid;
+  min-width: 13rem;
+  padding: 4px;
+  border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  border-radius: 8px;
+  background: var(--panel-strong);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+.notepad-menu-item {
+  display: grid;
+  grid-template-columns: 1.2rem 1fr auto;
   align-items: center;
-  gap: 0.6rem;
-}
-
-.notes-save-indicator {
-  color: var(--ink-soft);
-  font-size: 0.78rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-/* Ruled paper; lines scroll with the text */
-.notes-editor {
-  width: 100%;
-  min-width: 0;
-  height: 100%;
-  min-height: 0;
-  padding: 0.5rem 1rem;
-  border: var(--outline);
-  border-radius: 14px;
-  background:
-    repeating-linear-gradient(
-      transparent 0 calc(1.75em - 1px),
-      color-mix(in srgb, var(--candy-blue) 55%, transparent) calc(1.75em - 1px) 1.75em
-    ),
-    #fffdf6;
-  background-attachment: local;
-  background-position: 0 0.5rem;
+  gap: 0.4rem;
+  padding: 0.4rem 0.6rem 0.4rem 0.4rem;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
   color: var(--ink);
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  line-height: 1.75;
+  font: inherit;
+  font-size: 0.82rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.notepad-menu-item:hover:not(:disabled) {
+  background: var(--accent-soft);
+}
+
+.notepad-menu-item:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.notepad-menu-check svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.notepad-menu-item kbd {
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 0.74rem;
+}
+
+.notepad-editor {
+  width: 100%;
+  height: 100%;
+  padding: 0.6rem 0.9rem;
+  border: 0;
+  background: var(--panel-strong);
+  color: var(--ink);
+  font-family: "Cascadia Mono", Consolas, var(--font-mono);
+  line-height: 1.5;
   resize: none;
   outline: none;
 }
 
-.notes-editor:focus {
-  box-shadow: var(--pop-sm);
+.notepad-editor.is-nowrap {
+  overflow-x: auto;
+  white-space: pre;
 }
 
-.notes-editor::selection,
-.notes-title-input::selection {
-  background: var(--accent-soft);
-}
-
-.notes-statusbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  font-size: 0.76rem;
-  font-weight: 600;
-}
-
-.notes-statusbar span {
-  padding: 0.1rem 0.55rem;
-  border: 1.5px solid var(--ink);
-  border-radius: 999px;
-  background: var(--panel-strong);
-}
-
-.notes-editor-empty {
+.notepad-empty {
   display: grid;
-  place-items: center;
-  align-content: center;
+  place-content: center;
+  justify-items: center;
   gap: 0.8rem;
-  grid-row: 1 / -1;
-  min-height: 100%;
-  padding: 1.5rem;
-  border: 2px dashed color-mix(in srgb, var(--ink) 40%, transparent);
-  border-radius: 18px;
-  text-align: center;
-}
-
-.notes-empty-icon {
-  width: 54px;
-  height: 54px;
-  padding: 12px;
-  border: var(--outline);
-  border-radius: 8px 18px 8px 8px;
-  background: var(--candy-yellow);
-  box-shadow: var(--pop-sm);
-  transform: rotate(-5deg);
-}
-
-.notes-editor-empty h3 {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 800;
-}
-
-.notes-editor-empty p {
-  max-width: 36ch;
-  margin: 0;
   color: var(--ink-soft);
-  line-height: 1.55;
+  font-size: 0.9rem;
 }
 
-@container (max-width: 620px) {
-  .notes-app {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(190px, 36%) minmax(0, 1fr);
-  }
+.notepad-empty p {
+  margin: 0;
+}
 
-  .notes-sidebar {
-    padding: 0.8rem;
-    border-right: 0;
-    border-bottom: var(--outline);
-  }
+.notepad-empty-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
 
-  .notes-editor-shell {
-    padding: 0.8rem;
-  }
+.notepad-empty-button svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.notepad-statusbar {
+  display: flex;
+  min-width: 0;
+  padding: 0.3rem 0.4rem;
+  overflow: hidden;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  background: var(--panel);
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
+
+.notepad-statusbar span {
+  padding: 0 0.8rem;
+}
+
+.notepad-statusbar span:first-child {
+  flex: 1 1 auto;
+}
+
+.notepad-statusbar span + span {
+  border-left: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
 }
 
 .browser-unavailable {

@@ -27,7 +27,7 @@ test("inspect maps rendered class names back to the component that renders them"
   for (const [className, file] of [
     ["taskbar-clock", "Taskbar.tsx"],
     ["window-titlebar", "DesktopWindow.tsx"],
-    ["notes-app", "NotesApp.tsx"],
+    ["notepad", "NotesApp.tsx"],
     ["app-glyph", "AppGlyph.tsx"],
   ]) {
     assert.ok(findClassSource(className, files)?.path.endsWith(file), className);

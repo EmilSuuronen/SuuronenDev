@@ -1,5 +1,5 @@
-import { FileText, Plus, Search, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Check, FileText, Plus } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useLocale } from "../i18n/locale";
 import type { NoteFile } from "../types/desktop";
@@ -14,6 +14,11 @@ type NotesAppProps = {
   onUpdateNoteContent: (noteId: NoteFile["id"], content: string) => void;
 };
 
+type MenuItem = { checked?: boolean; disabled?: boolean; label: string; onSelect: () => void; shortcut?: string };
+
+const ZOOM_STEPS = [50, 70, 80, 90, 100, 110, 125, 150, 175, 200];
+
+// Notepad-style editor: a tab per note, a File/Edit/View menu bar, plain text, and a status bar.
 function NotesApp({
   activeNote,
   notes,
@@ -24,154 +29,255 @@ function NotesApp({
   onUpdateNoteContent,
 }: NotesAppProps) {
   const { t } = useLocale();
-  const [query, setQuery] = useState("");
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const menuBarRef = useRef<HTMLDivElement>(null);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [renamingId, setRenamingId] = useState<NoteFile["id"] | null>(null);
   const [titleDraft, setTitleDraft] = useState("");
+  const [cursor, setCursor] = useState({ column: 1, line: 1 });
+  const [zoom, setZoom] = useState(100);
+  const [wordWrap, setWordWrap] = useState(true);
+  const [showStatusBar, setShowStatusBar] = useState(true);
+
+  // Creation order keeps tabs still while typing (the list itself is sorted by last edit).
+  const tabs = useMemo(() => [...notes].sort((left, right) => left.createdAt.localeCompare(right.createdAt)), [notes]);
 
   useEffect(() => {
-    setTitleDraft(activeNote?.title ?? "");
-  }, [activeNote?.id, activeNote?.title]);
-
-  const filteredNotes = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
-    if (!normalizedQuery) {
-      return notes;
+    if (!openMenu) {
+      return undefined;
     }
 
-    return notes.filter(
-      (note) =>
-        note.title.toLowerCase().includes(normalizedQuery) ||
-        note.content.toLowerCase().includes(normalizedQuery),
-    );
-  }, [notes, query]);
+    const close = (event: PointerEvent | KeyboardEvent) => {
+      if (event instanceof KeyboardEvent ? event.key === "Escape" : !menuBarRef.current?.contains(event.target as Node)) {
+        setOpenMenu(null);
+      }
+    };
 
-  const wordCount = activeNote
-    ? activeNote.content
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean).length
-    : 0;
-  const characterCount = activeNote?.content.length ?? 0;
-  const lineCount = activeNote ? activeNote.content.split("\n").length : 0;
+    window.addEventListener("pointerdown", close);
+    window.addEventListener("keydown", close);
+    return () => {
+      window.removeEventListener("pointerdown", close);
+      window.removeEventListener("keydown", close);
+    };
+  }, [openMenu]);
 
-  const commitTitleDraft = () => {
-    if (!activeNote) {
+  useEffect(() => {
+    setCursor({ column: 1, line: 1 });
+    setRenamingId(null);
+  }, [activeNote?.id]);
+
+  const updateCursor = () => {
+    const editor = editorRef.current;
+
+    if (!editor) {
       return;
     }
 
-    if (titleDraft !== activeNote.title) {
-      onRenameNote(activeNote.id, titleDraft);
-    }
+    const before = editor.value.slice(0, editor.selectionStart);
+    const lines = before.split("\n");
+    setCursor({ column: lines[lines.length - 1].length + 1, line: lines.length });
   };
 
+  const startRename = (note: NoteFile) => {
+    setRenamingId(note.id);
+    setTitleDraft(note.title);
+  };
+
+  const commitRename = () => {
+    const note = notes.find((item) => item.id === renamingId);
+
+    if (note && titleDraft.trim() && titleDraft !== note.title) {
+      onRenameNote(note.id, titleDraft);
+    }
+
+    setRenamingId(null);
+  };
+
+  const insertTimeDate = () => {
+    const editor = editorRef.current;
+
+    if (!editor || !activeNote) {
+      return;
+    }
+
+    const stamp = new Date().toLocaleString([], { dateStyle: "short", timeStyle: "short" });
+    const { selectionEnd, selectionStart, value } = editor;
+    onUpdateNoteContent(activeNote.id, value.slice(0, selectionStart) + stamp + value.slice(selectionEnd));
+    requestAnimationFrame(() => {
+      editor.focus();
+      editor.setSelectionRange(selectionStart + stamp.length, selectionStart + stamp.length);
+      updateCursor();
+    });
+  };
+
+  const stepZoom = (direction: 1 | -1) => {
+    const index = ZOOM_STEPS.indexOf(zoom);
+    setZoom(ZOOM_STEPS[Math.min(ZOOM_STEPS.length - 1, Math.max(0, index + direction))]);
+  };
+
+  const menus: { items: MenuItem[]; label: string }[] = [
+    {
+      label: "File",
+      items: [
+        { label: "New note", onSelect: onCreateNote },
+        { disabled: !activeNote, label: "Rename", onSelect: () => activeNote && startRename(activeNote) },
+        { disabled: !activeNote, label: "Move to Trash", onSelect: () => activeNote && onDeleteNote(activeNote.id) },
+      ],
+    },
+    {
+      label: "Edit",
+      items: [
+        { disabled: !activeNote, label: "Time/Date", onSelect: insertTimeDate, shortcut: "F5" },
+        {
+          disabled: !activeNote,
+          label: "Select all",
+          onSelect: () => {
+            editorRef.current?.focus();
+            editorRef.current?.select();
+          },
+          shortcut: "Ctrl+A",
+        },
+      ],
+    },
+    {
+      label: "View",
+      items: [
+        { label: "Zoom in", onSelect: () => stepZoom(1) },
+        { label: "Zoom out", onSelect: () => stepZoom(-1) },
+        { label: "Restore default zoom", onSelect: () => setZoom(100) },
+        { checked: wordWrap, label: "Word wrap", onSelect: () => setWordWrap(!wordWrap) },
+        { checked: showStatusBar, label: "Status bar", onSelect: () => setShowStatusBar(!showStatusBar) },
+      ],
+    },
+  ];
+
   return (
-    <div className="notes-app">
-      <aside className="notes-sidebar">
-        <div className="notes-sidebar-header">
-          <div>
-            <span className="notes-kicker">{t("Notes")}</span>
-            <h2>{t("Desktop notes")}</h2>
-          </div>
-          <button className="notes-action-button" type="button" onClick={onCreateNote}>
-            <Plus className="notes-action-icon" />
-            <span>{t("New note")}</span>
-          </button>
-        </div>
-
-        <label className="notes-search">
-          <Search className="notes-search-icon" />
-          <input
-            type="text"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={t("Search notes")}
-          />
-        </label>
-
-        <div className="notes-list" role="list">
-          {filteredNotes.length === 0 ? (
-            <div className="notes-empty-list">{t("No notes yet. Create one to start writing.")}</div>
-          ) : (
-            filteredNotes.map((note) => (
-              <button
-                key={note.id}
-                className={`notes-list-item${activeNote?.id === note.id ? " is-active" : ""}`}
-                type="button"
-                onClick={() => onOpenNote(note.id)}
-              >
-                <span className="notes-list-item-icon" aria-hidden="true">
-                  <FileText className="notes-file-icon" />
-                </span>
-                <span className="notes-list-item-text">
-                  <strong>{note.title}</strong>
-                  <span>{new Date(note.updatedAt).toLocaleString()}</span>
-                </span>
-              </button>
-            ))
-          )}
-        </div>
-      </aside>
-
-      <section className="notes-editor-shell">
-        {activeNote ? (
-          <>
-            <div className="notes-editor-toolbar">
+    <div className="notepad">
+      <div className="notepad-tabs" role="tablist" aria-label={t("Notes")}>
+        {tabs.map((note) => (
+          <div
+            key={note.id}
+            aria-selected={activeNote?.id === note.id}
+            className={`notepad-tab${activeNote?.id === note.id ? " is-active" : ""}`}
+            onClick={() => onOpenNote(note.id)}
+            onDoubleClick={() => startRename(note)}
+            role="tab"
+            title={`${note.title} · ${t("Double-click to rename")}`}
+          >
+            <FileText aria-hidden="true" className="notepad-tab-icon" />
+            {renamingId === note.id ? (
               <input
-                className="notes-title-input"
-                type="text"
-                value={titleDraft}
-                onBlur={commitTitleDraft}
+                aria-label={t("Rename note")}
+                autoFocus
+                className="notepad-tab-rename"
+                onBlur={commitRename}
                 onChange={(event) => setTitleDraft(event.target.value)}
+                onClick={(event) => event.stopPropagation()}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
-                    event.currentTarget.blur();
-                  }
-
-                  if (event.key === "Escape") {
-                    setTitleDraft(activeNote.title);
-                    event.currentTarget.blur();
+                    commitRename();
+                  } else if (event.key === "Escape") {
+                    setRenamingId(null);
                   }
                 }}
+                value={titleDraft}
               />
-
-              <div className="notes-editor-toolbar-actions">
-                <span className="notes-save-indicator">{t("Autosaved to desktop")}</span>
-                <button
-                  className="notes-delete-button"
-                  type="button"
-                  onClick={() => onDeleteNote(activeNote.id)}
-                >
-                  <Trash2 className="notes-delete-icon" />
-                  <span>{t("Delete")}</span>
-                </button>
-              </div>
-            </div>
-
-            <textarea
-              className="notes-editor"
-              value={activeNote.content}
-              onChange={(event) => onUpdateNoteContent(activeNote.id, event.target.value)}
-              placeholder={t("Start typing your note here...")}
-            />
-
-            <div className="notes-statusbar">
-              <span>{t("Words")}: {wordCount}</span>
-              <span>{t("Characters")}: {characterCount}</span>
-              <span>{t("Lines")}: {lineCount}</span>
-            </div>
-          </>
-        ) : (
-          <div className="notes-editor-empty">
-            <FileText className="notes-empty-icon" />
-            <h3>{t("No note selected")}</h3>
-            <p>{t("Create a .txt file and it will appear on the desktop automatically.")}</p>
-            <button className="notes-action-button" type="button" onClick={onCreateNote}>
-              <Plus className="notes-action-icon" />
-              <span>{t("Create first note")}</span>
-            </button>
+            ) : (
+              <span className="notepad-tab-title">{note.title}</span>
+            )}
           </div>
-        )}
-      </section>
+        ))}
+        <button aria-label={t("New note")} className="notepad-new-tab" onClick={onCreateNote} title={t("New note")} type="button">
+          <Plus aria-hidden="true" />
+        </button>
+      </div>
+
+      <div ref={menuBarRef} className="notepad-menubar" role="menubar">
+        {menus.map((menu) => (
+          <div key={menu.label} className="notepad-menu">
+            <button
+              aria-expanded={openMenu === menu.label}
+              aria-haspopup="menu"
+              className={`notepad-menu-trigger${openMenu === menu.label ? " is-open" : ""}`}
+              onClick={() => setOpenMenu(openMenu === menu.label ? null : menu.label)}
+              onPointerEnter={() => openMenu && setOpenMenu(menu.label)}
+              role="menuitem"
+              type="button"
+            >
+              {t(menu.label)}
+            </button>
+            {openMenu === menu.label ? (
+              <div className="notepad-menu-panel" role="menu">
+                {menu.items.map((item) => (
+                  <button
+                    key={item.label}
+                    className="notepad-menu-item"
+                    disabled={item.disabled}
+                    onClick={() => {
+                      setOpenMenu(null);
+                      item.onSelect();
+                    }}
+                    role={item.checked === undefined ? "menuitem" : "menuitemcheckbox"}
+                    aria-checked={item.checked}
+                    type="button"
+                  >
+                    <span className="notepad-menu-check" aria-hidden="true">
+                      {item.checked ? <Check /> : null}
+                    </span>
+                    <span>{t(item.label)}</span>
+                    {item.shortcut ? <kbd>{item.shortcut}</kbd> : null}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </div>
+
+      {activeNote ? (
+        <textarea
+          ref={editorRef}
+          aria-label={activeNote.title}
+          className={`notepad-editor${wordWrap ? "" : " is-nowrap"}`}
+          onChange={(event) => {
+            onUpdateNoteContent(activeNote.id, event.target.value);
+            updateCursor();
+          }}
+          onClick={updateCursor}
+          onKeyDown={(event) => {
+            if (event.key === "F5") {
+              event.preventDefault();
+              insertTimeDate();
+            }
+          }}
+          onKeyUp={updateCursor}
+          spellCheck={false}
+          style={{ fontSize: `${(15 * zoom) / 100}px` }}
+          value={activeNote.content}
+          wrap={wordWrap ? "soft" : "off"}
+        />
+      ) : (
+        <div className="notepad-empty">
+          <p>{t("No notes yet.")}</p>
+          <button className="notepad-empty-button" onClick={onCreateNote} type="button">
+            <Plus aria-hidden="true" />
+            {t("New note")}
+          </button>
+        </div>
+      )}
+
+      {showStatusBar ? (
+        <div className="notepad-statusbar">
+          <span>
+            {t("Ln")} {cursor.line}, {t("Col")} {cursor.column}
+          </span>
+          <span>
+            {activeNote?.content.length ?? 0} {t("characters")}
+          </span>
+          <span>{zoom}%</span>
+          <span>UTF-8</span>
+        </div>
+      ) : null}
     </div>
   );
 }
