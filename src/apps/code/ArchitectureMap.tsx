@@ -1,4 +1,4 @@
-import { Maximize2 } from "lucide-react";
+import { Maximize2, Minus, Plus } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent } from "react";
 
 import { useLocale } from "../../i18n/locale";
@@ -112,20 +112,26 @@ function ArchitectureMap({ activePath, onOpen }: ArchitectureMapProps) {
     return rect && rect.width > 0 ? Math.max(bounds.width / rect.width, bounds.height / rect.height) : 1;
   };
 
-  const handleWheel = (event: WheelEvent<SVGSVGElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const unitsPerPixel = getUnitsPerPixel();
-    const pointerX = (event.clientX - rect.left - rect.width / 2) * unitsPerPixel;
-    const pointerY = (event.clientY - rect.top - rect.height / 2) * unitsPerPixel;
-    const nextScale = Math.min(4, Math.max(0.5, view.scale * (event.deltaY < 0 ? 1.15 : 1 / 1.15)));
+  // Zooms around a point given in graph units from the centre, keeping that point fixed on screen.
+  const zoom = (factor: number, pointerX = 0, pointerY = 0) => {
+    const nextScale = Math.min(4, Math.max(0.5, view.scale * factor));
     const ratio = nextScale / view.scale;
 
-    // Zoom around the cursor: keep the point under it fixed.
     setView({
       scale: nextScale,
       x: view.x * ratio + pointerX * (1 - ratio),
       y: view.y * ratio + pointerY * (1 - ratio),
     });
+  };
+
+  const handleWheel = (event: WheelEvent<SVGSVGElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const unitsPerPixel = getUnitsPerPixel();
+    zoom(
+      event.deltaY < 0 ? 1.15 : 1 / 1.15,
+      (event.clientX - rect.left - rect.width / 2) * unitsPerPixel,
+      (event.clientY - rect.top - rect.height / 2) * unitsPerPixel,
+    );
   };
 
   const handlePointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
@@ -267,20 +273,28 @@ function ArchitectureMap({ activePath, onOpen }: ArchitectureMapProps) {
           </>
         ) : (
           <span>
-            {nodes.length} {t("files")} · {edgeCount} {t("imports")} · {t("scroll to zoom, drag to pan, click a file to open it")}
+            {nodes.length} {t("files")} · {edgeCount} {t("imports")} · {t("zoom, drag to pan, click a file to open it")}
           </span>
         )}
       </div>
 
-      <button
-        aria-label={t("Fit to view")}
-        className="code-map-fit"
-        onClick={() => setView({ scale: 1, x: 0, y: 0 })}
-        title={t("Fit to view")}
-        type="button"
-      >
-        <Maximize2 className="code-toolbar-icon" />
-      </button>
+      <div className="code-map-controls">
+        <button aria-label={t("Zoom in")} className="code-map-fit" onClick={() => zoom(1.3)} title={t("Zoom in")} type="button">
+          <Plus className="code-toolbar-icon" />
+        </button>
+        <button aria-label={t("Zoom out")} className="code-map-fit" onClick={() => zoom(1 / 1.3)} title={t("Zoom out")} type="button">
+          <Minus className="code-toolbar-icon" />
+        </button>
+        <button
+          aria-label={t("Fit to view")}
+          className="code-map-fit"
+          onClick={() => setView({ scale: 1, x: 0, y: 0 })}
+          title={t("Fit to view")}
+          type="button"
+        >
+          <Maximize2 className="code-toolbar-icon" />
+        </button>
+      </div>
     </div>
   );
 }

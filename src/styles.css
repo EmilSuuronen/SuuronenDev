@@ -4585,10 +4585,15 @@ a.code-live-reset {
   background: var(--candy-blue);
 }
 
-.code-map-fit {
+.code-map-controls {
   position: absolute;
   top: 0.6rem;
   right: 0.6rem;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.code-map-fit {
   display: grid;
   place-items: center;
   width: 2rem;
