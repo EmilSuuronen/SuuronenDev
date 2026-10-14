@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import BrowserApp from "./apps/BrowserApp";
 import CalculatorApp from "./apps/CalculatorApp";
@@ -26,6 +26,9 @@ import { useWindowManager } from "./hooks/useWindowManager";
 import type { DesktopEntryId, FolderId, WindowId } from "./types/desktop";
 import { useLocale } from "./i18n/locale";
 
+// Lazy so CodeMirror and the bundled source only load when the app is opened.
+const CodeApp = lazy(() => import("./apps/code/CodeApp"));
+
 type RenderWindowAppProps = {
   activeFilterId: string;
   currentTheme: ReturnType<typeof useDesktopTheme>["currentTheme"];
@@ -40,6 +43,7 @@ type RenderWindowAppProps = {
     onRenameNote: ReturnType<typeof useNotes>["renameNote"];
     onUpdateNoteContent: ReturnType<typeof useNotes>["updateNoteContent"];
   };
+  onFocusWindow: (windowId: WindowId) => void;
   onSelectFilter: (filterId: DesktopFilterId) => void;
   onResetTheme: ReturnType<typeof useDesktopTheme>["resetTheme"];
   onSelectTheme: ReturnType<typeof useDesktopTheme>["selectTheme"];
@@ -53,6 +57,7 @@ function renderWindowApp({
   currentTheme,
   filterOptions,
   notesState,
+  onFocusWindow,
   onSelectFilter,
   onResetTheme,
   onSelectTheme,
@@ -70,6 +75,14 @@ function renderWindowApp({
 
   if (windowId === "antgame") {
     return <AntGameApp />;
+  }
+
+  if (windowId === "code") {
+    return (
+      <Suspense fallback={null}>
+        <CodeApp onFocusSelf={() => onFocusWindow("code")} />
+      </Suspense>
+    );
   }
 
   if (windowId === "settings") {
@@ -466,6 +479,7 @@ function App() {
                   onRenameNote: notesState.renameNote,
                   onUpdateNoteContent: notesState.updateNoteContent,
                 },
+                onFocusWindow: focusWindow,
                 onSelectFilter: setActiveFilterId,
                 onResetTheme: resetTheme,
                 onSelectTheme: selectTheme,

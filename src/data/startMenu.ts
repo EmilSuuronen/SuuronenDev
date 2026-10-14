@@ -41,6 +41,15 @@ export const startMenuSections: StartMenuSection[] = [
         },
       },
       {
+        label: "Source Code",
+        description: "Browse this OS's own source",
+        icon: "code",
+        action: {
+          type: "open_entry",
+          entryId: "code",
+        },
+      },
+      {
         label: "Settings",
         description: "Themes and personalization",
         icon: "settings",

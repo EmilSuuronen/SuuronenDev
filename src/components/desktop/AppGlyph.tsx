@@ -1,4 +1,4 @@
-import { Calculator, FileText, FolderClosed, Globe2, NotebookPen, ScanFace, Settings2, Trash2 } from "lucide-react";
+import { Calculator, CodeXml, FileText, FolderClosed, Globe2, NotebookPen, ScanFace, Settings2, Trash2 } from "lucide-react";
 import molkkisIcon from "../../res/icon-192.png";
 import type { DesktopIconKey } from "../../types/desktop";
 
@@ -52,6 +52,14 @@ function AppGlyph({ iconKey, className = "" }: AppGlyphProps) {
     return (
       <span className={`app-glyph app-glyph--antgame ${className}`.trim()} aria-hidden="true">
         <span className="app-glyph-antgame-pixel" />
+      </span>
+    );
+  }
+
+  if (iconKey === "code") {
+    return (
+      <span className={`app-glyph app-glyph--code ${className}`.trim()} aria-hidden="true">
+        <CodeXml className="app-glyph-code" strokeWidth={1.75} />
       </span>
     );
   }

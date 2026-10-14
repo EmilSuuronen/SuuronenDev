@@ -39,6 +39,12 @@ export const desktopLaunchers: DesktopLauncher[] = [
     icon: "notes",
     subtitle: "Text editor and desktop notes",
   },
+  {
+    id: "code",
+    label: "Source Code",
+    icon: "code",
+    subtitle: "Browse this OS's own source",
+  },
 ];
 
 export const DESKTOP_ICON_WIDTH = 88;
@@ -262,6 +268,18 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
   );
   const antGameX = isCompact ? WINDOW_GAP : Math.max(WINDOW_GAP, safeWidth / 2 - antGameWidth / 2);
   const antGameY = isCompact ? 82 : 36;
+  const codeWidth = clamp(
+    isCompact ? 360 : 980,
+    340,
+    Math.min(1240, safeWidth - WINDOW_GAP * 2),
+  );
+  const codeHeight = clamp(
+    isCompact ? 520 : 660,
+    400,
+    Math.min(880, safeHeight - WINDOW_GAP * 2),
+  );
+  const codeX = isCompact ? WINDOW_GAP : Math.max(WINDOW_GAP, safeWidth / 2 - codeWidth / 2 + 20);
+  const codeY = isCompact ? 64 : 44;
 
   return [
     {
@@ -358,6 +376,21 @@ export function createInitialWindows(bounds: DesktopBounds): DesktopWindowState[
       minSize: { width: 360, height: 420 },
       maxSize: { width: 1200, height: 860 },
       zIndex: -2,
+    },
+    {
+      animationState: "idle",
+      id: "code",
+      kind: "app",
+      title: "source.code",
+      icon: "code",
+      isOpen: false,
+      isMaximized: false,
+      maximizeMode: null,
+      position: { x: codeX, y: codeY },
+      restoreRect: null,
+      size: { width: codeWidth, height: codeHeight },
+      minSize: { width: 340, height: 400 },
+      zIndex: -3,
     },
   ];
 }
