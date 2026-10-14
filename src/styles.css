@@ -3639,11 +3639,6 @@ button {
   font-size: 0.78rem;
 }
 
-.start-menu-footer-hint {
-  color: color-mix(in srgb, var(--panel-strong) 65%, transparent);
-  font-size: 0.76rem;
-}
-
 @media (max-width: 900px) {
   .start-menu {
     width: min(560px, calc(100vw - 20px));
@@ -4922,5 +4917,314 @@ button.code-live-message {
   .textmode-scanlines,
   .textmode .boot-cursor {
     animation: none;
+  }
+}
+
+/* Top bar search (opens the command palette) */
+.topbar-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  padding: 0.12rem 0.5rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.topbar-search:hover,
+.topbar-search:focus-visible {
+  background: var(--accent-soft);
+}
+
+.topbar-search-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.topbar-search-kbd {
+  padding: 0 0.3rem;
+  border: 1px solid var(--ink-soft);
+  border-radius: 4px;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+}
+
+@media (max-width: 820px) {
+  .topbar-search-label,
+  .topbar-search-kbd {
+    display: none;
+  }
+}
+
+/* Command palette */
+.palette-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  justify-content: center;
+  padding: calc(var(--topbar-height) + var(--safe-top) + 6vh) 16px 16px;
+  background: rgba(0, 0, 0, 0.28);
+  animation: palette-fade 120ms ease-out both;
+}
+
+.palette {
+  display: flex;
+  flex-direction: column;
+  width: min(36rem, 100%);
+  max-height: min(30rem, 72vh);
+  overflow: hidden;
+  border: var(--outline);
+  border-radius: 14px;
+  background: var(--panel-strong);
+  box-shadow: var(--pop-lg), 0 24px 60px rgba(0, 0, 0, 0.3);
+  color: var(--ink);
+  animation: palette-pop 160ms var(--spring) both;
+}
+
+@keyframes palette-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes palette-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+.palette-search {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border-bottom: var(--outline);
+}
+
+.palette-search-icon {
+  flex: 0 0 auto;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.palette-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+}
+
+.palette-kbd {
+  padding: 0.05rem 0.35rem;
+  border: 1px solid var(--ink-soft);
+  border-radius: 4px;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+}
+
+.palette-results {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0.35rem;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.palette-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.4rem 0.55rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.palette-item.is-active {
+  background: var(--accent);
+}
+
+.palette-item-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+.palette-item-glyph {
+  width: 1.9rem;
+  height: 1.9rem;
+  font-size: 0.7rem;
+}
+
+.palette-item-lucide {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.palette-item-text {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.palette-item-label {
+  overflow: hidden;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette-item-detail {
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette-item-group {
+  flex: 0 0 auto;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+}
+
+.palette-empty {
+  padding: 1rem;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.palette-footer {
+  display: flex;
+  gap: 1rem;
+  padding: 0.45rem 0.9rem;
+  border-top: 1px solid var(--accent-soft);
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+}
+
+@media (max-width: 560px) {
+  .palette-footer {
+    display: none;
+  }
+}
+
+/* Window snapping preview */
+.window-snap-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 3px dashed var(--ink);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  box-shadow: inset 0 0 0 2px var(--accent);
+  pointer-events: none;
+  transition:
+    transform 140ms ease-out,
+    width 140ms ease-out,
+    height 140ms ease-out;
+  animation: palette-fade 120ms ease-out both;
+}
+
+/* Window switcher (Alt+`) */
+.desktop-window--peek-focus {
+  z-index: 1000 !important;
+}
+
+.desktop-window--peek-dim {
+  opacity: 0.2;
+}
+
+.desktop-window--peek-focus,
+.desktop-window--peek-dim {
+  transition: opacity 140ms ease;
+}
+
+.window-switcher {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 1100;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  max-width: calc(100% - 32px);
+  padding: 0.8rem;
+  border: var(--outline);
+  border-radius: 16px;
+  background: var(--panel-strong);
+  box-shadow: var(--pop-lg), 0 24px 60px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, -50%);
+}
+
+.window-switcher-item {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  width: 7.5rem;
+  padding: 0.7rem 0.4rem 0.55rem;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.window-switcher-item.is-active {
+  border-color: var(--ink);
+  background: var(--accent);
+  box-shadow: var(--pop-sm);
+}
+
+.window-switcher-glyph {
+  width: 3rem;
+  height: 3rem;
+}
+
+.window-switcher-title {
+  max-width: 100%;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.window-switcher-hint {
+  flex: 1 0 100%;
+  margin: 0.1rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .palette-backdrop,
+  .palette,
+  .window-snap-preview {
+    animation: none;
+    transition: none;
   }
 }

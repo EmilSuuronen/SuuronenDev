@@ -42,6 +42,12 @@ Routing uses the History API, so links, reloads and back/forward work. GitHub Pa
 
 In the boot manager, the highlighted entry boots after 10 seconds unless the visitor touches the menu. The pick is remembered for the session (returning to `/` goes straight to it) and preselected on the next visit. `reboot` in the terminal returns to `/`; text mode links to the desktop, and the desktop's System menu links to text mode. Projects shown in text mode live in `src/data/projects.ts`.
 
+## Desktop shortcuts
+
+- **Command palette:** Ctrl/⌘+K, Space when nothing has focus, or Search in the top bar. Finds apps, folders, notes, actions, themes, desktop effects, languages and terminal commands (which run in the terminal), and hands anything else to the Source Code app's file search. In the terminal, Ctrl+K keeps its readline meaning when there is text after the cursor.
+- **Snapping:** drag a window to the left or right edge for half the screen, into a corner for a quarter, or to the top to maximize. Dragging a tiled window away restores its earlier size, and tiles follow the browser size.
+- **Window switcher:** hold Alt and press \` (Alt+Tab where the browser receives it; most operating systems keep it), Shift to go back, release Alt to switch, Esc to cancel. The highlighted window comes forward and the others dim while you cycle.
+
 ## Source Code app
 
 The Source Code app (`src/apps/code/`) is a viewer for this site's own source, bundled at build time with `import.meta.glob`, so it always shows exactly what is deployed. It loads lazily: CodeMirror and the source text download only when the app is opened.

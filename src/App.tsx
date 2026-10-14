@@ -7,7 +7,10 @@ import NotesApp from "./apps/NotesApp";
 import SettingsApp from "./apps/SettingsApp";
 import TerminalApp from "./apps/TerminalApp";
 import AntGameApp from "./apps/AntGameApp";
+import CommandPalette from "./components/desktop/CommandPalette";
 import DesktopFilterOverlay from "./components/desktop/DesktopFilterOverlay";
+import { getPaletteItems } from "./components/desktop/paletteItems";
+import WindowSwitcher from "./components/desktop/WindowSwitcher";
 import DesktopContextMenu from "./components/desktop/DesktopContextMenu";
 import DesktopWallpaper from "./components/desktop/DesktopWallpaper";
 import DesktopIcons from "./components/desktop/DesktopIcons";
@@ -22,6 +25,7 @@ import { useDesktopIcons } from "./hooks/useDesktopIcons";
 import { useNotes } from "./hooks/useNotes";
 import { getThemeVariables, useDesktopTheme } from "./hooks/useDesktopTheme";
 import { useElementSize } from "./hooks/useElementSize";
+import { terminalCommandRequests } from "./hooks/requestChannel";
 import { getWindowSource, requestSource } from "./hooks/useSourceRequest";
 import { useWindowManager } from "./hooks/useWindowManager";
 import type { DesktopEntryId, FolderId, WindowEntityId, WindowId } from "./types/desktop";
@@ -122,18 +126,21 @@ function renderWindowApp({
 
 type AppProps = {
   onReboot: () => void;
+  onTextMode: () => void;
   // Owned by the session root so the boot screen and text mode share the desktop's theme.
   theme: ReturnType<typeof useDesktopTheme>;
 };
 
-function App({ onReboot, theme }: AppProps) {
+function App({ onReboot, onTextMode, theme }: AppProps) {
   const workspaceRef = useRef<HTMLDivElement>(null);
   const bounds = useElementSize(workspaceRef);
   const isMobile = isMobileDesktopViewport(bounds);
-  const { t } = useLocale();
+  const { languageLabel, setLocale, t, themeName } = useLocale();
   const { currentTheme, resetTheme, selectTheme, setThemeColor, themeOptions } = theme;
   const { activeFilterId, filterOptions, setActiveFilterId } = useDesktopFilter();
   const notesState = useNotes();
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const [peekWindowId, setPeekWindowId] = useState<WindowEntityId | null>(null);
   const [desktopContextMenu, setDesktopContextMenu] = useState<{
     windowId?: WindowEntityId;
     x: number;
@@ -170,6 +177,7 @@ function App({ onReboot, theme }: AppProps) {
     openFolderWindow,
     openWindow,
     restoreWindowFromDrag,
+    snapWindow,
     toggleMaximizeWindow,
     updateWindowRect,
   } = useWindowManager(bounds);
@@ -419,11 +427,62 @@ function App({ onReboot, theme }: AppProps) {
     };
   }, []);
 
+  // Ctrl/Cmd+K anywhere, or Space when nothing has focus, opens the command palette.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target instanceof HTMLElement ? event.target : null;
+
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        // In the terminal Ctrl+K is readline's cut-to-end-of-line; leave it alone when there is text to cut.
+        if (event.ctrlKey && target instanceof HTMLInputElement && target.closest(".terminal-app")) {
+          if ((target.selectionEnd ?? target.value.length) < target.value.length) {
+            return;
+          }
+        }
+
+        event.preventDefault();
+        setIsPaletteOpen((isOpen) => !isOpen);
+      } else if (event.key === " " && !event.repeat && (!target || target === document.body)) {
+        event.preventDefault();
+        setIsPaletteOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const paletteItems = isPaletteOpen
+    ? getPaletteItems({
+        actions: {
+          createFolder: handleCreateFolderRequest,
+          createNote: handleCreateNote,
+          openEntry: openDesktopEntry,
+          reboot: onReboot,
+          runCommand: (input) => {
+            terminalCommandRequests.request(input);
+            openWindow("terminal");
+          },
+          selectFilter: setActiveFilterId,
+          selectTheme,
+          setLocale,
+          textMode: onTextMode,
+          viewSource: () => openSource("src/App.tsx"),
+        },
+        entries: icons,
+        filterOptions,
+        languageLabel,
+        t,
+        themeName,
+        themeOptions,
+      })
+    : [];
+
   return (
     <div className={`desktop-root desktop-root--filter-${activeFilterId}`} style={desktopThemeStyle}>
       <DesktopWallpaper theme={currentTheme} />
       <DesktopFilterOverlay filterId={activeFilterId} />
-      <TopBar onOpenWindow={openWindow} />
+      <TopBar onOpenPalette={() => setIsPaletteOpen(true)} onOpenWindow={openWindow} />
 
       <main
         ref={workspaceRef}
@@ -452,9 +511,11 @@ function App({ onReboot, theme }: AppProps) {
             onFocus={focusWindow}
             onMinimize={minimizeWindow}
             onRestoreFromDrag={restoreWindowFromDrag}
+            onSnap={snapWindow}
             onTitleContextMenu={(windowId, x, y) => setDesktopContextMenu({ windowId, x, y })}
             onToggleMaximize={toggleMaximizeWindow}
             onRectChange={updateWindowRect}
+            peek={peekWindowId ? (peekWindowId === windowState.id ? "focus" : "dim") : null}
             windowState={windowState}
           >
             {windowState.kind === "folder" && windowState.folderId ? (
@@ -513,6 +574,20 @@ function App({ onReboot, theme }: AppProps) {
           </DesktopWindow>
         ))}
       </main>
+
+      <WindowSwitcher
+        onPeek={setPeekWindowId}
+        onSwitch={focusWindow}
+        windows={openWindows.filter((windowState) => windowState.animationState === "idle")}
+      />
+
+      {isPaletteOpen ? (
+        <CommandPalette
+          items={paletteItems}
+          onClose={() => setIsPaletteOpen(false)}
+          onSearchSource={openSource}
+        />
+      ) : null}
 
       <Taskbar
         activeWindowId={activeWindow?.kind === "app" ? (activeWindow.id as WindowId) : null}

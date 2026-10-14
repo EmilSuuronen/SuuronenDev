@@ -1,36 +1,13 @@
-import { useSyncExternalStore } from "react";
+import { createRequestChannel } from "./requestChannel";
 
 // Lets other apps ask the Source Code app to show a file, even before its lazy chunk has loaded.
 export type SourceRequest = { line?: number; query: string };
 
-let pending: SourceRequest | null = null;
-const listeners = new Set<() => void>();
+const sourceRequests = createRequestChannel<SourceRequest>();
 
-function emit() {
-  listeners.forEach((listener) => listener());
-}
-
-export function requestSource(query: string, line?: number) {
-  pending = { line, query };
-  emit();
-}
-
-export function takeSourceRequest() {
-  const request = pending;
-  pending = null;
-  emit();
-  return request;
-}
-
-export function useSourceRequest() {
-  return useSyncExternalStore(
-    (listener) => {
-      listeners.add(listener);
-      return () => listeners.delete(listener);
-    },
-    () => pending,
-  );
-}
+export const requestSource = (query: string, line?: number) => sourceRequests.request({ line, query });
+export const takeSourceRequest = sourceRequests.take;
+export const useSourceRequest = sourceRequests.usePending;
 
 const WINDOW_SOURCES: Record<string, string> = {
   antgame: "src/apps/antgame/AntGameApp.tsx",

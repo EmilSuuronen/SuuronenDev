@@ -120,7 +120,6 @@ function StartMenu({ isOpen, isMobile, onClose, onOpenEntry }: StartMenuProps) {
 
       <div className="start-menu-footer">
         <div className="start-menu-footer-user">emil@desktop</div>
-        <div className="start-menu-footer-hint">{t("Placeholder shell menu")}</div>
       </div>
     </div>
   );

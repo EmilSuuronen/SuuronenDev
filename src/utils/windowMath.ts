@@ -1,4 +1,4 @@
-import type { DesktopBounds, DesktopWindowState, ResizeEdge, WindowRect } from "../types/desktop";
+import type { DesktopBounds, DesktopWindowState, ResizeEdge, SnapZone, WindowRect } from "../types/desktop";
 
 export const WINDOW_GAP = 16;
 
@@ -129,5 +129,50 @@ export function resizeWindow(
   return {
     position: { x: left, y: top },
     size: { width: right - left, height: bottom - top },
+  };
+}
+
+const SNAP_EDGE = 12;
+const SNAP_CORNER = 96;
+
+// Pointer position in workspace coordinates -> the tile it would snap to, or null away from the edges.
+export function getSnapZone(pointerX: number, pointerY: number, bounds: DesktopBounds): SnapZone | null {
+  const atLeft = pointerX <= SNAP_EDGE;
+  const atRight = pointerX >= bounds.width - SNAP_EDGE;
+
+  if (atLeft || atRight) {
+    const side = atLeft ? "left" : "right";
+
+    if (pointerY <= SNAP_CORNER) {
+      return `top-${side}`;
+    }
+
+    if (pointerY >= bounds.height - SNAP_CORNER) {
+      return `bottom-${side}`;
+    }
+
+    return side;
+  }
+
+  return pointerY <= SNAP_EDGE / 2 ? "top" : null;
+}
+
+export function getSnapRect(zone: SnapZone, bounds: DesktopBounds, minSize: DesktopWindowState["minSize"]): WindowRect {
+  if (zone === "top") {
+    return getMaximizedWindowRect(bounds);
+  }
+
+  const isQuarter = zone.includes("-");
+  const width = Math.min(bounds.width, Math.max(Math.floor(bounds.width / 2), minSize.width));
+  const height = isQuarter
+    ? Math.min(bounds.height, Math.max(Math.floor(bounds.height / 2), minSize.height))
+    : bounds.height;
+
+  return {
+    position: {
+      x: zone.endsWith("right") ? bounds.width - width : 0,
+      y: zone.startsWith("bottom") ? bounds.height - height : 0,
+    },
+    size: { width, height },
   };
 }

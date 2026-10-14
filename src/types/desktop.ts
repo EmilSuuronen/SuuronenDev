@@ -16,6 +16,7 @@ export type DesktopIconKey =
   | "ar"
   | "trash"
   | "folder";
+export type SnapZone = "left" | "right" | "top" | "top-left" | "top-right" | "bottom-left" | "bottom-right";
 export type WindowEntityId = WindowId | `folder:${FolderId}`;
 
 export type Point = {
@@ -47,6 +48,8 @@ export type DesktopWindowState = {
   position: Point;
   restoreRect?: WindowRect | null;
   size: Size;
+  // Set while tiled by dragging to an edge; restoreRect then holds the size from before tiling.
+  snap?: SnapZone | null;
   minSize: Size;
   title: string;
   zIndex: number;

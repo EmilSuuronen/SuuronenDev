@@ -109,6 +109,7 @@ function SessionRoot() {
             navigate("/");
             setBoot("full");
           }}
+          onTextMode={() => navigate("/text")}
           theme={theme}
         />
       ) : null}

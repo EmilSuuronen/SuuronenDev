@@ -28,10 +28,4 @@ export const projects: Project[] = [
     stack: "Lens Studio",
     links: [{ label: "open", href: "/ar/" }],
   },
-  {
-    name: "Ant Exterminator",
-    description: "A pixel-art arcade game with a WebGL renderer. Lives in the desktop's Applications folder.",
-    stack: "TypeScript · WebGL",
-    links: [],
-  },
 ];

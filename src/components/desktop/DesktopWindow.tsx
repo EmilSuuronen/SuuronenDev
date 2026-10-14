@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Copy, Minus, Square, X } from "lucide-react";
 
 import { isMobileDesktopViewport } from "../../data/desktop";
@@ -8,14 +8,18 @@ import type {
   DesktopBounds,
   DesktopWindowState,
   ResizeEdge,
+  SnapZone,
   WindowEntityId,
   WindowRect,
 } from "../../types/desktop";
-import { clamp, moveWindow, resizeWindow } from "../../utils/windowMath";
+import { clamp, getSnapRect, getSnapZone, moveWindow, resizeWindow } from "../../utils/windowMath";
 
 type Interaction =
   | {
       mode: "drag";
+      // Workspace origin in client coordinates, to tell when the pointer reaches a screen edge.
+      originX: number;
+      originY: number;
       startX: number;
       startY: number;
       snapshot: DesktopWindowState;
@@ -35,9 +39,12 @@ type DesktopWindowProps = {
   onFocus: (windowId: WindowEntityId) => void;
   onMinimize: (windowId: WindowEntityId) => void;
   onRestoreFromDrag: (windowId: WindowEntityId, nextRect: WindowRect) => void;
+  onSnap: (windowId: WindowEntityId, zone: SnapZone, restoreRect: WindowRect) => void;
   onTitleContextMenu?: (windowId: WindowEntityId, x: number, y: number) => void;
   onToggleMaximize: (windowId: WindowEntityId) => void;
   onRectChange: (windowId: WindowEntityId, nextRect: WindowRect) => void;
+  // Window switcher preview: the highlighted window comes forward, the rest fade back.
+  peek?: "focus" | "dim" | null;
   windowState: DesktopWindowState;
 };
 
@@ -50,13 +57,17 @@ function DesktopWindow({
   onFocus,
   onMinimize,
   onRestoreFromDrag,
+  onSnap,
   onTitleContextMenu,
   onToggleMaximize,
   onRectChange,
+  peek = null,
   windowState,
 }: DesktopWindowProps) {
   const { t } = useLocale();
   const [interaction, setInteraction] = useState<Interaction | null>(null);
+  const [snapZone, setSnapZone] = useState<SnapZone | null>(null);
+  const snapZoneRef = useRef<SnapZone | null>(null);
   const isAnimatingOut = windowState.animationState !== "idle";
   const isMobile = isMobileDesktopViewport(bounds);
 
@@ -80,6 +91,9 @@ function DesktopWindow({
 
       if (interaction.mode === "drag") {
         onRectChange(windowState.id, moveWindow(interaction.snapshot, deltaX, deltaY, bounds));
+        const zone = getSnapZone(event.clientX - interaction.originX, event.clientY - interaction.originY, bounds);
+        snapZoneRef.current = zone;
+        setSnapZone(zone);
         return;
       }
 
@@ -90,6 +104,17 @@ function DesktopWindow({
     };
 
     const handlePointerUp = () => {
+      const zone = snapZoneRef.current;
+
+      if (interaction.mode === "drag" && zone) {
+        onSnap(windowState.id, zone, {
+          position: interaction.snapshot.position,
+          size: interaction.snapshot.size,
+        });
+      }
+
+      snapZoneRef.current = null;
+      setSnapZone(null);
       setInteraction(null);
     };
 
@@ -102,7 +127,7 @@ function DesktopWindow({
       window.removeEventListener("pointerup", handlePointerUp);
       window.removeEventListener("pointercancel", handlePointerUp);
     };
-  }, [bounds, interaction, isAnimatingOut, onRectChange, windowState.id]);
+  }, [bounds, interaction, isAnimatingOut, onRectChange, onSnap, windowState.id]);
 
   const startDrag = (event: React.PointerEvent<HTMLDivElement>) => {
     if (isAnimatingOut || isMobile) {
@@ -111,8 +136,11 @@ function DesktopWindow({
 
     event.preventDefault();
     onFocus(windowState.id);
+    const windowRect = event.currentTarget.parentElement!.getBoundingClientRect();
+    const origin = { originX: windowRect.left - windowState.position.x, originY: windowRect.top - windowState.position.y };
 
-    if (windowState.isMaximized && windowState.restoreRect) {
+    // Maximized and tiled windows both pop back to their earlier size under the pointer.
+    if ((windowState.isMaximized || windowState.snap) && windowState.restoreRect) {
       const restoredWidth = windowState.restoreRect.size.width;
       const restoredHeight = windowState.restoreRect.size.height;
       const pointerRatioX =
@@ -137,6 +165,7 @@ function DesktopWindow({
       onRestoreFromDrag(windowState.id, restoredRect);
       setInteraction({
         mode: "drag",
+        ...origin,
         startX: event.clientX,
         startY: event.clientY,
         snapshot: {
@@ -144,6 +173,7 @@ function DesktopWindow({
           ...restoredRect,
           isMaximized: false,
           restoreRect: null,
+          snap: null,
         },
       });
       return;
@@ -151,11 +181,14 @@ function DesktopWindow({
 
     setInteraction({
       mode: "drag",
+      ...origin,
       startX: event.clientX,
       startY: event.clientY,
       snapshot: windowState,
     });
   };
+
+  const snapPreview = snapZone ? getSnapRect(snapZone, bounds, windowState.minSize) : null;
 
   const startResize =
     (edge: ResizeEdge) => (event: React.PointerEvent<HTMLDivElement>) => {
@@ -176,8 +209,21 @@ function DesktopWindow({
     };
 
   return (
+    <>
+    {snapPreview ? (
+      <div
+        aria-hidden="true"
+        className="window-snap-preview"
+        style={{
+          height: snapPreview.size.height,
+          transform: `translate(${snapPreview.position.x}px, ${snapPreview.position.y}px)`,
+          width: snapPreview.size.width,
+          zIndex: windowState.zIndex,
+        }}
+      />
+    ) : null}
     <section
-      className={`desktop-window desktop-window--${windowState.id} desktop-window--${windowState.animationState}${windowState.isMaximized ? " desktop-window--maximized" : ""}${interaction ? " desktop-window--interacting" : ""}${isMobile ? " desktop-window--mobile" : ""}`}
+      className={`desktop-window desktop-window--${windowState.id} desktop-window--${windowState.animationState}${windowState.isMaximized ? " desktop-window--maximized" : ""}${interaction ? " desktop-window--interacting" : ""}${isMobile ? " desktop-window--mobile" : ""}${peek ? ` desktop-window--peek-${peek}` : ""}`}
       style={{
         width: `${windowState.size.width}px`,
         height: `${windowState.size.height}px`,
@@ -254,6 +300,7 @@ function DesktopWindow({
           ))
         : null}
     </section>
+    </>
   );
 }
 

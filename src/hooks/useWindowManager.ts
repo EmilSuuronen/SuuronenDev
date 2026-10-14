@@ -5,12 +5,13 @@ import type {
   DesktopBounds,
   DesktopWindowState,
   FolderId,
+  SnapZone,
   WindowAnimationState,
   WindowEntityId,
   WindowId,
   WindowRect,
 } from "../types/desktop";
-import { clampWindowToBounds, getMaximizedWindowRect } from "../utils/windowMath";
+import { clampWindowToBounds, getMaximizedWindowRect, getSnapRect } from "../utils/windowMath";
 
 const WINDOW_EXIT_ANIMATION_MS = 220;
 
@@ -33,7 +34,13 @@ function applyWindowViewportMode(
         position: windowState.position,
         size: windowState.size,
       },
+      snap: null,
     };
+  }
+
+  // Tiled windows follow the viewport so a half stays a half after resizing the browser.
+  if (windowState.snap && !windowState.isMaximized) {
+    return clampWindowToBounds({ ...windowState, ...getSnapRect(windowState.snap, bounds, windowState.minSize) }, bounds);
   }
 
   if (windowState.maximizeMode === "mobile") {
@@ -211,11 +218,51 @@ export function useWindowManager(bounds: DesktopBounds) {
                 isMaximized: false,
                 maximizeMode: null,
                 restoreRect: null,
+                snap: null,
               },
               bounds,
             )
           : windowState,
       ),
+    );
+
+    bringToFront(windowId, false);
+  };
+
+  const snapWindow = (windowId: WindowEntityId, zone: SnapZone, restoreRect: WindowRect) => {
+    if (isMobile) {
+      return;
+    }
+
+    setWindows((currentWindows) =>
+      currentWindows.map((windowState) => {
+        if (windowState.id !== windowId) {
+          return windowState;
+        }
+
+        if (zone === "top") {
+          return {
+            ...windowState,
+            ...getMaximizedWindowRect(bounds),
+            isMaximized: true,
+            maximizeMode: "manual",
+            restoreRect,
+            snap: null,
+          };
+        }
+
+        return clampWindowToBounds(
+          {
+            ...windowState,
+            ...getSnapRect(zone, bounds, windowState.minSize),
+            isMaximized: false,
+            maximizeMode: null,
+            restoreRect,
+            snap: zone,
+          },
+          bounds,
+        );
+      }),
     );
 
     bringToFront(windowId, false);
@@ -250,10 +297,15 @@ export function useWindowManager(bounds: DesktopBounds) {
           ...getMaximizedWindowRect(bounds),
           isMaximized: true,
           maximizeMode: "manual",
-          restoreRect: {
-            position: windowState.position,
-            size: windowState.size,
-          },
+          // A tiled window restores to its size from before tiling.
+          restoreRect:
+            windowState.snap && windowState.restoreRect
+              ? windowState.restoreRect
+              : {
+                  position: windowState.position,
+                  size: windowState.size,
+                },
+          snap: null,
         };
       }),
     );
@@ -269,7 +321,11 @@ export function useWindowManager(bounds: DesktopBounds) {
     setWindows((currentWindows) =>
       currentWindows.map((windowState) =>
         windowState.id === windowId
-          ? clampWindowToBounds({ ...windowState, ...nextRect }, bounds)
+          ? clampWindowToBounds(
+              // Resizing a tile turns it back into a free-floating window.
+              windowState.snap ? { ...windowState, ...nextRect, restoreRect: null, snap: null } : { ...windowState, ...nextRect },
+              bounds,
+            )
           : windowState,
       ),
     );
@@ -373,6 +429,7 @@ export function useWindowManager(bounds: DesktopBounds) {
     openWindow,
     openFolderWindow,
     restoreWindowFromDrag,
+    snapWindow,
     toggleMaximizeWindow,
     updateWindowRect,
   };

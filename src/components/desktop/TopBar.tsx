@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MdOutlineMail } from "react-icons/md";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { Search } from "lucide-react";
 
 import { systemMenus } from "../../data/systemMenus";
 import { useLocale } from "../../i18n/locale";
 import type { DesktopMenu, WindowId } from "../../types/desktop";
 
 type TopBarProps = {
+  onOpenPalette: () => void;
   onOpenWindow: (windowId: WindowId) => void;
 };
 
@@ -26,7 +28,7 @@ function MenuItemIcon({ icon }: { icon?: DesktopMenu["items"][number]["icon"] })
   return null;
 }
 
-function TopBar({ onOpenWindow }: TopBarProps) {
+function TopBar({ onOpenPalette, onOpenWindow }: TopBarProps) {
   const { t } = useLocale();
   const [activeMenuLabel, setActiveMenuLabel] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -127,6 +129,11 @@ function TopBar({ onOpenWindow }: TopBarProps) {
           </div>
         ))}
       </div>
+      <button aria-keyshortcuts="Control+K Meta+K" className="topbar-search" onClick={onOpenPalette} type="button">
+        <Search aria-hidden="true" className="topbar-search-icon" />
+        <span className="topbar-search-label">{t("Search")}</span>
+        <kbd className="topbar-search-kbd">Ctrl K</kbd>
+      </button>
     </header>
   );
 }

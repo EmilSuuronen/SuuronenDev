@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 
 import { getInitialTerminalLines } from "../data/terminalLines";
 import { useElementSize } from "../hooks/useElementSize";
+import { terminalCommandRequests } from "../hooks/requestChannel";
 import { useLocale } from "../i18n/locale";
 import type { NoteFile, TerminalLine } from "../types/desktop";
 import { complete, noteFiles } from "./terminal/completion";
@@ -234,6 +235,17 @@ function TerminalApp({
       if (mountedRef.current) setBusy(false);
     }
   };
+
+  // Commands sent from elsewhere (the command palette) run as if typed at the prompt.
+  const requestedCommand = terminalCommandRequests.usePending();
+
+  useEffect(() => {
+    const input = requestedCommand ? terminalCommandRequests.take() : null;
+
+    if (input) {
+      void submit(input);
+    }
+  }, [requestedCommand]);
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.nativeEvent.isComposing || event.keyCode === 229) return;
