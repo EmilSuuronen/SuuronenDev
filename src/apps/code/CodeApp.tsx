@@ -1,10 +1,11 @@
-import { ChevronDown, ChevronLeft, ChevronRight, Crosshair, ExternalLink, FileCode2, FolderTree, History, RotateCcw, Search, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Crosshair, ExternalLink, FileCode2, FolderTree, History, Network, RotateCcw, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 
 import { useElementSize } from "../../hooks/useElementSize";
 import { updateLiveState, useLiveState } from "../../hooks/useLiveData";
 import { useLocale } from "../../i18n/locale";
+import ArchitectureMap from "./ArchitectureMap";
 import CodeEditor from "./CodeEditor";
 import { fetchFileAtCommit, formatRelativeDate, type FileCommit } from "./gitHistory";
 import HistoryPanel from "./HistoryPanel";
@@ -62,6 +63,7 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [resetCounts, setResetCounts] = useState<Record<string, number>>({});
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isMapOpen, setIsMapOpen] = useState(false);
   const [historyView, setHistoryView] = useState<{ commits: FileCommit[]; index: number; path: string } | null>(null);
   const [diff, setDiff] = useState<
     { content: string; original: string; sha: string } | { error: string; sha: string } | null
@@ -109,6 +111,7 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
     setActivePath(path);
     setExpanded((current) => new Set([...current, ...getAncestors(path)]));
     setStatusMessage(null);
+    setIsMapOpen(false);
     setHistoryView((current) => (current?.path === path ? null : current));
 
     if (line) {
@@ -247,6 +250,15 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
           <span>{t("Inspect")}</span>
         </button>
         <button
+          aria-pressed={isMapOpen}
+          className="code-toolbar-button"
+          onClick={() => setIsMapOpen(!isMapOpen)}
+          title={t("Architecture map")}
+          type="button"
+        >
+          <Network className="code-toolbar-icon" />
+        </button>
+        <button
           aria-pressed={isHistoryOpen}
           className="code-toolbar-button"
           onClick={() => {
@@ -284,12 +296,20 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
             {tabs.map((path) => (
               <div
                 key={path}
-                className={`code-tab ${path === activePath ? "is-active" : ""} ${live.drafts[path] !== undefined ? "is-modified" : ""}`}
+                className={`code-tab ${path === activePath && !isMapOpen ? "is-active" : ""} ${live.drafts[path] !== undefined ? "is-modified" : ""}`}
                 onAuxClick={(event) => event.button === 1 && closeTab(path)}
                 role="tab"
                 aria-selected={path === activePath}
               >
-                <button className="code-tab-label" onClick={() => setActivePath(path)} title={path} type="button">
+                <button
+                  className="code-tab-label"
+                  onClick={() => {
+                    setActivePath(path);
+                    setIsMapOpen(false);
+                  }}
+                  title={path}
+                  type="button"
+                >
                   {path.slice(path.lastIndexOf("/") + 1)}
                 </button>
                 <button
@@ -304,7 +324,9 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
             ))}
           </div>
 
-          {viewedCommit && historyView ? (
+          {isMapOpen ? (
+            <ArchitectureMap activePath={activePath} onOpen={(path) => openFile(path)} />
+          ) : viewedCommit && historyView ? (
             <div className="code-live-banner code-history-banner">
               <button
                 aria-label={t("Older commit")}
@@ -360,7 +382,7 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
             </div>
           ) : null}
 
-          {viewedCommit ? (
+          {isMapOpen ? null : viewedCommit ? (
             viewedDiff && "content" in viewedDiff ? (
               <CodeEditor
                 content={viewedDiff.content}
@@ -400,8 +422,10 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
           )}
 
           <footer className="code-statusbar">
-            <span className="code-statusbar-path">{statusMessage ?? activePath ?? ""}</span>
-            {activePath ? (
+            <span className="code-statusbar-path">
+              {isMapOpen ? t("Architecture map") : (statusMessage ?? activePath ?? "")}
+            </span>
+            {activePath && !isMapOpen ? (
               <>
                 <span>
                   {t("Ln")} {cursor.line}, {t("Col")} {cursor.column}

@@ -4435,3 +4435,179 @@ a.code-live-reset {
 .code-app.is-narrow .code-toolbar-search kbd {
   display: none;
 }
+
+.code-map {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.07) 1px, transparent 1.5px) 0 0 / 22px 22px,
+    var(--surface-dark);
+}
+
+.code-map-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.code-map-canvas:active {
+  cursor: grabbing;
+}
+
+.code-map-edge {
+  stroke: var(--text-light-soft);
+  stroke-opacity: 0.22;
+  stroke-width: 1;
+  transition: stroke-opacity 150ms ease, stroke 150ms ease;
+}
+
+.code-map-edge.is-outgoing {
+  stroke: var(--accent-strong);
+  stroke-opacity: 0.95;
+  stroke-width: 1.6;
+}
+
+.code-map-edge.is-incoming {
+  stroke: var(--candy-blue);
+  stroke-opacity: 0.95;
+  stroke-width: 1.6;
+}
+
+.code-map-edge.is-dimmed {
+  stroke-opacity: 0.05;
+}
+
+.code-map-node {
+  cursor: pointer;
+  outline: none;
+  transition: opacity 150ms ease;
+}
+
+.code-map-node circle {
+  stroke: var(--surface-dark-strong);
+  stroke-width: 2;
+  transition: stroke 150ms ease;
+}
+
+.code-map-node:hover circle,
+.code-map-node:focus-visible circle {
+  stroke: var(--text-light);
+}
+
+.code-map-node.is-active circle {
+  stroke: var(--text-light);
+  stroke-dasharray: 3 2;
+}
+
+.code-map-node.is-dimmed {
+  opacity: 0.18;
+}
+
+.code-map-label {
+  fill: var(--text-light);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: var(--surface-dark);
+  stroke-width: 3px;
+  text-anchor: middle;
+}
+
+.code-map-legend {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  max-width: calc(100% - 4rem);
+}
+
+.code-map-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--surface-dark-border);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--text-light-soft);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  cursor: default;
+}
+
+.code-map-chip.is-active {
+  border-color: var(--text-light-soft);
+  color: var(--text-light);
+}
+
+.code-map-swatch {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+}
+
+.code-map-info {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  left: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
+  color: var(--text-light-soft);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  pointer-events: none;
+}
+
+.code-map-info strong {
+  color: var(--text-light);
+}
+
+.code-map-key {
+  display: inline-block;
+  width: 0.9rem;
+  height: 2px;
+  vertical-align: middle;
+  background: var(--accent-strong);
+}
+
+.code-map-key.is-incoming {
+  background: var(--candy-blue);
+}
+
+.code-map-fit {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--surface-dark-border);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--text-light);
+  cursor: pointer;
+}
+
+.code-map-fit:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-map-edge,
+  .code-map-node,
+  .code-map-node circle {
+    transition: none;
+  }
+}

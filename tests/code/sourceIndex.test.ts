@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import test from "node:test";
+import { buildImportGraph, createLayout, getGroup } from "../../src/apps/code/importGraph";
 import { parseExportedLiteral } from "../../src/apps/code/literalParser";
 import { findClassSource, fuzzyScore, IMPORT_PATH_PATTERN, resolveImport } from "../../src/apps/code/sourceIndex";
 
@@ -63,4 +64,28 @@ test("broken live edits report the line instead of applying", () => {
   assert.match(String(!parseExportedLiteral(themes.replace('"#ff8f45"', "someVar"), "desktopThemes").ok), /true/);
   const unclosed = parseExportedLiteral("export const x = [1, 2", "x");
   assert.deepEqual(unclosed, { error: 'Unclosed "["', line: 1, ok: false });
+});
+
+test("architecture map links every source file, including lazy imports", () => {
+  const nodes = buildImportGraph(files);
+  const app = nodes.find((node) => node.id === "src/App.tsx")!;
+  assert.ok(app.imports.includes("src/apps/code/CodeApp.tsx"), "dynamic import() counts as an edge");
+  assert.ok(app.importedBy.includes("src/main.tsx"));
+  assert.deepEqual(nodes.filter((node) => !node.imports.length && !node.importedBy.length).map((node) => node.id), []);
+  assert.equal(getGroup("src/apps/antgame/engine/world.ts"), "antgame");
+  assert.equal(getGroup("src/hooks/useNotes.ts"), "hooks");
+  assert.equal(getGroup("src/App.tsx"), "core");
+});
+
+test("architecture layout settles deterministically", () => {
+  const nodes = buildImportGraph(files);
+  const run = () => {
+    const layout = createLayout(nodes);
+    let movement = Infinity;
+    for (let step = 0; step < 320; step += 1) movement = layout.step();
+    return { first: layout.positions.get("src/App.tsx")!, movement };
+  };
+  const [a, b] = [run(), run()];
+  assert.deepEqual(a.first, b.first);
+  assert.ok(a.movement < 0.5, `still moving: ${a.movement}`);
 });
