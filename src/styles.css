@@ -4300,3 +4300,138 @@ button.code-live-message {
 .code-statusbar {
   flex: 0 0 auto;
 }
+
+.code-history {
+  display: flex;
+  flex: 0 0 280px;
+  flex-direction: column;
+  min-height: 0;
+  border-left: var(--outline);
+  background: var(--panel-strong);
+}
+
+.code-app.is-narrow .code-history {
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: 2;
+  width: min(300px, 90%);
+  box-shadow: var(--pop);
+}
+
+.code-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.4rem 0.2rem 0.5rem;
+  color: var(--ink);
+}
+
+.code-history-header .code-explorer-title {
+  padding: 0 0.5rem;
+}
+
+.code-history-note {
+  margin: 0;
+  padding: 0.5rem 0.9rem;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
+
+.code-history-note p {
+  margin: 0 0 0.6rem;
+}
+
+.code-history-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.code-history .code-live-reset {
+  border: var(--outline);
+  background: var(--panel);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.code-history-list {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0.2rem 0.4rem 0.6rem;
+  overflow: auto;
+  list-style: none;
+}
+
+.code-history-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.code-history-item:hover {
+  background: var(--accent-soft);
+}
+
+.code-history-item.is-active {
+  background: var(--accent);
+}
+
+.code-history-item .code-tree-icon {
+  margin-top: 0.15rem;
+}
+
+.code-history-text {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.code-history-text strong {
+  overflow: hidden;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.code-history-text small {
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.code-history-banner {
+  background: rgba(124, 183, 255, 0.14);
+}
+
+.code-history-banner code {
+  padding: 0 0.3rem;
+  border-radius: 4px;
+  background: var(--candy-blue);
+  color: #121212;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.code-live-reset:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+a.code-live-reset {
+  text-decoration: none;
+}
+
+.code-app.is-narrow .code-toolbar-search kbd {
+  display: none;
+}

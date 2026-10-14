@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Crosshair, ExternalLink, FileCode2, FolderTree, RotateCcw, Search, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Crosshair, ExternalLink, FileCode2, FolderTree, History, RotateCcw, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 
@@ -6,6 +6,8 @@ import { useElementSize } from "../../hooks/useElementSize";
 import { updateLiveState, useLiveState } from "../../hooks/useLiveData";
 import { useLocale } from "../../i18n/locale";
 import CodeEditor from "./CodeEditor";
+import { fetchFileAtCommit, formatRelativeDate, type FileCommit } from "./gitHistory";
+import HistoryPanel from "./HistoryPanel";
 import { evaluateLiveFile, liveFiles } from "./liveFiles";
 import { sourceFiles, sourcePaths } from "./sourceFiles";
 import { findClassSource, fuzzyScore, getLanguageLabel, resolveImport, type SourceLocation } from "./sourceIndex";
@@ -59,6 +61,11 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
   const [isInspecting, setIsInspecting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [resetCounts, setResetCounts] = useState<Record<string, number>>({});
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historyView, setHistoryView] = useState<{ commits: FileCommit[]; index: number; path: string } | null>(null);
+  const [diff, setDiff] = useState<
+    { content: string; original: string; sha: string } | { error: string; sha: string } | null
+  >(null);
   const live = useLiveState();
   const liveFile = activePath ? liveFiles[activePath] : undefined;
   const activeDraft = activePath ? live.drafts[activePath] : undefined;
@@ -68,7 +75,29 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
   );
 
   const isNarrow = width > 0 && width < NARROW_WIDTH;
-  const isExplorerOpen = explorerPreference ?? !isNarrow;
+  const isExplorerOpen = (explorerPreference ?? !isNarrow) && !(isNarrow && isHistoryOpen);
+  const viewedCommit = historyView && historyView.path === activePath ? historyView.commits[historyView.index] : null;
+  const viewedDiff = diff && viewedCommit && diff.sha === viewedCommit.sha ? diff : null;
+
+  useEffect(() => {
+    if (!historyView) {
+      return undefined;
+    }
+
+    const { commits, index, path } = historyView;
+    const commit = commits[index];
+    // shortcut: the oldest listed commit diffs against an empty file, which is only right when it created the file.
+    const parent = commits[index + 1];
+    let isCurrent = true;
+
+    Promise.all([fetchFileAtCommit(commit.sha, path), parent ? fetchFileAtCommit(parent.sha, path) : ""])
+      .then(([content, original]) => isCurrent && setDiff({ content, original, sha: commit.sha }))
+      .catch((error: Error) => isCurrent && setDiff({ error: error.message, sha: commit.sha }));
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [historyView]);
 
   // Focus on open so keyboard shortcuts work without clicking into the window first.
   useEffect(() => {
@@ -80,6 +109,7 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
     setActivePath(path);
     setExpanded((current) => new Set([...current, ...getAncestors(path)]));
     setStatusMessage(null);
+    setHistoryView((current) => (current?.path === path ? null : current));
 
     if (line) {
       setJump({ line, nonce: Date.now(), path });
@@ -216,6 +246,18 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
           <Crosshair className="code-toolbar-icon" />
           <span>{t("Inspect")}</span>
         </button>
+        <button
+          aria-pressed={isHistoryOpen}
+          className="code-toolbar-button"
+          onClick={() => {
+            setIsHistoryOpen(!isHistoryOpen);
+            setHistoryView(null);
+          }}
+          title={t("Timeline")}
+          type="button"
+        >
+          <History className="code-toolbar-icon" />
+        </button>
         {activePath ? (
           <a
             className="code-toolbar-button"
@@ -262,7 +304,40 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
             ))}
           </div>
 
-          {liveFile && activePath ? (
+          {viewedCommit && historyView ? (
+            <div className="code-live-banner code-history-banner">
+              <button
+                aria-label={t("Older commit")}
+                className="code-live-reset"
+                disabled={historyView.index >= historyView.commits.length - 1}
+                onClick={() => setHistoryView({ ...historyView, index: historyView.index + 1 })}
+                type="button"
+              >
+                <ChevronLeft className="code-toolbar-icon" />
+              </button>
+              <button
+                aria-label={t("Newer commit")}
+                className="code-live-reset"
+                onClick={() =>
+                  setHistoryView(historyView.index === 0 ? null : { ...historyView, index: historyView.index - 1 })
+                }
+                type="button"
+              >
+                <ChevronRight className="code-toolbar-icon" />
+              </button>
+              <span className="code-live-message" title={viewedCommit.message}>
+                <code>{viewedCommit.sha.slice(0, 7)}</code> {viewedCommit.message.split("\n")[0]} ·{" "}
+                {formatRelativeDate(viewedCommit.date)}
+              </span>
+              <a className="code-live-reset" href={viewedCommit.url} rel="noopener noreferrer" target="_blank">
+                <ExternalLink className="code-toolbar-icon" />
+              </a>
+              <button className="code-live-reset" onClick={() => setHistoryView(null)} type="button">
+                <X className="code-toolbar-icon" />
+                <span>{t("Back to current")}</span>
+              </button>
+            </div>
+          ) : liveFile && activePath ? (
             <div className={`code-live-banner ${liveEvaluation && !liveEvaluation.ok ? "has-error" : ""}`}>
               <span className="code-live-pill">{t("live")}</span>
               {liveEvaluation && !liveEvaluation.ok ? (
@@ -285,7 +360,26 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
             </div>
           ) : null}
 
-          {activePath ? (
+          {viewedCommit ? (
+            viewedDiff && "content" in viewedDiff ? (
+              <CodeEditor
+                content={viewedDiff.content}
+                diffOriginal={viewedDiff.original}
+                documentKey={`${activePath}@${viewedDiff.sha}`}
+                editable={false}
+                jump={null}
+                onChange={() => undefined}
+                onCursorChange={(line, column) => setCursor({ column, line })}
+                onOpenImport={handleOpenImport}
+                path={activePath!}
+              />
+            ) : (
+              <div className="code-empty">
+                <p>{viewedDiff ? t("Couldn't load this version") : t("Loading version from GitHub…")}</p>
+                {viewedDiff && "error" in viewedDiff ? <p>{t(viewedDiff.error)}</p> : null}
+              </div>
+            )
+          ) : activePath ? (
             <CodeEditor
               content={activeDraft ?? sourceFiles[activePath]}
               documentKey={`${activePath}#${resetCounts[activePath] ?? 0}`}
@@ -313,11 +407,27 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
                   {t("Ln")} {cursor.line}, {t("Col")} {cursor.column}
                 </span>
                 <span>{getLanguageLabel(activePath)}</span>
-                <span>{liveFile ? t("Live") : t("Read-only")}</span>
+                <span>
+                  {viewedCommit ? `@${viewedCommit.sha.slice(0, 7)}` : liveFile ? t("Live") : t("Read-only")}
+                </span>
               </>
             ) : null}
           </footer>
         </section>
+
+        {isHistoryOpen && activePath ? (
+          <HistoryPanel
+            onClose={() => {
+              setIsHistoryOpen(false);
+              setHistoryView(null);
+            }}
+            onSelect={(commits, index) =>
+              setHistoryView(index === null ? null : { commits, index, path: activePath })
+            }
+            path={activePath}
+            selectedSha={viewedCommit?.sha ?? null}
+          />
+        ) : null}
       </div>
 
       {isPaletteOpen ? (

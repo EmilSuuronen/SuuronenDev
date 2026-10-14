@@ -1,6 +1,7 @@
 import { css } from "@codemirror/lang-css";
 import { javascript } from "@codemirror/lang-javascript";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
+import { unifiedMergeView } from "@codemirror/merge";
 import { EditorSelection, EditorState, type Extension } from "@codemirror/state";
 import { Decoration, EditorView, MatchDecorator, ViewPlugin, type DecorationSet, type ViewUpdate } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
@@ -11,6 +12,8 @@ import { IMPORT_PATH_PATTERN } from "./sourceIndex";
 
 type CodeEditorProps = {
   content: string;
+  // When set, the content is shown as a diff against this older version.
+  diffOriginal?: string;
   // Changing this reloads the document; content changes alone don't, so typing isn't reset by the parent.
   documentKey: string;
   editable: boolean;
@@ -47,6 +50,21 @@ const editorTheme = EditorView.theme(
     ".cm-searchMatch": { backgroundColor: "rgba(255, 216, 77, 0.25)" },
     ".cm-import-link": { cursor: "pointer", textDecoration: "underline dotted" },
     ".cm-import-link:hover": { textDecoration: "underline solid" },
+    ".cm-changedLine": { backgroundColor: "rgba(143, 224, 160, 0.1) !important" },
+    ".cm-changedText": { background: "rgba(143, 224, 160, 0.3) !important" },
+    ".cm-deletedChunk": { backgroundColor: "rgba(255, 107, 94, 0.12) !important" },
+    ".cm-deletedChunk .cm-deletedText": { background: "rgba(255, 107, 94, 0.32) !important" },
+    ".cm-changeGutter": { width: "3px", paddingLeft: "0" },
+    ".cm-changedLineGutter": { background: "var(--candy-green)" },
+    ".cm-deletedLineGutter": { background: "var(--candy-red)" },
+    ".cm-collapsedLines": {
+      padding: "0.3rem 1rem",
+      background: "var(--surface-dark-strong)",
+      color: "var(--text-light-soft)",
+      fontFamily: "var(--font-ui)",
+      fontSize: "0.75rem",
+    },
+    ".cm-collapsedLines:before, .cm-collapsedLines:after": { display: "none" },
   },
   { dark: true },
 );
@@ -95,7 +113,7 @@ function getLanguage(path: string): Extension {
   return [];
 }
 
-function CodeEditor({ content, documentKey, editable, jump, onChange, onCursorChange, onOpenImport, path }: CodeEditorProps) {
+function CodeEditor({ content, diffOriginal, documentKey, editable, jump, onChange, onCursorChange, onOpenImport, path }: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const changeTimeoutRef = useRef<number | undefined>(undefined);
@@ -130,6 +148,14 @@ function CodeEditor({ content, documentKey, editable, jump, onChange, onCursorCh
           editorTheme,
           syntaxHighlighting(highlightStyle),
           importLinks,
+          diffOriginal === undefined
+            ? []
+            : unifiedMergeView({
+                collapseUnchanged: { margin: 3, minSize: 6 },
+                gutter: true,
+                mergeControls: false,
+                original: diffOriginal,
+              }),
           EditorView.updateListener.of((update) => {
             if (update.selectionSet || update.docChanged) {
               const head = update.state.selection.main.head;
@@ -177,7 +203,7 @@ function CodeEditor({ content, documentKey, editable, jump, onChange, onCursorCh
     );
     view.scrollDOM.scrollTop = 0;
     callbacksRef.current.onCursorChange(1, 1);
-  }, [documentKey, editable, path]);
+  }, [diffOriginal, documentKey, editable, path]);
 
   useEffect(() => {
     const view = viewRef.current;
