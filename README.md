@@ -37,7 +37,6 @@ The Source Code app (`src/apps/code/`) is a viewer for this site's own source, b
 - **Browse:** file tree, tabs, Ctrl+P fuzzy file search, and clickable import paths (relative and `@/`).
 - **Inspect:** click Inspect, then anything on the desktop, to open the JSX line that renders it. It matches the element's CSS classes against `className` usages in the `.tsx` files and walks up to parent elements until one matches, so new components need no tagging.
 - **Live edit:** `src/data/themes.ts` and `src/data/browserSections.ts` are editable. Edits are parsed as plain data (no code is evaluated), validated, and applied to the running desktop. Invalid edits show the error line and the desktop keeps the last valid version. Edits last until reload.
-- **Timeline:** per-file commit history from the public GitHub API, with each commit shown as a diff against the previous one. Anonymous API calls are limited to 60 per hour per visitor, so responses are cached for the session and file contents come from `raw.githubusercontent.com`.
 - **Architecture map:** a force-directed graph of every import, including lazy `import()`. Hover a file for its imports and importers; click to open it.
 - **Elsewhere in the OS:** `code [FILE]` in the terminal, View source when right-clicking a window title bar, View page source on the desktop, and System > View source.
 
