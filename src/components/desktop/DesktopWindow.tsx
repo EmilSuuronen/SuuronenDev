@@ -35,6 +35,7 @@ type DesktopWindowProps = {
   onFocus: (windowId: WindowEntityId) => void;
   onMinimize: (windowId: WindowEntityId) => void;
   onRestoreFromDrag: (windowId: WindowEntityId, nextRect: WindowRect) => void;
+  onTitleContextMenu?: (windowId: WindowEntityId, x: number, y: number) => void;
   onToggleMaximize: (windowId: WindowEntityId) => void;
   onRectChange: (windowId: WindowEntityId, nextRect: WindowRect) => void;
   windowState: DesktopWindowState;
@@ -49,6 +50,7 @@ function DesktopWindow({
   onFocus,
   onMinimize,
   onRestoreFromDrag,
+  onTitleContextMenu,
   onToggleMaximize,
   onRectChange,
   windowState,
@@ -193,7 +195,17 @@ function DesktopWindow({
         }
       }}
     >
-      <header className="window-titlebar" onPointerDown={startDrag}>
+      <header
+        className="window-titlebar"
+        onContextMenu={(event) => {
+          if (onTitleContextMenu) {
+            event.preventDefault();
+            event.stopPropagation();
+            onTitleContextMenu(windowState.id, event.clientX, event.clientY);
+          }
+        }}
+        onPointerDown={startDrag}
+      >
         <div className="window-title">
           <span className="window-icon">
             <AppGlyph iconKey={windowState.icon} className="window-icon-glyph" />

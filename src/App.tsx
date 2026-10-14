@@ -22,8 +22,9 @@ import { useDesktopIcons } from "./hooks/useDesktopIcons";
 import { useNotes } from "./hooks/useNotes";
 import { useDesktopTheme } from "./hooks/useDesktopTheme";
 import { useElementSize } from "./hooks/useElementSize";
+import { getWindowSource, requestSource } from "./hooks/useSourceRequest";
 import { useWindowManager } from "./hooks/useWindowManager";
-import type { DesktopEntryId, FolderId, WindowId } from "./types/desktop";
+import type { DesktopEntryId, FolderId, WindowEntityId, WindowId } from "./types/desktop";
 import { useLocale } from "./i18n/locale";
 
 // Lazy so CodeMirror and the bundled source only load when the app is opened.
@@ -127,7 +128,11 @@ function App() {
   const { currentTheme, resetTheme, selectTheme, setThemeColor, themeOptions } = useDesktopTheme();
   const { activeFilterId, filterOptions, setActiveFilterId } = useDesktopFilter();
   const notesState = useNotes();
-  const [desktopContextMenu, setDesktopContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [desktopContextMenu, setDesktopContextMenu] = useState<{
+    windowId?: WindowEntityId;
+    x: number;
+    y: number;
+  } | null>(null);
   const [folderDialog, setFolderDialog] = useState<{ initialValue: string } | null>(null);
   const [renameDialog, setRenameDialog] = useState<
     | { kind: "folder"; folderId: FolderId; title: string }
@@ -345,6 +350,11 @@ function App() {
     );
   };
 
+  const openSource = (query: string) => {
+    requestSource(query);
+    openWindow("code");
+  };
+
   const handleCreateFolderRequest = () => {
     setDesktopContextMenu(null);
     setFolderDialog({ initialValue: t("New folder") });
@@ -455,6 +465,7 @@ function App() {
             onFocus={focusWindow}
             onMinimize={minimizeWindow}
             onRestoreFromDrag={restoreWindowFromDrag}
+            onTitleContextMenu={(windowId, x, y) => setDesktopContextMenu({ windowId, x, y })}
             onToggleMaximize={toggleMaximizeWindow}
             onRectChange={updateWindowRect}
             windowState={windowState}
@@ -476,6 +487,8 @@ function App() {
                   onOpen: (target) => {
                     if (/^https?:\/\//.test(target)) {
                       window.open(target, "_blank", "noopener,noreferrer");
+                    } else if (target.startsWith("source:")) {
+                      openSource(target.slice("source:".length));
                     } else if (target.startsWith("note:")) {
                       notesState.openNote(target as `note:${string}`);
                       openWindow("notes");
@@ -521,7 +534,32 @@ function App() {
         windows={windows}
       />
 
-      {desktopContextMenu ? (
+      {desktopContextMenu?.windowId ? (
+        <DesktopContextMenu
+          sections={[
+            {
+              items: [
+                {
+                  label: t("View source"),
+                  onSelect: () => {
+                    openSource(getWindowSource(desktopContextMenu.windowId!));
+                    setDesktopContextMenu(null);
+                  },
+                },
+                {
+                  label: t("Close window"),
+                  onSelect: () => {
+                    closeWindow(desktopContextMenu.windowId!);
+                    setDesktopContextMenu(null);
+                  },
+                },
+              ],
+            },
+          ]}
+          x={desktopContextMenu.x}
+          y={desktopContextMenu.y}
+        />
+      ) : desktopContextMenu ? (
         <DesktopContextMenu
           sections={[
             {
@@ -547,6 +585,17 @@ function App() {
                   label: t("Open Terminal"),
                   onSelect: () => {
                     openWindow("terminal");
+                    setDesktopContextMenu(null);
+                  },
+                },
+              ],
+            },
+            {
+              items: [
+                {
+                  label: t("View page source"),
+                  onSelect: () => {
+                    openSource("src/App.tsx");
                     setDesktopContextMenu(null);
                   },
                 },

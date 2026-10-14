@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 
 import { useElementSize } from "../../hooks/useElementSize";
 import { updateLiveState, useLiveState } from "../../hooks/useLiveData";
+import { takeSourceRequest, useSourceRequest } from "../../hooks/useSourceRequest";
 import { useLocale } from "../../i18n/locale";
 import ArchitectureMap from "./ArchitectureMap";
 import CodeEditor from "./CodeEditor";
@@ -11,7 +12,14 @@ import { fetchFileAtCommit, formatRelativeDate, type FileCommit } from "./gitHis
 import HistoryPanel from "./HistoryPanel";
 import { evaluateLiveFile, liveFiles } from "./liveFiles";
 import { sourceFiles, sourcePaths } from "./sourceFiles";
-import { findClassSource, fuzzyScore, getLanguageLabel, resolveImport, type SourceLocation } from "./sourceIndex";
+import {
+  findClassSource,
+  findSourcePath,
+  fuzzyScore,
+  getLanguageLabel,
+  resolveImport,
+  type SourceLocation,
+} from "./sourceIndex";
 
 const REPO_URL = "https://github.com/EmilSuuronen/SuuronenDev/blob/main";
 const DEFAULT_FILE = "src/App.tsx";
@@ -105,6 +113,25 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
   useEffect(() => {
     rootRef.current?.focus({ preventScroll: true });
   }, []);
+
+  const sourceRequest = useSourceRequest();
+
+  useEffect(() => {
+    const request = sourceRequest ? takeSourceRequest() : null;
+
+    if (!request) {
+      return;
+    }
+
+    const path = findSourcePath(request.query, sourcePaths);
+
+    if (path) {
+      openFile(path, request.line);
+    } else {
+      setStatusMessage(`${t("No source file matches")} "${request.query}"`);
+    }
+    // openFile is recreated each render; only a new request should trigger this.
+  }, [sourceRequest]);
 
   const openFile = (path: string, line?: number) => {
     setTabs((current) => (current.includes(path) ? current : [...current, path]));

@@ -67,6 +67,14 @@ export const systemMenus: DesktopMenu[] = [
         action: { type: "none" },
       },
       {
+        label: "View source",
+        description: "Browse how this desktop is built",
+        action: {
+          type: "open_window",
+          windowId: "code",
+        },
+      },
+      {
         label: "Version 1.0.0",
         description: "Current shell build",
         action: { type: "none" },

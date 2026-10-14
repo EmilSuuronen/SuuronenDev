@@ -104,6 +104,7 @@ export class VirtualFileSystem {
       "notes",
       "terminal",
       "antgame",
+      "code",
       "molkkis",
     ]) {
       files[`${HOME}/applications/${app}.desktop`] =

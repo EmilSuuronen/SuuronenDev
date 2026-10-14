@@ -17,6 +17,7 @@ export const APP_NAMES = [
   "notes",
   "terminal",
   "antgame",
+  "code",
   "molkkis",
   "applications",
   "trash",
@@ -326,7 +327,7 @@ export const builtins: Record<string, CommandHandler> = {
   logout: (args, stdin, context) => builtins.exit(args, stdin, context),
   apps: () =>
     ok(
-      "browser       Portfolio, tech stack, and contact\ncalculator    Quick math\nsettings      Themes and personalization\nnotes         Desktop text editor\nterminal      This shell\nantgame       Ant Exterminator\nmolkkis       Mölkkis (opens in a new tab)\napplications  Application folder\ntrash         Desktop trash\n\nLaunch with: open NAME\n",
+      "browser       Portfolio, tech stack, and contact\ncalculator    Quick math\nsettings      Themes and personalization\nnotes         Desktop text editor\nterminal      This shell\nantgame       Ant Exterminator\ncode          Source Code: this desktop's own source\nmolkkis       Mölkkis (opens in a new tab)\napplications  Application folder\ntrash         Desktop trash\n\nLaunch with: open NAME\n",
     ),
   open: (args, _stdin, context) => {
     if (args.length !== 1) throw new Error("usage: open APP|FILE|URL");
@@ -357,6 +358,11 @@ export const builtins: Record<string, CommandHandler> = {
     return ok("", [{ type: "pager", content }]);
   },
   "xdg-open": (args, stdin, context) => builtins.open(args, stdin, context),
+  // The Source Code app resolves FILE itself (fuzzy), since the bundled source isn't loaded here.
+  code: (args) => {
+    if (args.length > 1) throw new Error("usage: code [FILE]");
+    return ok("", [{ type: "open", target: args.length ? `source:${args[0]}` : "code" }]);
+  },
   notes: (_args, _stdin, context) =>
     ok(
       context.notes.length

@@ -3,7 +3,8 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import test from "node:test";
 import { buildImportGraph, createLayout, getGroup } from "../../src/apps/code/importGraph";
 import { parseExportedLiteral } from "../../src/apps/code/literalParser";
-import { findClassSource, fuzzyScore, IMPORT_PATH_PATTERN, resolveImport } from "../../src/apps/code/sourceIndex";
+import { findClassSource, findSourcePath, fuzzyScore, IMPORT_PATH_PATTERN, resolveImport } from "../../src/apps/code/sourceIndex";
+import { Shell } from "../../src/apps/terminal/shell";
 
 const files: Record<string, string> = {};
 const walk = (directory: string) =>
@@ -88,4 +89,21 @@ test("architecture layout settles deterministically", () => {
   const [a, b] = [run(), run()];
   assert.deepEqual(a.first, b.first);
   assert.ok(a.movement < 0.5, `still moving: ${a.movement}`);
+});
+
+test("source lookups prefer exact paths, then the closest file name", () => {
+  const paths = Object.keys(files);
+  assert.equal(findSourcePath("src/App.tsx", paths), "src/App.tsx");
+  assert.equal(findSourcePath("./src/App.tsx", paths), "src/App.tsx");
+  assert.equal(findSourcePath("taskbar", paths), "src/components/desktop/Taskbar.tsx");
+  assert.equal(findSourcePath("qqqqzzz", paths), null);
+});
+
+test("terminal `code` opens the Source Code app, optionally at a file", async () => {
+  const shell = new Shell();
+  assert.deepEqual((await shell.execute("code")).effects, [{ type: "open", target: "code" }]);
+  assert.deepEqual((await shell.execute("code Taskbar")).effects, [{ type: "open", target: "source:Taskbar" }]);
+  assert.deepEqual((await shell.execute("open code")).effects, [{ type: "open", target: "code" }]);
+  const usage = (await shell.execute("code a b")).lines.map((line) => line.value).join("\n");
+  assert.match(usage, /usage: code \[FILE\]/);
 });

@@ -80,6 +80,22 @@ export function fuzzyScore(query: string, path: string) {
   return score + (baseName.includes(needle) ? 10 : 0) - haystack.length * 0.01;
 }
 
+// Exact path first, then the best loose match, so `code taskbar` finds src/components/desktop/Taskbar.tsx.
+export function findSourcePath(query: string, paths: string[]) {
+  const normalized = query.trim().replace(/^\.\//, "");
+
+  if (paths.includes(normalized)) {
+    return normalized;
+  }
+
+  const best = paths
+    .map((path) => ({ path, score: fuzzyScore(normalized, path) }))
+    .filter((result) => result.score >= 0)
+    .sort((left, right) => right.score - left.score)[0];
+
+  return best?.path ?? null;
+}
+
 export function getLanguageLabel(path: string) {
   const extension = path.slice(path.lastIndexOf(".") + 1);
   const labels: Record<string, string> = {

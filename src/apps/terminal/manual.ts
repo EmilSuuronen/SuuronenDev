@@ -67,7 +67,8 @@ export const manuals: Record<string, string> = {
   exit: "exit [STATUS]\nClose the terminal window. Files and history remain saved. `logout` also closes it.",
   logout: "logout\nClose the terminal window.",
   apps: "apps\nList desktop applications. Launch one using `open NAME`.",
-  open: "open APP|FILE|URL\nLaunch browser, calculator, settings, notes, terminal, antgame, molkkis, applications or trash. Open a .desktop launcher, a desktop Note, or read a virtual file in the pager. HTTPS links open in a new browser tab.\nExamples: open antgame; open Notes/todo.txt; open https://github.com/EmilSuuronen",
+  open: "open APP|FILE|URL\nLaunch browser, calculator, settings, notes, terminal, antgame, code, molkkis, applications or trash. Open a .desktop launcher, a desktop Note, or read a virtual file in the pager. HTTPS links open in a new browser tab.\nExamples: open antgame; open Notes/todo.txt; open https://github.com/EmilSuuronen",
+  code: "code [FILE]\nOpen the Source Code app, optionally at a file of this desktop's source. FILE is matched loosely, so a partial name works.\nExamples: code; code Taskbar; code src/App.tsx",
   "xdg-open": "xdg-open APP|FILE|URL\nAlias for the desktop's open command.",
   notes:
     "notes\nList desktop Notes. Read with cat ~/Notes/NAME, or edit using open ~/Notes/NAME.",
@@ -93,5 +94,5 @@ export function helpText(command?: string) {
     return Object.prototype.hasOwnProperty.call(manuals, command)
       ? `${manuals[command]}\n`
       : null;
-  return "Available commands (help COMMAND for usage, man intro for a tour):\n\nFiles       ls  cd  pwd  tree  find  cat  stat  du\nCreate      mkdir  touch  cp  mv  rm  rmdir  nano\nText        echo  printf  head  tail  grep  wc  sort  uniq\n            cut  tr  rev  base64  seq  less  more\nShell       history  alias  unalias  env  printenv  export\n            unset  type  which  test  true  false  sleep\nSystem      whoami  id  hostname  uname  date  uptime  ps\nDesktop     apps  open  xdg-open  notes  contact  neofetch\nSession     clear  reset  logo  exit  logout\nDiscover    fortune  cowsay  coffee  adventure\n\nUse pipes (|), redirects (> >> <), quotes, variables, && and ||.\nTab completes; Up/Down recalls; Ctrl+R searches; Ctrl+C cancels.\nHome files and history are saved in this browser. Try ls -a.\n";
+  return "Available commands (help COMMAND for usage, man intro for a tour):\n\nFiles       ls  cd  pwd  tree  find  cat  stat  du\nCreate      mkdir  touch  cp  mv  rm  rmdir  nano\nText        echo  printf  head  tail  grep  wc  sort  uniq\n            cut  tr  rev  base64  seq  less  more\nShell       history  alias  unalias  env  printenv  export\n            unset  type  which  test  true  false  sleep\nSystem      whoami  id  hostname  uname  date  uptime  ps\nDesktop     apps  open  xdg-open  code  notes  contact  neofetch\nSession     clear  reset  logo  exit  logout\nDiscover    fortune  cowsay  coffee  adventure\n\nUse pipes (|), redirects (> >> <), quotes, variables, && and ||.\nTab completes; Up/Down recalls; Ctrl+R searches; Ctrl+C cancels.\nHome files and history are saved in this browser. Try ls -a.\n";
 }
