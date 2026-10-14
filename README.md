@@ -30,9 +30,17 @@ Home files and up to 500 history entries persist in this browser under `suuronen
 
 This is a browser sandbox, not a remote shell or native Ubuntu installation. It never executes host commands. System files are read-only; writes have file-count and byte limits. `man intro` documents supported syntax and limits, including the absence of native binaries, package installation, job control, and shell scripts.
 
-## Boot and text mode
+## Routes, boot and text mode
 
-The first visit in a browser session plays a short CRT boot, then a boot manager that offers the full **Desktop** or **Text mode**, a single-page portfolio (about, projects, stack, contact) in the same terminal style. The highlighted entry boots after 10 seconds unless the visitor touches the menu. The pick is remembered for the session, so reloads skip the boot, and it becomes the default next visit. `reboot` in the terminal and the links at the bottom of text mode switch between them. Projects shown in text mode live in `src/data/projects.ts`.
+| URL | Shows |
+| --- | --- |
+| `/` | CRT boot, then a boot manager offering **Desktop** or **Text mode** |
+| `/desktop` | The desktop (a short load screen on the first visit of a session) |
+| `/text` | Single-page portfolio (about, projects, stack, contact) in the boot screen's terminal style |
+
+Routing uses the History API, so links, reloads and back/forward work. GitHub Pages has no SPA fallback, so the build copies `index.html` into `desktop/` and `text/` (and `404.html`) via a small plugin in `vite.config.ts`; add new routes there too.
+
+In the boot manager, the highlighted entry boots after 10 seconds unless the visitor touches the menu. The pick is remembered for the session (returning to `/` goes straight to it) and preselected on the next visit. `reboot` in the terminal returns to `/`; text mode links to the desktop, and the desktop's System menu links to text mode. Projects shown in text mode live in `src/data/projects.ts`.
 
 ## Source Code app
 

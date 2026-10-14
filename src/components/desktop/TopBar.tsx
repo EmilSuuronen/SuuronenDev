@@ -89,8 +89,8 @@ function TopBar({ onOpenWindow }: TopBarProps) {
                       key={`${menu.label}-${item.label}`}
                       className="topbar-menu-item"
                       href={item.href}
-                      target={item.href.startsWith("mailto:") ? undefined : "_blank"}
-                      rel={item.href.startsWith("mailto:") ? undefined : "noreferrer"}
+                      target={item.href.startsWith("http") ? "_blank" : undefined}
+                      rel={item.href.startsWith("http") ? "noreferrer" : undefined}
                       onClick={() => setActiveMenuLabel(null)}
                     >
                       <span className="topbar-menu-item-main">

@@ -75,6 +75,12 @@ export const systemMenus: DesktopMenu[] = [
         },
       },
       {
+        label: "Text mode",
+        description: "Simple one-page portfolio",
+        href: "/text",
+        action: { type: "none" },
+      },
+      {
         label: "Version 1.0.0",
         description: "Current shell build",
         action: { type: "none" },

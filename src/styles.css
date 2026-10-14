@@ -4783,6 +4783,16 @@ button.code-live-message {
   padding: clamp(1.5rem, 6vh, 4rem) 0 4rem;
 }
 
+.textmode-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px dashed var(--accent-soft);
+}
+
 .textmode-section {
   margin: 0 0 2.2rem;
   animation: textmode-type 320ms steps(6) var(--reveal-delay, 0ms) both;

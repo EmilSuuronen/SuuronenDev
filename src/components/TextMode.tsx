@@ -7,8 +7,7 @@ import { techStackGroups } from "../data/techStackGroups";
 import { useLocale } from "../i18n/locale";
 
 type TextModeProps = {
-  onLaunchDesktop: () => void;
-  onReboot: () => void;
+  onOpenDesktop: () => void;
 };
 
 function Command({ children, id }: { children: ReactNode; id: string }) {
@@ -22,13 +21,29 @@ function Command({ children, id }: { children: ReactNode; id: string }) {
 // Sections type in one after another; delays stay short so the page is readable almost immediately.
 const reveal = (index: number) => ({ "--reveal-delay": `${index * 90}ms` }) as CSSProperties;
 
-function TextMode({ onLaunchDesktop, onReboot }: TextModeProps) {
+function TextMode({ onOpenDesktop }: TextModeProps) {
   const { t } = useLocale();
   const about = browserSections[0];
 
   return (
     <main className="textmode">
       <div className="textmode-page">
+        <nav aria-label={t("Site")} className="textmode-nav">
+          <span className="textmode-dim">suuronen.dev/text</span>
+          <a
+            className="textmode-link"
+            href="/desktop"
+            onClick={(event) => {
+              // Plain clicks boot the desktop in place; modified clicks keep normal link behaviour.
+              if (!event.metaKey && !event.ctrlKey && !event.shiftKey && event.button === 0) {
+                event.preventDefault();
+                onOpenDesktop();
+              }
+            }}
+          >
+            [{t("desktop")}]
+          </a>
+        </nav>
         <header className="textmode-section" style={reveal(0)}>
           <Command id="textmode-whoami">whoami</Command>
           <h1 className="textmode-name">Emil Suuronen</h1>
@@ -97,20 +112,8 @@ function TextMode({ onLaunchDesktop, onReboot }: TextModeProps) {
           </ul>
         </section>
 
-        <section aria-labelledby="textmode-startx" className="textmode-section" style={reveal(4)}>
-          <Command id="textmode-startx">startx</Command>
-          <p>{t("This page is the short version. The desktop has windows, a working shell, games and the site's own source code.")}</p>
-          <p className="textmode-links">
-            <button className="textmode-link" onClick={onLaunchDesktop} type="button">
-              [{t("boot desktop")}]
-            </button>
-            <button className="textmode-link" onClick={onReboot} type="button">
-              [{t("reboot")}]
-            </button>
-          </p>
-        </section>
 
-        <p aria-hidden="true" className="textmode-section textmode-command" style={reveal(5)}>
+        <p aria-hidden="true" className="textmode-section textmode-command" style={reveal(4)}>
           <span className="textmode-prompt">emil@suuronen.dev:~$</span> <span className="boot-cursor" />
         </p>
       </div>
