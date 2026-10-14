@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "node --import ./scripts/register-typescript.mjs --test tests/terminal/*.test.ts",
+    "test": "node --import ./scripts/register-typescript.mjs --test tests/*/*.test.ts",
     "dev": "vite",
     "build": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json && vite build",
     "preview": "vite preview"

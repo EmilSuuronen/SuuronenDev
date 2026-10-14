@@ -38,7 +38,7 @@ jobs:
       - name: Build site
         run: npm run build
 
-      - name: Test terminal
+      - name: Run tests
         run: npm test
 
       - name: Upload Pages artifact
