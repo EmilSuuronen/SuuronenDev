@@ -1,10 +1,12 @@
-import { ChevronDown, ChevronRight, Crosshair, ExternalLink, FileCode2, FolderTree, Search, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Crosshair, ExternalLink, FileCode2, FolderTree, RotateCcw, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 
 import { useElementSize } from "../../hooks/useElementSize";
+import { updateLiveState, useLiveState } from "../../hooks/useLiveData";
 import { useLocale } from "../../i18n/locale";
 import CodeEditor from "./CodeEditor";
+import { evaluateLiveFile, liveFiles } from "./liveFiles";
 import { sourceFiles, sourcePaths } from "./sourceFiles";
 import { findClassSource, fuzzyScore, getLanguageLabel, resolveImport, type SourceLocation } from "./sourceIndex";
 
@@ -56,9 +58,22 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isInspecting, setIsInspecting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [resetCounts, setResetCounts] = useState<Record<string, number>>({});
+  const live = useLiveState();
+  const liveFile = activePath ? liveFiles[activePath] : undefined;
+  const activeDraft = activePath ? live.drafts[activePath] : undefined;
+  const liveEvaluation = useMemo(
+    () => (liveFile && activeDraft !== undefined ? evaluateLiveFile(liveFile, activeDraft) : null),
+    [activeDraft, liveFile],
+  );
 
   const isNarrow = width > 0 && width < NARROW_WIDTH;
   const isExplorerOpen = explorerPreference ?? !isNarrow;
+
+  // Focus on open so keyboard shortcuts work without clicking into the window first.
+  useEffect(() => {
+    rootRef.current?.focus({ preventScroll: true });
+  }, []);
 
   const openFile = (path: string, line?: number) => {
     setTabs((current) => (current.includes(path) ? current : [...current, path]));
@@ -109,6 +124,32 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
     }
   };
 
+  const handleEdit = (path: string, text: string) => {
+    const file = liveFiles[path];
+
+    if (!file) {
+      return;
+    }
+
+    const evaluation = evaluateLiveFile(file, text);
+    updateLiveState((current) => ({
+      drafts: { ...current.drafts, [path]: text },
+      values: evaluation.ok ? { ...current.values, [file.key]: evaluation.value } : current.values,
+    }));
+  };
+
+  const resetLiveFile = (path: string) => {
+    const file = liveFiles[path];
+    updateLiveState((current) => {
+      const { [path]: _removedDraft, ...drafts } = current.drafts;
+      const { [file.key]: _removedValue, ...values } = current.values;
+      return { drafts, values };
+    });
+    setResetCounts((current) => ({ ...current, [path]: (current[path] ?? 0) + 1 }));
+    // The Reset button unmounts, so keep focus inside the app for shortcuts.
+    rootRef.current?.focus({ preventScroll: true });
+  };
+
   const handleKeyDown = (event: ReactKeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "p") {
       event.preventDefault();
@@ -141,6 +182,7 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
                 <FileCode2 className="code-tree-icon" />
               )}
               <span>{name}</span>
+              {liveFiles[child.path] ? <em className="code-live-badge">{t("live")}</em> : null}
             </button>
             {isFolder && isOpen ? <ul>{renderTree(child, depth + 1)}</ul> : null}
           </li>
@@ -148,7 +190,7 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
       });
 
   return (
-    <div ref={rootRef} className={`code-app ${isNarrow ? "is-narrow" : ""}`} onKeyDown={handleKeyDown}>
+    <div ref={rootRef} className={`code-app ${isNarrow ? "is-narrow" : ""}`} onKeyDown={handleKeyDown} tabIndex={-1}>
       <header className="code-toolbar">
         <button
           aria-pressed={isExplorerOpen}
@@ -200,7 +242,7 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
             {tabs.map((path) => (
               <div
                 key={path}
-                className={`code-tab ${path === activePath ? "is-active" : ""}`}
+                className={`code-tab ${path === activePath ? "is-active" : ""} ${live.drafts[path] !== undefined ? "is-modified" : ""}`}
                 onAuxClick={(event) => event.button === 1 && closeTab(path)}
                 role="tab"
                 aria-selected={path === activePath}
@@ -220,10 +262,36 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
             ))}
           </div>
 
+          {liveFile && activePath ? (
+            <div className={`code-live-banner ${liveEvaluation && !liveEvaluation.ok ? "has-error" : ""}`}>
+              <span className="code-live-pill">{t("live")}</span>
+              {liveEvaluation && !liveEvaluation.ok ? (
+                <button
+                  className="code-live-message"
+                  onClick={() => setJump({ line: liveEvaluation.line, nonce: Date.now(), path: activePath })}
+                  type="button"
+                >
+                  {t("Line")} {liveEvaluation.line}: {liveEvaluation.error}. {t("The desktop keeps the last valid version.")}
+                </button>
+              ) : (
+                <span className="code-live-message">{t(liveFile.hint)}</span>
+              )}
+              {activeDraft !== undefined ? (
+                <button className="code-live-reset" onClick={() => resetLiveFile(activePath)} type="button">
+                  <RotateCcw className="code-toolbar-icon" />
+                  <span>{t("Reset")}</span>
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+
           {activePath ? (
             <CodeEditor
-              content={sourceFiles[activePath]}
+              content={activeDraft ?? sourceFiles[activePath]}
+              documentKey={`${activePath}#${resetCounts[activePath] ?? 0}`}
+              editable={Boolean(liveFile)}
               jump={jump}
+              onChange={handleEdit}
               onCursorChange={(line, column) => setCursor({ column, line })}
               onOpenImport={handleOpenImport}
               path={activePath}
@@ -245,7 +313,7 @@ function CodeApp({ onFocusSelf }: CodeAppProps) {
                   {t("Ln")} {cursor.line}, {t("Col")} {cursor.column}
                 </span>
                 <span>{getLanguageLabel(activePath)}</span>
-                <span>{t("Read-only")}</span>
+                <span>{liveFile ? t("Live") : t("Read-only")}</span>
               </>
             ) : null}
           </footer>

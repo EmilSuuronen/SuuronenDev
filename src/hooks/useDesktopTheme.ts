@@ -5,6 +5,7 @@ import {
   desktopThemes,
   type DesktopTheme,
 } from "../data/themes";
+import { useLiveState } from "./useLiveData";
 
 const STORAGE_KEY = "suuronen.desktop.theme.v2";
 
@@ -68,13 +69,15 @@ export function useDesktopTheme(): ThemeState {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(currentTheme));
   }, [currentTheme]);
 
-  const themeOptions = useMemo(() => desktopThemes, []);
+  const liveThemes = useLiveState().values.themes;
+  const themeOptions = useMemo(() => liveThemes ?? desktopThemes, [liveThemes]);
 
   return {
-    currentTheme,
+    // Live edits from the Source Code app apply on top of the stored theme without being persisted.
+    currentTheme: liveThemes?.find((theme) => theme.id === currentTheme.id) ?? currentTheme,
     themeOptions,
     selectTheme: (themeId) => {
-      const nextTheme = desktopThemes.find((theme) => theme.id === themeId);
+      const nextTheme = themeOptions.find((theme) => theme.id === themeId);
 
       if (nextTheme) {
         setCurrentTheme(nextTheme);

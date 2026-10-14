@@ -18,7 +18,8 @@ import BrowserLoading from "../components/browser/BrowserLoading";
 import BrowserPixelCat from "../components/browser/BrowserPixelCat";
 import BrowserTechStack from "../components/browser/BrowserTechStack";
 import BrowserUnavailable from "../components/browser/BrowserUnavailable";
-import { browserSections } from "../data/browserSections";
+import { browserSections as shippedBrowserSections } from "../data/browserSections";
+import { useLiveState } from "../hooks/useLiveData";
 import { contactLinks } from "../data/contactLinks";
 import { useLocale } from "../i18n/locale";
 
@@ -93,7 +94,7 @@ function normalizeAddressInput(value: string) {
     .replace(/^\/+/, "")
     .replace(/\/+$/, "");
 
-  if (browserSections.some((section) => section.id === normalizedSectionId)) {
+  if (shippedBrowserSections.some((section) => section.id === normalizedSectionId)) {
     return { kind: "internal" as const, sectionId: normalizedSectionId };
   }
 
@@ -130,6 +131,7 @@ function getContactIcon(type: "email" | "github" | "linkedin") {
 
 function BrowserApp() {
   const { t } = useLocale();
+  const browserSections = useLiveState().values.browserSections ?? shippedBrowserSections;
   const defaultSectionId = browserSections[0].id;
   const loadingIframeRef = useRef<HTMLIFrameElement | null>(null);
   const iframeLoadStateRef = useRef<{ tabId: string | null; url: string | null; loaded: boolean }>({
@@ -152,7 +154,7 @@ function BrowserApp() {
       browserSections.find((section) => section.id === activeSectionId) ??
       browserSections.find((section) => section.id === defaultSectionId) ??
       browserSections[0],
-    [activeSectionId, defaultSectionId],
+    [activeSectionId, browserSections, defaultSectionId],
   );
   const isExternalPage = pageState.kind === "external";
   const canCloseTabs = tabs.length > 1;

@@ -11,8 +11,12 @@ import { IMPORT_PATH_PATTERN } from "./sourceIndex";
 
 type CodeEditorProps = {
   content: string;
+  // Changing this reloads the document; content changes alone don't, so typing isn't reset by the parent.
+  documentKey: string;
+  editable: boolean;
   jump: { line: number; nonce: number; path: string } | null;
   onCursorChange: (line: number, column: number) => void;
+  onChange: (path: string, text: string) => void;
   onOpenImport: (specifier: string) => void;
   path: string;
 };
@@ -91,17 +95,19 @@ function getLanguage(path: string): Extension {
   return [];
 }
 
-function CodeEditor({ content, jump, onCursorChange, onOpenImport, path }: CodeEditorProps) {
+function CodeEditor({ content, documentKey, editable, jump, onChange, onCursorChange, onOpenImport, path }: CodeEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
-  const callbacksRef = useRef({ onCursorChange, onOpenImport });
-  callbacksRef.current = { onCursorChange, onOpenImport };
+  const changeTimeoutRef = useRef<number | undefined>(undefined);
+  const callbacksRef = useRef({ content, onChange, onCursorChange, onOpenImport });
+  callbacksRef.current = { content, onChange, onCursorChange, onOpenImport };
 
   useEffect(() => {
     const view = new EditorView({ parent: containerRef.current! });
     viewRef.current = view;
 
     return () => {
+      window.clearTimeout(changeTimeoutRef.current);
       view.destroy();
       viewRef.current = null;
     };
@@ -116,10 +122,10 @@ function CodeEditor({ content, jump, onCursorChange, onOpenImport, path }: CodeE
 
     view.setState(
       EditorState.create({
-        doc: content,
+        doc: callbacksRef.current.content,
         extensions: [
           basicSetup,
-          EditorState.readOnly.of(true),
+          EditorState.readOnly.of(!editable),
           getLanguage(path),
           editorTheme,
           syntaxHighlighting(highlightStyle),
@@ -129,6 +135,14 @@ function CodeEditor({ content, jump, onCursorChange, onOpenImport, path }: CodeE
               const head = update.state.selection.main.head;
               const line = update.state.doc.lineAt(head);
               callbacksRef.current.onCursorChange(line.number, head - line.from + 1);
+            }
+
+            if (update.docChanged) {
+              window.clearTimeout(changeTimeoutRef.current);
+              changeTimeoutRef.current = window.setTimeout(
+                () => callbacksRef.current.onChange(path, update.state.doc.toString()),
+                120,
+              );
             }
           }),
           EditorView.domEventHandlers({
@@ -161,8 +175,9 @@ function CodeEditor({ content, jump, onCursorChange, onOpenImport, path }: CodeE
         ],
       }),
     );
+    view.scrollDOM.scrollTop = 0;
     callbacksRef.current.onCursorChange(1, 1);
-  }, [content, path]);
+  }, [documentKey, editable, path]);
 
   useEffect(() => {
     const view = viewRef.current;
