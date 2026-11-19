@@ -14,6 +14,22 @@ export const projects: Project[] = [
     links: [{ label: "source", href: "https://github.com/EmilSuuronen/SuuronenDev" }],
   },
   {
+    name: "Poplio",
+    description:
+      "One shared place for family and friends: a calendar, repeating tasks, a shopping list, chat and a fridge door for drawings that is wiped at midnight. Installs like an app and sends push notifications.",
+    stack: "SvelteKit · TypeScript · SQLite · Fly.io",
+    links: [{ label: "open", href: "https://poplio.suuronen.dev" }],
+  },
+  {
+    name: "Discis",
+    description: "Disc golf scorecard and course finder that keeps working offline on the course.",
+    stack: "React · Vite · PWA",
+    links: [
+      { label: "open", href: "https://discis.suuronen.dev" },
+      { label: "source", href: "https://github.com/EmilSuuronen/discis" },
+    ],
+  },
+  {
     name: "Mölkkis",
     description: "Mölkkis web application.",
     stack: "JavaScript",

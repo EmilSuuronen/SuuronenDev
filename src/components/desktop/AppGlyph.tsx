@@ -1,6 +1,15 @@
 import { Calculator, CodeXml, FileText, FolderClosed, Globe2, NotebookPen, ScanFace, Settings2, Trash2 } from "lucide-react";
+import discisIcon from "../../res/discis-192.png";
 import molkkisIcon from "../../res/icon-192.png";
+import poplioIcon from "../../res/poplio-192.png";
 import type { DesktopIconKey } from "../../types/desktop";
+
+// Projects that live on their own sites wear their own app icon.
+const projectIcons: Partial<Record<DesktopIconKey, string>> = {
+  discis: discisIcon,
+  molkkis: molkkisIcon,
+  poplio: poplioIcon,
+};
 
 type AppGlyphProps = {
   iconKey: DesktopIconKey;
@@ -16,10 +25,11 @@ function AppGlyph({ iconKey, className = "" }: AppGlyphProps) {
     );
   }
 
-  if (iconKey === "molkkis") {
+  const projectIcon = projectIcons[iconKey];
+  if (projectIcon) {
     return (
-      <span className={`app-glyph app-glyph--molkkis ${className}`.trim()} aria-hidden="true">
-        <img className="app-glyph-molkkis-image" src={molkkisIcon} alt="" />
+      <span className={`app-glyph app-glyph--${iconKey} ${className}`.trim()} aria-hidden="true">
+        <img className="app-glyph-molkkis-image" src={projectIcon} alt="" />
       </span>
     );
   }

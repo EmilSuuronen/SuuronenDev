@@ -542,7 +542,7 @@ function App({ onReboot, onTextMode, theme }: AppProps) {
                     } else if (target.startsWith("note:")) {
                       notesState.openNote(target as `note:${string}`);
                       openWindow("notes");
-                    } else if (target === "applications" || target === "trash" || target === "molkkis") {
+                    } else if (target === "applications" || target === "trash" || target === "molkkis" || target === "poplio" || target === "discis") {
                       openDesktopEntry(target);
                     } else {
                       openWindow(target as WindowId);

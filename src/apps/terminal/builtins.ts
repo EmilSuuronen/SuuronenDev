@@ -19,6 +19,8 @@ export const APP_NAMES = [
   "antgame",
   "code",
   "molkkis",
+  "poplio",
+  "discis",
   "applications",
   "trash",
 ];
