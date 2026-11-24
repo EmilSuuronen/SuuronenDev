@@ -4696,6 +4696,7 @@ button.code-live-message {
   padding: 1px 9px;
   border: 0;
   background: transparent;
+  text-decoration: none;
   cursor: pointer;
 }
 

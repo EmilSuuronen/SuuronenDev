@@ -34,7 +34,9 @@ function SessionRoot() {
   }, [page]);
 
   const navigate = (next: TextModePage) => {
-    window.history.pushState(null, "", next);
+    if (next !== page) {
+      window.history.pushState(null, "", next);
+    }
     setPage(next);
   };
 

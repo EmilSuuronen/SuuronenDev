@@ -96,6 +96,7 @@ function TextMode({ onNavigate, onReboot, page }: TextModeProps) {
       return;
     }
     event.preventDefault();
+    setMenu(null);
     onNavigate(next);
   };
 
@@ -134,6 +135,14 @@ function TextMode({ onNavigate, onReboot, page }: TextModeProps) {
           </span>
         </div>
         <nav ref={menubarRef} aria-label={t("Site")} className="textmode-menubar">
+          <a
+            aria-current={page === "/projects" ? "page" : undefined}
+            className="textmode-menu-button"
+            href="/projects"
+            onClick={navigate("/projects")}
+          >
+            {t("Projects")}
+          </a>
           <div className="textmode-menu">
             {menuButton("contact", "Contact")}
             {menu === "contact" ? (
