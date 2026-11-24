@@ -4509,13 +4509,107 @@ button.code-live-message {
   position: fixed;
   inset: 0;
   overflow-y: auto;
-  background: radial-gradient(ellipse at center, #14110d 0%, #070605 70%, #000 100%) fixed;
+  background:
+    linear-gradient(#c0c0c0 2px, #808080 2px 3px, #404040 3px) 0 100% / 100% 4px no-repeat border-box,
+    linear-gradient(90deg, #dfdfdf 1px, #fff 1px 2px, #c0c0c0 2px) 0 0 / 4px 100% no-repeat border-box,
+    radial-gradient(ellipse at center, #14110d 0%, #070605 70%, #000 100%) fixed;
   color: var(--accent-strong);
   font-family: var(--font-mono);
   font-size: clamp(13px, 3.4vw, 15px);
   line-height: 1.65;
   text-shadow: 0 0 5px var(--accent-soft);
-  scrollbar-color: var(--accent) #0b0906;
+  /* Raised window edges on the left and bottom, painted into a transparent border */
+  border: solid transparent;
+  border-width: 0 0 4px 4px;
+}
+
+/* Windows 98 scrollbars, for the page and for less/nano in the terminal. */
+.textmode,
+.textmode .terminal-screen,
+.textmode textarea {
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+}
+
+/* Firefox can't draw the buttons, so it gets the colours only. */
+@supports not selector(::-webkit-scrollbar) {
+  .textmode,
+  .textmode .terminal-screen,
+  .textmode textarea {
+    scrollbar-color: #c0c0c0 #dfdfdf;
+  }
+}
+
+.textmode::-webkit-scrollbar,
+.textmode .terminal-screen::-webkit-scrollbar,
+.textmode textarea::-webkit-scrollbar {
+  width: 17px;
+  height: 17px;
+}
+
+/* A fine white and gray checker, as in Windows 98 */
+.textmode::-webkit-scrollbar-track,
+.textmode .terminal-screen::-webkit-scrollbar-track,
+.textmode textarea::-webkit-scrollbar-track {
+  background: repeating-conic-gradient(#fff 0 25%, #c0c0c0 0 50%) 0 0 / 2px 2px;
+}
+
+.textmode::-webkit-scrollbar-thumb,
+.textmode .terminal-screen::-webkit-scrollbar-thumb,
+.textmode textarea::-webkit-scrollbar-thumb,
+.textmode::-webkit-scrollbar-button:single-button,
+.textmode .terminal-screen::-webkit-scrollbar-button:single-button,
+.textmode textarea::-webkit-scrollbar-button:single-button {
+  border: 2px solid;
+  border-color: #fff #404040 #404040 #fff;
+  border-radius: 0;
+  background-color: #c0c0c0;
+}
+
+.textmode::-webkit-scrollbar-thumb,
+.textmode .terminal-screen::-webkit-scrollbar-thumb,
+.textmode textarea::-webkit-scrollbar-thumb {
+  min-height: 24px;
+}
+
+.textmode::-webkit-scrollbar-button:single-button,
+.textmode .terminal-screen::-webkit-scrollbar-button:single-button,
+.textmode textarea::-webkit-scrollbar-button:single-button {
+  width: 17px;
+  height: 17px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.textmode::-webkit-scrollbar-button:single-button:active,
+.textmode .terminal-screen::-webkit-scrollbar-button:single-button:active,
+.textmode textarea::-webkit-scrollbar-button:single-button:active {
+  border-color: #404040 #fff #fff #404040;
+}
+
+.textmode::-webkit-scrollbar-button:single-button:vertical:decrement,
+.textmode .terminal-screen::-webkit-scrollbar-button:single-button:vertical:decrement,
+.textmode textarea::-webkit-scrollbar-button:single-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' shape-rendering='crispEdges'%3E%3Cpath d='M3 0h1v1h1v1h1v1h1v1H0V3h1V2h1V1h1z'/%3E%3C/svg%3E");
+}
+
+.textmode::-webkit-scrollbar-button:single-button:vertical:increment,
+.textmode .terminal-screen::-webkit-scrollbar-button:single-button:vertical:increment,
+.textmode textarea::-webkit-scrollbar-button:single-button:vertical:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' shape-rendering='crispEdges'%3E%3Cpath d='M0 0h7v1H6v1H5v1H4v1H3V3H2V2H1V1H0z'/%3E%3C/svg%3E");
+}
+
+/* nano scrolls sideways too */
+.textmode textarea::-webkit-scrollbar-button:single-button:horizontal:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7' shape-rendering='crispEdges'%3E%3Cpath d='M0 3h1V2h1V1h1V0h1v7H3V6H2V5H1V4H0z'/%3E%3C/svg%3E");
+}
+
+.textmode textarea::-webkit-scrollbar-button:single-button:horizontal:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7' shape-rendering='crispEdges'%3E%3Cpath d='M0 0h1v1h1v1h1v1h1v1H3v1H2v1H1v1H0z'/%3E%3C/svg%3E");
+}
+
+.textmode textarea::-webkit-scrollbar-corner {
+  background: #c0c0c0;
 }
 
 /* Grows with the content, so the sticky bar and scanlines stay put for the whole scroll. */
@@ -4529,16 +4623,16 @@ button.code-live-message {
   padding: clamp(1.5rem, 6vh, 4rem) 0 4rem;
 }
 
-/* Windows 98-style title bar and menu bar, in the theme's colours */
+/* Windows 98-style title bar and menu bar, in its classic gray */
 .textmode-bar {
   position: sticky;
   top: 0;
   /* above the scanlines (3): the bar is the window frame, not part of the CRT picture */
   z-index: 4;
   border: 2px solid;
-  border-color: var(--accent-strong) #000 #000 var(--accent-strong);
-  background: #1d1812;
-  color: var(--text-light);
+  border-color: #fff #404040 #404040 #fff;
+  background: #c0c0c0;
+  color: #000;
   font-size: 13px;
   line-height: 1.4;
   text-shadow: none;
@@ -4555,6 +4649,12 @@ button.code-live-message {
   font-weight: 700;
 }
 
+/* The project cards and video player keep the orange. */
+.textmode-bar .textmode-titlebar {
+  background: linear-gradient(90deg, #6b6b6b, #b0b0b0);
+  color: #fff;
+}
+
 .textmode-titlebar-title {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4569,9 +4669,9 @@ button.code-live-message {
 .textmode-titlebar-buttons span,
 .textmode-menu-popup {
   border: 2px solid;
-  border-color: var(--accent-strong) #000 #000 var(--accent-strong);
-  background: #1d1812;
-  color: var(--text-light);
+  border-color: #fff #404040 #404040 #fff;
+  background: #c0c0c0;
+  color: #000;
 }
 
 .textmode-titlebar-buttons span {
@@ -4605,8 +4705,8 @@ button.code-live-message {
 .textmode-menu-item:hover,
 .textmode-menu-item:focus-visible,
 .textmode-menu-item:focus-within {
-  background: var(--accent);
-  color: #0b0906;
+  background: #000080;
+  color: #fff;
   outline: none;
 }
 
@@ -4634,7 +4734,7 @@ button.code-live-message {
 
 .textmode-menu-item input {
   margin: 0;
-  accent-color: var(--accent);
+  accent-color: #000080;
 }
 
 .textmode-section {
@@ -4949,10 +5049,22 @@ button.code-live-message {
   position: sticky;
   top: 0;
   z-index: 3;
-  height: 100vh;
-  height: 100dvh;
-  margin-bottom: -100vh;
-  margin-bottom: -100dvh;
+  /* Gentler than the boot screen's: people read here, and text starts at the left edge. */
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0, 0, 0, 0.28) 2px 3px),
+    radial-gradient(ellipse at center, transparent 65%, rgba(0, 0, 0, 0.18) 100%);
+  animation-name: textmode-flicker;
+  /* the window minus its 4px bottom edge */
+  height: calc(100vh - 4px);
+  height: calc(100dvh - 4px);
+  margin-bottom: calc(4px - 100vh);
+  margin-bottom: calc(4px - 100dvh);
+}
+
+@keyframes textmode-flicker {
+  50% {
+    opacity: 0.93;
+  }
 }
 
 .textmode--no-crt {

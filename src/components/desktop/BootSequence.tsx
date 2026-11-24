@@ -12,8 +12,8 @@ const FADE_MS = 300;
 
 function getBootLines(themeId: string) {
   return [
-    "SUURONEN BIOS v1.0.0  (c) 2026 Emil Suuronen",
-    "CPU: Human Brain @ 3 coffees/hour",
+    "BIOS v1.0.0  (c) 2026 Emil Suuronen",
+    "CPU: Exists",
     "Memory test: 16384K OK",
     "Detecting drives... /dev/portfolio",
     "",
@@ -21,10 +21,10 @@ function getBootLines(themeId: string) {
     "[  OK  ] Mounted /home/emil",
     "[  OK  ] Started shell",
     `[  OK  ] Loaded theme ${themeId}`,
-    "[  OK  ] Reached target Coffee",
+    "[  OK  ] Reached target Setup",
     "[  OK  ] Reached target Portfolio",
     "",
-    "Starting text mode...",
+    "Starting in text mode...",
   ];
 }
 

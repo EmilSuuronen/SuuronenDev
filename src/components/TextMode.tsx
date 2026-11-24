@@ -126,7 +126,7 @@ function TextMode({ onNavigate, onReboot, page }: TextModeProps) {
       {crt ? <div aria-hidden="true" className="boot-scanlines textmode-scanlines" /> : null}
       <header className="textmode-bar">
         <div className="textmode-titlebar">
-          <span className="textmode-titlebar-title">Emil Suuronen - suuronen.dev</span>
+          <span className="textmode-titlebar-title">suuronen.dev</span>
           <span aria-hidden="true" className="textmode-titlebar-buttons">
             <span>_</span>
             <span>□</span>
@@ -176,7 +176,7 @@ function TextMode({ onNavigate, onReboot, page }: TextModeProps) {
         <header className="textmode-section" style={reveal(0)}>
           <Command id="textmode-whoami">whoami</Command>
           <h1 className="textmode-name">Emil Suuronen</h1>
-          <p className="textmode-lead">{t("Backend engineer, infrastructure builder, and curious product tinkerer.")}</p>
+          <p className="textmode-lead">{t("Building cool things")}</p>
           <p>{t(about.description)}</p>
         </header>
 

@@ -61,7 +61,7 @@ function ProjectCard({ onPlay, project }: { onPlay: (project: Project) => void; 
         </a>
       )}
       <p className="textmode-dim textmode-card-stack">{project.stack}</p>
-      <p className="textmode-card-description">{t(project.summary ?? project.description)}</p>
+      <p className="textmode-card-description">{t(project.description)}</p>
       <ProjectLinks project={project} />
     </li>
   );

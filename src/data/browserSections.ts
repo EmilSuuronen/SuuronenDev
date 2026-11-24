@@ -7,7 +7,7 @@ export const browserSections: BrowserSection[] = [
     eyebrow: "Profile",
     heading: "Hi, im Emil.",
     description:
-      "Currently working as a backend engineer, I spend most of my time around backend systems, infrastructure, and implementation details. Currently making software to make game development accessible for anyone",
+      "Currently working as a lead backend engineer at Nimble Fox. I like AI, game and AR stuff. ",
     cards: [
       {
         title: "Backend engineering, first",

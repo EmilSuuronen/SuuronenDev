@@ -93,7 +93,7 @@ const finnishTranslations: Record<string, string> = {
   "Backend engineer by trade, terminal goblin by aesthetic, builder of systems that should behave under pressure.":
     "Ammatiltani backend-insinööri, estetiikaltani terminaaligoblin, ja sellaisten järjestelmien rakentaja joiden pitää toimia paineen alla.",
   "Python, Go, Kotlin, cloud-heavy backend work, a bit of AI curiosity, and enough frontend sense to make the interface worth opening.":
-    "Pythonia, Goa, Kotlinia, pilvipainotteista backend-työtä, ripaus AI-uteliaisuutta ja juuri tarpeeksi frontend-järkeä, jotta käyttöliittymän avaaminen kannattaa.",
+    "Pythonia, Go, Kotlin, pilvipainotteista backend-työtä, ripaus AI-uteliaisuutta ja juuri tarpeeksi frontend-järkeä, jotta käyttöliittymän avaaminen kannattaa.",
   "If you want the actual links, run contact.": "Jos haluat varsinaiset linkit, aja komento contact.",
   Filters: "Suodattimet",
   Frontend: "Frontend",

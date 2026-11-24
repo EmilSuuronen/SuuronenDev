@@ -5,8 +5,6 @@ export type Project = {
   stack: string;
   // 16:9 picture for the projects page.
   image: string;
-  // One or two lines for the cards there, when the description is longer.
-  summary?: string;
   video?: string;
 };
 
@@ -15,9 +13,7 @@ export const projects: Project[] = [
   {
     name: "stepin",
     image: "/projects/stepin.jpg",
-    summary: "Walk around inside a photo in your terminal, and use shell commands on the things in it.",
-    description:
-      "Walk around inside a photo in your terminal. Local AI turns any image into a 3D point cloud and names what's in it, and you explore it with WASD or shell commands: ls, cd sofa, rm chair, find red mug.",
+    description: "Render a photo into 3D point cloud in terminal. Interact with commands, and walk around with WASD.",
     stack: "Python · PyTorch · Numba · SAM 2.1 · MoGe\u20112",
     links: [
       { label: "watch demo", href: "/stepin/demo.mp4" },
@@ -28,16 +24,14 @@ export const projects: Project[] = [
   {
     name: "Poplio",
     image: "/projects/poplio.jpg",
-    summary: "A shared calendar, tasks, shopping list, chat and fridge door for family and friends.",
-    description:
-      "One shared place for family and friends: a calendar, repeating tasks, a shopping list, chat and a fridge door for drawings that is wiped at midnight. Installs like an app and sends push notifications.",
+    description: "Shared everything tracking app, with mobile install.",
     stack: "SvelteKit · TypeScript · SQLite",
     links: [{ label: "open", href: "https://poplio.suuronen.dev" }],
   },
   {
     name: "Discis",
     image: "/projects/discis.jpg",
-    description: "Disc golf scorecard and course finder that keeps working offline on the course.",
+    description: "Disc Golf scorecard app, with some routes.",
     stack: "React · Vite · PWA",
     links: [
       { label: "open", href: "https://discis.suuronen.dev" },
@@ -47,8 +41,7 @@ export const projects: Project[] = [
   {
     name: "Mölkkis",
     image: "/projects/molkkis.jpg",
-    summary: "Set up players, draw the throwing order and keep track of your Mölkkis games.",
-    description: "Mölkkis web application.",
+    description: "The best Mölkky score keeper ever. PWA + web",
     stack: "JavaScript",
     links: [
       { label: "open", href: "https://molkkis.suuronen.dev/" },
@@ -58,17 +51,14 @@ export const projects: Project[] = [
   {
     name: "AR Lenses",
     image: "/projects/ar.jpg",
-    summary: "More than 20 lenses, filters and AR games, made in Lens Studio.",
-    description: "Lenses, filters and AR games made in Lens Studio.",
+    description: "Some AR lenses and games made for Snapchat.",
     stack: "Lens Studio",
     links: [{ label: "open", href: "/ar/" }],
   },
   {
     name: "Cuboid Scene Builder",
     image: "/projects/cuboid.jpg",
-    summary: "Turns a single photo into a simple 3D scene of cuboids, with all models running locally.",
-    description:
-      "Turns a single image into a simple 3D scene of cuboids, as JSON or a Blender scene with a render. Detection, segmentation and depth models all run locally.",
+    description: "A experimental thing that turns a single photo into a 3D scene of cubes with AI, for AR and 3D reconstruction. ",
     stack: "Python · PyTorch · GroundingDINO · MobileSAM · Depth Anything V2",
     links: [{ label: "source", href: "https://github.com/EmilSuuronen/cuboid_scene_builder" }],
   },
