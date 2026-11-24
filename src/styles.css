@@ -4717,6 +4717,150 @@ button.code-live-message {
   padding-top: 1rem;
 }
 
+/* Projects page: cards framed like the title bar */
+.textmode-page--wide {
+  width: min(72rem, calc(100% - 32px));
+}
+
+.textmode-page h1:focus {
+  outline: none;
+}
+
+/* Rows are shared between neighbouring cards, so titles, pictures, text and links line up. */
+.textmode-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 1.2rem;
+}
+
+.textmode-card {
+  display: grid;
+  grid-row: span 5;
+  grid-template-rows: subgrid;
+  margin-bottom: 1.2rem;
+  border: 2px solid;
+  border-color: var(--accent-strong) #000 #000 var(--accent-strong);
+  background: #14110d;
+  transition: translate 120ms, box-shadow 120ms;
+}
+
+.textmode-card:hover,
+.textmode-card:focus-within {
+  box-shadow: 0 0 0 1px var(--accent), 0 6px 22px rgba(0, 0, 0, 0.7);
+  translate: 0 -3px;
+}
+
+.textmode-card-title {
+  margin: 0;
+  font-size: 1em;
+  line-height: 1.4;
+  text-shadow: none;
+}
+
+.textmode-card-picture {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-bottom: 2px solid #000;
+  background: #000;
+  cursor: pointer;
+}
+
+.textmode-card-picture:focus-visible {
+  outline: 2px solid var(--candy-blue);
+  outline-offset: -2px;
+}
+
+.textmode-card-picture img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.textmode-card-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 2.6rem;
+  text-shadow: 0 0 14px #000, 0 0 4px #000;
+}
+
+.textmode .textmode-card > p {
+  margin: 0;
+  padding: 0 0.8rem 0.5rem;
+}
+
+.textmode .textmode-card > .textmode-card-stack {
+  padding-top: 0.7rem;
+  font-size: 0.85em;
+  white-space: normal;
+}
+
+.textmode .textmode-card > .textmode-links {
+  padding-bottom: 0.8rem;
+}
+
+.textmode-school {
+  margin-top: 3rem;
+  font-size: 0.9em;
+}
+
+@media (max-width: 900px) {
+  .textmode-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .textmode-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .textmode-card {
+    transition: none;
+  }
+}
+
+.textmode-player {
+  width: min(1280px, 94vw, calc(86dvh * 16 / 9));
+  max-width: none;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid;
+  border-color: var(--accent-strong) #000 #000 var(--accent-strong);
+  background: #000;
+  text-shadow: none;
+}
+
+.textmode-player::backdrop {
+  background: rgba(0, 0, 0, 0.82);
+}
+
+.textmode-player video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.textmode-player-close {
+  width: 24px;
+  height: 22px;
+  border: 2px solid;
+  border-color: var(--accent-strong) #000 #000 var(--accent-strong);
+  background: #1d1812;
+  color: var(--text-light);
+  line-height: 1;
+  cursor: pointer;
+}
+
 /* Blue against the amber text, so links read as clickable. */
 .textmode-link {
   padding: 0 0.2ch;

@@ -89,7 +89,7 @@ export class VirtualFileSystem {
       [`${HOME}/projects/suuronen.dev/README.md`]:
         "# SuuronenDev\n\nEmil Suuronen's interactive desktop portfolio.\nReact + TypeScript + Vite.\n\nSource: https://github.com/EmilSuuronen/SuuronenDev\nWebsite: https://suuronen.dev\n\nRun `open browser` to explore the portfolio.\n",
       [`${HOME}/browser/bookmarks.txt`]:
-        "https://suuronen.dev\nhttps://github.com/EmilSuuronen\nhttps://emilsuuronen.github.io/molkkis/\nhttps://poplio.suuronen.dev\nhttps://discis.suuronen.dev\n",
+        "https://suuronen.dev\nhttps://github.com/EmilSuuronen\nhttps://molkkis.suuronen.dev/\nhttps://poplio.suuronen.dev\nhttps://discis.suuronen.dev\n",
       "/etc/os-release":
         'NAME="Ubuntu (browser sandbox)"\nID=ubuntu\nPRETTY_NAME="Ubuntu-inspired Suuronen Desktop"\nHOME_URL="https://suuronen.dev"\n',
       "/etc/hostname": "desktop\n",

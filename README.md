@@ -34,7 +34,7 @@ This is a browser sandbox, not a remote shell or native Ubuntu installation. It 
 
 Every URL plays the CRT boot animation (any key or click skips it), then shows text mode: a single-page portfolio (about, projects, stack, contact) with a Windows 98-style title and menu bar (Contact, and Settings with a CRT effect toggle) and the terminal embedded at the bottom of the page. The desktop (`src/App.tsx`) is currently not mounted; `src/SessionRoot.tsx` is where it would be routed again.
 
-GitHub Pages has no SPA fallback, so the build still copies `index.html` into `desktop/` and `text/` (and `404.html`) via a small plugin in `vite.config.ts`, which keeps old links working. `reboot` in the terminal replays the boot. Projects shown in text mode live in `src/data/projects.ts`.
+GitHub Pages has no SPA fallback, so the build still copies `index.html` into `desktop/`, `text/` and `projects/` (and `404.html`) via a small plugin in `vite.config.ts`, which keeps `/projects` and old links working. `reboot` in the terminal replays the boot. `/projects` is a card view of every project, with school projects at the bottom. Project data lives in `src/data/projects.ts`.
 
 ## Desktop shortcuts
 

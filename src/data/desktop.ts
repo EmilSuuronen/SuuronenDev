@@ -145,7 +145,7 @@ export function createInitialDesktopIcons(bounds: DesktopBounds): DesktopIconSta
     },
     {
       id: "molkkis",
-      href: "https://emilsuuronen.github.io/molkkis/",
+      href: "https://molkkis.suuronen.dev/",
       icon: "molkkis",
       kind: "app" as const,
       label: "Mölkkis",

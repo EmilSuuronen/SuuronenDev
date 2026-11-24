@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent, type ReactNode } from "react";
 
 import TerminalApp from "../apps/TerminalApp";
 import { browserSections } from "../data/browserSections";
@@ -6,9 +6,14 @@ import { contactLinks } from "../data/contactLinks";
 import { projects } from "../data/projects";
 import { techStackGroups } from "../data/techStackGroups";
 import { useLocale } from "../i18n/locale";
+import ProjectsPage, { ProjectLinks } from "./ProjectsPage";
+
+export type TextModePage = "/" | "/projects";
 
 type TextModeProps = {
+  onNavigate: (page: TextModePage) => void;
   onReboot: () => void;
+  page: TextModePage;
 };
 
 type MenuId = "contact" | "settings";
@@ -47,7 +52,7 @@ function Command({ children, id }: { children: ReactNode; id: string }) {
 // Sections type in one after another; delays stay short so the page is readable almost immediately.
 const reveal = (index: number) => ({ "--reveal-delay": `${index * 90}ms` }) as CSSProperties;
 
-function TextMode({ onReboot }: TextModeProps) {
+function TextMode({ onNavigate, onReboot, page }: TextModeProps) {
   const { t } = useLocale();
   const about = browserSections[0];
   const [crt, toggleCrt] = useStoredFlag("suuronen.text.crt", true);
@@ -76,6 +81,24 @@ function TextMode({ onReboot }: TextModeProps) {
     };
   }, [menu]);
 
+  // Home keeps its scroll position while the projects page is open.
+  const scrollRef = useRef<HTMLElement>(null);
+  const homeScrollRef = useRef(0);
+
+  useLayoutEffect(() => {
+    const scroller = scrollRef.current!;
+    scroller.scrollTop = page === "/" ? homeScrollRef.current : 0;
+  }, [page]);
+
+  const navigate = (next: TextModePage) => (event: MouseEvent<HTMLAnchorElement>) => {
+    // Modified clicks keep normal link behaviour (new tab, download...).
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+    event.preventDefault();
+    onNavigate(next);
+  };
+
   const menuButton = (id: MenuId, label: string) => (
     <button
       aria-expanded={menu === id}
@@ -90,7 +113,15 @@ function TextMode({ onReboot }: TextModeProps) {
   );
 
   return (
-    <main className={`textmode ${crt ? "" : "textmode--no-crt"} ${leftAligned ? "textmode--left" : ""}`}>
+    <main
+      ref={scrollRef}
+      onScroll={(event) => {
+        if (page === "/") {
+          homeScrollRef.current = event.currentTarget.scrollTop;
+        }
+      }}
+      className={`textmode ${crt ? "" : "textmode--no-crt"} ${leftAligned ? "textmode--left" : ""}`}
+    >
       <div className="textmode-screen">
       {crt ? <div aria-hidden="true" className="boot-scanlines textmode-scanlines" /> : null}
       <header className="textmode-bar">
@@ -139,7 +170,9 @@ function TextMode({ onReboot }: TextModeProps) {
           </div>
         </nav>
       </header>
-      <div className="textmode-page">
+      {page === "/projects" ? <ProjectsPage onBack={navigate("/")} /> : null}
+      {/* Hidden rather than unmounted, so the terminal session survives a visit to the projects page. */}
+      <div className="textmode-page" hidden={page !== "/"}>
         <header className="textmode-section" style={reveal(0)}>
           <Command id="textmode-whoami">whoami</Command>
           <h1 className="textmode-name">Emil Suuronen</h1>
@@ -157,24 +190,15 @@ function TextMode({ onReboot }: TextModeProps) {
                   <span className="textmode-dim">{project.stack}</span>
                 </p>
                 <p>{t(project.description)}</p>
-                {project.links.length ? (
-                  <p className="textmode-links">
-                    {project.links.map((link) => (
-                      <a
-                        key={link.href}
-                        className="textmode-link"
-                        href={link.href}
-                        rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                        target={link.href.startsWith("http") ? "_blank" : undefined}
-                      >
-                        [{t(link.label)}]
-                      </a>
-                    ))}
-                  </p>
-                ) : null}
+                <ProjectLinks project={project} />
               </li>
             ))}
           </ul>
+          <p>
+            <a className="textmode-link" href="/projects" onClick={navigate("/projects")}>
+              [{t("view more projects")} →]
+            </a>
+          </p>
         </section>
 
         <section aria-labelledby="textmode-stack" className="textmode-section" style={reveal(2)}>
@@ -212,7 +236,7 @@ function TextMode({ onReboot }: TextModeProps) {
         <section aria-label={t("Terminal")} className="textmode-section textmode-terminal" style={reveal(4)}>
           <TerminalApp
             inline
-            isActive={autoFocus}
+            isActive={autoFocus && page === "/"}
             onOpen={(target) => {
               if (target === "reboot") {
                 onReboot();

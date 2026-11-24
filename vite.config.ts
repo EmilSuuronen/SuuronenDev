@@ -29,7 +29,7 @@ function spaRoutes(routes: string[]): Plugin {
 }
 
 export default defineConfig({
-    plugins: [react(), tailwindcss(), spaRoutes(["desktop", "text"])],
+    plugins: [react(), tailwindcss(), spaRoutes(["desktop", "text", "projects"])],
     resolve: {
         alias: {
             "@": new URL("./src", import.meta.url).pathname,
