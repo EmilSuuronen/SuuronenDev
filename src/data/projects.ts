@@ -8,16 +8,10 @@ export type Project = {
 // Shown in text mode. The desktop presents the same projects as apps.
 export const projects: Project[] = [
   {
-    name: "suuronen.dev",
-    description: "This site: a desktop OS in the browser with windows, a Unix-like shell, apps, games and a viewer for its own source code.",
-    stack: "React · TypeScript · Vite · WebGL",
-    links: [{ label: "source", href: "https://github.com/EmilSuuronen/SuuronenDev" }],
-  },
-  {
     name: "Poplio",
     description:
       "One shared place for family and friends: a calendar, repeating tasks, a shopping list, chat and a fridge door for drawings that is wiped at midnight. Installs like an app and sends push notifications.",
-    stack: "SvelteKit · TypeScript · SQLite · Fly.io",
+    stack: "SvelteKit · TypeScript · SQLite",
     links: [{ label: "open", href: "https://poplio.suuronen.dev" }],
   },
   {
@@ -43,5 +37,12 @@ export const projects: Project[] = [
     description: "Lenses, filters and AR games made in Lens Studio.",
     stack: "Lens Studio",
     links: [{ label: "open", href: "/ar/" }],
+  },
+  {
+    name: "Cuboid Scene Builder",
+    description:
+      "Turns a single image into a simple 3D scene of cuboids, as JSON or a Blender scene with a render. Detection, segmentation and depth models all run locally.",
+    stack: "Python · PyTorch · GroundingDINO · MobileSAM · Depth Anything V2",
+    links: [{ label: "source", href: "https://github.com/EmilSuuronen/cuboid_scene_builder" }],
   },
 ];

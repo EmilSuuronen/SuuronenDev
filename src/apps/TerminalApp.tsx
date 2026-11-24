@@ -25,21 +25,30 @@ type Props = {
   isActive?: boolean;
   notes?: NoteFile[];
   openApps?: string[];
-  onOpen?: (target: string) => void;
+  // Return false for a target this host cannot open.
+  onOpen?: (target: string) => boolean | void;
   onExit?: () => void;
+  // Text mode: flows with the page (the page scrolls, not the terminal) and signs the banner.
+  inline?: boolean;
 };
 
-function TerminalPromptPrefix({ path = HOME }: { path?: string }) {
+function TerminalPromptPrefix({
+  host = "desktop",
+  path = HOME,
+}: {
+  host?: string;
+  path?: string;
+}) {
   const displayed = displayPath(path);
   return (
     <span
       className="terminal-prompt-prefix"
-      aria-label={`emil@desktop:${displayed}$`}
+      aria-label={`emil@${host}:${displayed}$`}
       style={{ minWidth: 0, maxWidth: "65%" }}
     >
       <span className="terminal-prompt-user">emil</span>
       <span className="terminal-prompt-at">@</span>
-      <span className="terminal-prompt-host">desktop</span>
+      <span className="terminal-prompt-host">{host}</span>
       <span className="terminal-prompt-colon">:</span>
       <span
         className="terminal-prompt-path"
@@ -59,7 +68,9 @@ function TerminalApp({
   openApps = DEFAULT_APPS,
   onOpen,
   onExit,
+  inline = false,
 }: Props) {
+  const host = inline ? "suuronen.dev" : "desktop";
   const { t } = useLocale();
   const terminalRef = useRef<HTMLDivElement>(null);
   const terminalSize = useElementSize(terminalRef);
@@ -73,7 +84,7 @@ function TerminalApp({
     }
   });
   const [history, setHistory] = useState<TerminalLine[]>(() =>
-    getInitialTerminalLines(false),
+    getInitialTerminalLines(false, inline),
   );
   const [command, setCommand] = useState("");
   const [hasCommandHistory, setHasCommandHistory] = useState(false);
@@ -110,8 +121,9 @@ function TerminalApp({
   }, [openApps, shell]);
 
   useEffect(() => {
-    if (!hasCommandHistory) setHistory(getInitialTerminalLines(useCompactArt));
-  }, [hasCommandHistory, useCompactArt]);
+    if (!hasCommandHistory)
+      setHistory(getInitialTerminalLines(useCompactArt, inline));
+  }, [hasCommandHistory, inline, useCompactArt]);
 
   useEffect(() => {
     if (isActive && !mode) inputRef.current?.focus({ preventScroll: true });
@@ -140,6 +152,11 @@ function TerminalApp({
     const element = scrollRef.current;
     if (element && followOutputRef.current)
       element.scrollTop = element.scrollHeight;
+    // Inline, the page is the scroller: keep the prompt (or pager/editor) in view once the visitor is typing.
+    if (inline && hasCommandHistory && followOutputRef.current)
+      (mode ? terminalRef : inputRef).current?.scrollIntoView({
+        block: "nearest",
+      });
   }, [history, busy, mode, search]);
 
   const append = (lines: TerminalLine[]) => {
@@ -200,7 +217,7 @@ function TerminalApp({
             persist();
             callbacksRef.current.onExit?.();
           } else if (effect.type === "open") {
-            if (!callbacksRef.current.onOpen) {
+            if (callbacksRef.current.onOpen?.(effect.target) === false || !callbacksRef.current.onOpen) {
               append([
                 {
                   kind: "error",
@@ -210,7 +227,6 @@ function TerminalApp({
               ]);
               return 1;
             }
-            callbacksRef.current.onOpen(effect.target);
           } else {
             setMode(effect);
             return await new Promise<number>((resolve) => {
@@ -381,7 +397,7 @@ function TerminalApp({
   return (
     <div
       ref={terminalRef}
-      className="terminal-app"
+      className={`terminal-app ${mode ? "is-interactive" : ""}`}
       onClick={(event) => {
         if (
           mode ||
@@ -437,7 +453,7 @@ function TerminalApp({
                   key={`${line.kind}-${index}`}
                   className="terminal-prompt-row"
                 >
-                  <TerminalPromptPrefix path={line.path} />
+                  <TerminalPromptPrefix host={host} path={line.path} />
                   <span className="terminal-prompt-command">{line.value}</span>
                 </div>
               ) : line.kind === "link" ? (
@@ -492,7 +508,9 @@ function TerminalApp({
                   (reverse-i-search):
                 </span>
               ) : (
-                !busy && <TerminalPromptPrefix path={shell.context.cwd} />
+                !busy && (
+                  <TerminalPromptPrefix host={host} path={shell.context.cwd} />
+                )
               )}
               <input
                 ref={inputRef}

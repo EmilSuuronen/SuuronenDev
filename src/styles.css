@@ -4493,94 +4493,6 @@ button.code-live-message {
   }
 }
 
-.boot-loader {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.1rem;
-  color: var(--text-light);
-  animation: boot-loader-in 220ms ease-out both;
-}
-
-@keyframes boot-loader-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-}
-
-.boot-logo {
-  display: grid;
-  grid-template-columns: repeat(2, 26px);
-  grid-template-rows: repeat(2, 26px);
-  place-content: center;
-  gap: 8px;
-  width: 96px;
-  height: 96px;
-  border: 3px solid var(--ink);
-  border-radius: 28px;
-  background: var(--accent);
-  box-shadow: 6px 6px 0 rgba(255, 255, 255, 0.12), 0 0 40px var(--accent-soft);
-}
-
-.boot-logo span {
-  border-radius: 7px;
-  background: var(--ink);
-  animation: boot-pop 260ms var(--spring) both;
-}
-
-.boot-logo span:nth-child(2) {
-  border-radius: 50%;
-  animation-delay: 70ms;
-}
-
-.boot-logo span:nth-child(3) {
-  animation-delay: 140ms;
-}
-
-.boot-logo span:nth-child(4) {
-  animation-delay: 210ms;
-}
-
-@keyframes boot-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.2);
-  }
-}
-
-.boot-title {
-  font-family: var(--font-ui);
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-
-.boot-progress {
-  width: min(240px, 60vw);
-  height: 12px;
-  padding: 2px;
-  border: 2px solid var(--text-light);
-  border-radius: 999px;
-}
-
-.boot-progress span {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: var(--accent);
-  transform-origin: left;
-}
-
-.boot-status {
-  color: var(--text-light-soft);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-}
-
 /* Session root: shares theme variables with the boot screen and text mode without affecting layout */
 .session-root {
   display: contents;
@@ -4588,96 +4500,8 @@ button.code-live-message {
 
 .boot.is-static .boot-screen,
 .boot.is-static .boot-scanlines,
-.boot.is-static .boot-loader,
-.boot.is-static .boot-logo span,
 .boot.is-static .boot-cursor {
   animation: none;
-}
-
-/* Boot manager (GRUB-style session picker) */
-.boot-menu {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.9rem;
-  width: min(44rem, calc(100% - 2rem));
-  margin: 0 auto;
-  color: var(--text-light);
-  font-family: var(--font-mono);
-  font-size: clamp(12px, 2.8vw, 15px);
-  text-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
-}
-
-.boot-menu-title {
-  margin: 0;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-}
-
-.boot-menu-box {
-  display: grid;
-  gap: 0.2rem;
-  padding: 0.6rem;
-  border: 2px solid var(--accent-strong);
-  box-shadow: 0 0 10px var(--accent-soft), inset 0 0 10px var(--accent-soft);
-}
-
-.boot-menu-item {
-  display: grid;
-  grid-template-columns: 1.4ch 11ch minmax(0, 1fr);
-  align-items: baseline;
-  gap: 0.6ch;
-  width: 100%;
-  padding: 0.45rem 0.6rem;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  text-shadow: inherit;
-  cursor: pointer;
-}
-
-/* Names stay orange and descriptions white, so selection is a tinted bar rather than an inverted one. */
-.boot-menu-item.is-selected {
-  background: var(--accent-soft);
-  box-shadow: inset 0 0 0 1px var(--accent);
-}
-
-.boot-menu-marker,
-.boot-menu-name {
-  color: var(--accent-strong);
-  text-shadow: 0 0 6px var(--accent);
-}
-
-/* Focus always follows the selection, so the inverted highlight is the focus indicator. */
-.boot-menu-item:focus-visible {
-  outline: none;
-}
-
-.boot-menu-detail {
-  color: var(--text-light);
-}
-
-.boot-menu-hint {
-  margin: 0;
-  color: var(--text-light);
-  font-size: 0.85em;
-  text-align: center;
-  text-shadow: none;
-}
-
-@media (max-width: 560px) {
-  .boot-menu-item {
-    grid-template-columns: 1.4ch minmax(0, 1fr);
-  }
-
-  .boot-menu-detail {
-    grid-column: 2;
-  }
 }
 
 /* Text mode: single-page portfolio in the boot screen's CRT style */
@@ -4691,6 +4515,12 @@ button.code-live-message {
   font-size: clamp(13px, 3.4vw, 15px);
   line-height: 1.65;
   text-shadow: 0 0 5px var(--accent-soft);
+  scrollbar-color: var(--accent) #0b0906;
+}
+
+/* Grows with the content, so the sticky bar and scanlines stay put for the whole scroll. */
+.textmode-screen {
+  min-height: 100%;
 }
 
 .textmode-page {
@@ -4699,14 +4529,112 @@ button.code-live-message {
   padding: clamp(1.5rem, 6vh, 4rem) 0 4rem;
 }
 
-.textmode-nav {
+/* Windows 98-style title bar and menu bar, in the theme's colours */
+.textmode-bar {
+  position: sticky;
+  top: 0;
+  /* above the scanlines (3): the bar is the window frame, not part of the CRT picture */
+  z-index: 4;
+  border: 2px solid;
+  border-color: var(--accent-strong) #000 #000 var(--accent-strong);
+  background: #1d1812;
+  color: var(--text-light);
+  font-size: 13px;
+  line-height: 1.4;
+  text-shadow: none;
+}
+
+.textmode-titlebar {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 0.5rem 1rem;
-  margin-bottom: 2rem;
-  padding-bottom: 0.6rem;
-  border-bottom: 1px dashed var(--accent-soft);
+  gap: 0.5rem;
+  padding: 3px 3px 3px 8px;
+  background: linear-gradient(90deg, var(--accent), #3a2410);
+  color: #0b0906;
+  font-weight: 700;
+}
+
+.textmode-titlebar-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.textmode-titlebar-buttons {
+  display: flex;
+  gap: 2px;
+}
+
+.textmode-titlebar-buttons span,
+.textmode-menu-popup {
+  border: 2px solid;
+  border-color: var(--accent-strong) #000 #000 var(--accent-strong);
+  background: #1d1812;
+  color: var(--text-light);
+}
+
+.textmode-titlebar-buttons span {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 18px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.textmode-menubar {
+  display: flex;
+  padding: 2px;
+}
+
+.textmode-menu {
+  position: relative;
+}
+
+.textmode-menu-button {
+  padding: 1px 9px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.textmode-menu-button:hover,
+.textmode-menu-button:focus-visible,
+.textmode-menu-button[aria-expanded="true"],
+.textmode-menu-item:hover,
+.textmode-menu-item:focus-visible,
+.textmode-menu-item:focus-within {
+  background: var(--accent);
+  color: #0b0906;
+  outline: none;
+}
+
+.textmode-menu-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: grid;
+  min-width: 12rem;
+  max-width: calc(100vw - 24px);
+  padding: 2px;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
+}
+
+.textmode-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  padding: 3px 10px;
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.textmode-menu-item input {
+  margin: 0;
+  accent-color: var(--accent);
 }
 
 .textmode-section {
@@ -4748,7 +4676,7 @@ button.code-live-message {
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.15;
-  text-shadow: 0 0 10px var(--accent);
+  text-shadow: none;
 }
 
 .textmode-lead {
@@ -4762,7 +4690,7 @@ button.code-live-message {
 
 .textmode-dim {
   color: var(--text-light-soft);
-  white-space: pre;
+  white-space: pre-wrap;
 }
 
 .textmode-list {
@@ -4783,25 +4711,27 @@ button.code-live-message {
   gap: 0.4rem 1.2ch;
 }
 
+/* Settings > Left-aligned layout: hug the left edge like a real terminal. */
+.textmode--left .textmode-page {
+  margin-left: 12px;
+  padding-top: 1rem;
+}
+
+/* Blue against the amber text, so links read as clickable. */
 .textmode-link {
   padding: 0 0.2ch;
-  border: 0;
-  background: transparent;
-  color: var(--accent-strong);
-  font: inherit;
+  color: var(--candy-blue);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-shadow: inherit;
-  cursor: pointer;
+  text-shadow: none;
   overflow-wrap: anywhere;
 }
 
 .textmode-link:hover,
 .textmode-link:focus-visible {
-  background: var(--accent-strong);
+  background: var(--candy-blue);
   color: #0b0906;
   text-decoration: none;
-  text-shadow: none;
   outline: none;
 }
 
@@ -4823,14 +4753,71 @@ button.code-live-message {
   margin-bottom: 0.3rem;
 }
 
+/* The desktop terminal, laid out as part of the page instead of a scrolling window */
+.textmode-terminal .terminal-app {
+  height: auto;
+}
+
+.textmode-terminal .terminal-screen {
+  padding: 0;
+}
+
+.textmode-terminal .terminal-app:not(.is-interactive) .terminal-screen {
+  height: auto;
+  overflow: visible;
+}
+
+/* The banner keeps its own scaling so it fits narrow screens (no container here, so viewport units). */
+.textmode-terminal .terminal-app:not(.is-interactive) .terminal-line--accent {
+  font-size: min(0.82rem, calc((100vw - 4rem) / 33));
+}
+
+/* Let long lines clip or wrap instead of widening the page. */
+.textmode-terminal .terminal-history {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.textmode-terminal .terminal-link {
+  color: var(--candy-blue);
+  text-decoration-color: currentColor;
+  text-decoration-thickness: auto;
+  text-shadow: none;
+}
+
+/* less and nano need a fixed viewport to page and scroll in. */
+.textmode-terminal .terminal-app.is-interactive {
+  height: min(70vh, 32rem);
+}
+
+/* The pager and editor keep the terminal's own size: their row maths assumes it. */
+.textmode-terminal .terminal-app:not(.is-interactive) .terminal-line:not(.terminal-line--accent),
+.textmode-terminal .terminal-app:not(.is-interactive) .terminal-prompt-row {
+  font-size: inherit;
+}
+
+.textmode-terminal .terminal-prompt-prefix span {
+  color: var(--candy-green);
+  font-weight: 400;
+}
+
+/* Sticky inside the scroller, so it covers the page but never the scrollbar. */
 .textmode-scanlines {
-  position: fixed;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: 100vh;
+  height: 100dvh;
+  margin-bottom: -100vh;
+  margin-bottom: -100dvh;
+}
+
+.textmode--no-crt {
+  text-shadow: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .textmode-section,
-  .textmode-scanlines,
-  .textmode .boot-cursor {
+  .textmode-scanlines {
     animation: none;
   }
 }

@@ -15,10 +15,21 @@ function getAsciiArt(useCompactArt: boolean) {
   return useCompactArt ? ASCII_ART_COMPACT : ASCII_ART;
 }
 
-export function getInitialTerminalLines(useCompactArt: boolean): TerminalLine[] {
+// Text mode (inline) signs the banner instead of showing a version.
+export function getInitialTerminalLines(useCompactArt: boolean, inline = false): TerminalLine[] {
   return [
     { kind: "accent", value: getAsciiArt(useCompactArt) },
-    { kind: "output", value: "system version 1.0.0" },
+    ...(inline
+      ? ([
+          { kind: "output", literal: true, value: "© 2026 Emil Suuronen" },
+          {
+            kind: "link",
+            label: "source",
+            href: "https://github.com/EmilSuuronen/SuuronenDev",
+            value: "[github.com/EmilSuuronen/SuuronenDev]",
+          },
+        ] satisfies TerminalLine[])
+      : ([{ kind: "output", value: "system version 1.0.0" }] satisfies TerminalLine[])),
     { kind: "output", value: 'type "help" to get started' },
   ];
 }

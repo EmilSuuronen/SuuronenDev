@@ -337,3 +337,21 @@ test("multiline paste remains editable and requires explicit submission", async 
   });
   assert.match(output(), /onetwo$/);
 });
+
+test("inline mode signs the banner, uses the site prompt and reports targets the host refuses", async () => {
+  await mount({ inline: true, onOpen: (target: string) => target === "reboot" });
+  assert.match(output(), /© 2026 Emil Suuronen/);
+  assert.equal(
+    container.querySelector(".terminal-history a")?.getAttribute("href"),
+    "https://github.com/EmilSuuronen/SuuronenDev",
+  );
+  assert.equal(
+    container.querySelector(".terminal-prompt-prefix")?.textContent,
+    "emil@suuronen.dev:~$",
+  );
+  await run("open calculator");
+  assert.match(output(), /Desktop launcher is unavailable\./);
+  await run("clear");
+  await run("reboot");
+  assert.doesNotMatch(output(), /unavailable/);
+});
